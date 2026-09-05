@@ -1,0 +1,17 @@
+{
+	"name": "pr-bot",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"license": "MIT",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"check": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^5.20260905.1",
+		"typescript": "^7.0.2",
+		"wrangler": "^4.129.0"
+	}
+}

@@ -1,0 +1,18 @@
+{
+  "id": "example-corp",
+  "name": "Example Corp",
+  "aliases": ["Example Corporation", "ExampleCo"],
+  "country": "ZZ",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "environment",
+      "description": "FICTIONAL demo entry: illustrates the schema, not a real accusation. Replace or remove once real, sourced entries exist.",
+      "sourceUrl": null,
+      "dateAdded": "2026-09-05",
+      "severity": "moderate",
+      "status": "unverified"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+name: Build dataset bundle
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'data/**'
+      - 'scripts/build-dataset.mjs'
+      - '!data/dist/**'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - run: node scripts/build-dataset.mjs
+
+      - name: Commit updated bundle
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/dist
+          git diff --cached --quiet && echo "No dataset changes" && exit 0
+          git commit -m "chore: rebuild dataset bundle [skip ci]"
+          git push

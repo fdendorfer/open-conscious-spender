@@ -1,0 +1,16 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "ocs-pr-bot",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-09-05",
+	"vars": {
+		"GITHUB_OWNER": "fdendorfer",
+		"GITHUB_REPO": "open-conscious-spender",
+		"GITHUB_DEFAULT_BRANCH": "master",
+		"ALLOWED_ORIGIN": "https://open-conscious-spender.pages.dev"
+	}
+	// GITHUB_PAT is a secret, not a var — set it with:
+	//   npx wrangler secret put GITHUB_PAT
+	// Use a fine-grained PAT scoped to only this repo, with Contents (write) and
+	// Pull requests (write) permissions — nothing broader.
+}
