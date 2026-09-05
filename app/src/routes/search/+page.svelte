@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { startBarcodeScan, CameraUnavailableError, type ScanHandle } from '$lib/barcodeScanner';
-	import { loadDataset, ownershipChain, type Dataset, type Company } from '$lib/dataset';
+	import {
+		loadDataset,
+		ownershipChain,
+		searchCompaniesByName,
+		type Dataset,
+		type Company
+	} from '$lib/dataset';
 	import { lookupBarcode, type LookupResult } from '$lib/lookup';
 	import { scoreCompany, type Severity } from '$lib/scoring';
 	import {
@@ -14,15 +20,21 @@
 	} from '$lib/contribute';
 	import { CATEGORY_ICONS } from '$lib/categoryIcons';
 
-	type Phase =
-		'loading' | 'idle' | 'scanning' | 'looking-up' | 'result' | 'contribute' | 'submitted';
+	type Phase = 'loading' | 'browsing' | 'looking-up' | 'result' | 'contribute' | 'submitted';
 
 	let phase = $state<Phase>('loading');
 	let dataset = $state<Dataset | null>(null);
+
+	let searchQuery = $state('');
+	let searchResults = $derived(dataset ? searchCompaniesByName(dataset, searchQuery) : []);
+
+	let showScanner = $state(false);
 	let videoEl = $state<HTMLVideoElement | undefined>(undefined);
+	let scanning = $state(false);
 	let scanHandle: ScanHandle | null = null;
 	let cameraError = $state<string | null>(null);
 	let manualBarcode = $state('');
+
 	let lookupResult = $state<LookupResult | null>(null);
 
 	let contributeName = $state('');
@@ -36,38 +48,49 @@
 
 	onMount(async () => {
 		dataset = await loadDataset();
-		phase = 'idle';
+		phase = 'browsing';
 	});
 
 	onDestroy(() => scanHandle?.stop());
 
+	function selectCompany(company: Company) {
+		lookupResult = { status: 'found', company, via: 'name-search' };
+		phase = 'result';
+	}
+
+	function addByName() {
+		contributeName = searchQuery.trim();
+		phase = 'contribute';
+	}
+
 	async function startScan() {
 		if (!videoEl) return;
 		cameraError = null;
-		phase = 'scanning';
+		scanning = true;
 		try {
 			scanHandle = await startBarcodeScan(videoEl, onBarcodeDetected);
 		} catch (err) {
 			cameraError =
 				err instanceof CameraUnavailableError
-					? 'Camera unavailable — enter the barcode manually below.'
+					? 'Camera unavailable — try the manual barcode field below, or search by name instead.'
 					: 'Something went wrong starting the camera.';
-			phase = 'idle';
+			scanning = false;
 		}
 	}
 
 	async function onBarcodeDetected(raw: string) {
 		scanHandle?.stop();
 		scanHandle = null;
-		await runLookup(raw);
+		scanning = false;
+		await runBarcodeLookup(raw);
 	}
 
 	async function submitManualBarcode() {
 		if (!manualBarcode.trim()) return;
-		await runLookup(manualBarcode.trim());
+		await runBarcodeLookup(manualBarcode.trim());
 	}
 
-	async function runLookup(gtin: string) {
+	async function runBarcodeLookup(gtin: string) {
 		if (!dataset) return;
 		phase = 'looking-up';
 		lookupResult = await lookupBarcode(dataset, gtin);
@@ -84,14 +107,16 @@
 	}
 
 	function startOver() {
-		phase = 'idle';
+		phase = 'browsing';
 		lookupResult = null;
+		searchQuery = '';
 		manualBarcode = '';
+		showScanner = false;
 		submittedPrUrl = null;
 		contributeError = null;
 	}
 
-	function startContribute() {
+	function startContributeFromResult() {
 		contributeCategory = dataset?.categories[0]?.id ?? '';
 		phase = 'contribute';
 	}
@@ -127,37 +152,77 @@
 </script>
 
 <main class="mx-auto flex min-h-screen max-w-sm flex-col gap-6 p-6">
-	<h1 class="text-lg font-medium">Scan a product</h1>
+	<h1 class="text-lg font-medium">Find a company</h1>
 
 	{#if phase === 'loading'}
 		<p class="text-sm text-gray-500">Loading dataset…</p>
 	{/if}
 
-	{#if phase === 'idle' || phase === 'scanning'}
-		<div class="overflow-hidden rounded-2xl bg-black">
-			<video bind:this={videoEl} class="aspect-square w-full object-cover" muted playsinline
-			></video>
-		</div>
+	{#if phase === 'browsing'}
+		<input
+			class="rounded-xl border border-gray-300 px-3 py-2"
+			placeholder="Search company name…"
+			bind:value={searchQuery}
+		/>
 
-		{#if phase === 'idle'}
-			<button class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white" onclick={startScan}>
-				Start camera scan
-			</button>
+		{#if searchQuery.trim().length >= 2}
+			{#if searchResults.length > 0}
+				<ul class="flex flex-col gap-2">
+					{#each searchResults as company (company.id)}
+						<li>
+							<button
+								class="w-full rounded-xl border border-gray-200 px-3 py-2 text-left"
+								onclick={() => selectCompany(company)}
+							>
+								{company.name}
+							</button>
+						</li>
+					{/each}
+				</ul>
+			{:else}
+				<p class="text-sm text-gray-600">No match for "{searchQuery}".</p>
+				<button class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white" onclick={addByName}>
+					Add "{searchQuery}"
+				</button>
+			{/if}
 		{/if}
 
-		{#if cameraError}
-			<p class="text-sm text-red-600">{cameraError}</p>
-		{/if}
+		<button class="text-sm text-gray-500 underline" onclick={() => (showScanner = !showScanner)}>
+			{showScanner ? 'Hide barcode scanner' : "Can't find it by name? Scan a barcode instead"}
+		</button>
 
-		<div class="flex gap-2">
-			<input
-				class="flex-1 rounded-xl border border-gray-300 px-3 py-2"
-				placeholder="Or type a barcode…"
-				bind:value={manualBarcode}
-			/>
-			<button class="rounded-xl bg-gray-200 px-4 py-2" onclick={submitManualBarcode}>Look up</button
-			>
-		</div>
+		{#if showScanner}
+			<div class="flex flex-col gap-3 rounded-2xl border border-gray-200 p-4">
+				<div class="overflow-hidden rounded-2xl bg-black">
+					<video bind:this={videoEl} class="aspect-square w-full object-cover" muted playsinline
+					></video>
+				</div>
+
+				{#if !scanning}
+					<button
+						class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white"
+						onclick={startScan}
+					>
+						Start camera scan
+					</button>
+				{/if}
+
+				{#if cameraError}
+					<p class="text-sm text-red-600">{cameraError}</p>
+				{/if}
+
+				<div class="flex gap-2">
+					<input
+						class="flex-1 rounded-xl border border-gray-300 px-3 py-2"
+						placeholder="Or type a barcode…"
+						bind:value={manualBarcode}
+					/>
+					<button class="rounded-xl bg-gray-200 px-4 py-2" onclick={submitManualBarcode}
+						>Look up</button
+					>
+				</div>
+			</div>
+		{/if}
 	{/if}
 
 	{#if phase === 'looking-up'}
@@ -195,7 +260,7 @@
 			</p>
 			<button
 				class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white"
-				onclick={startContribute}
+				onclick={startContributeFromResult}
 			>
 				Add "{lookupResult.brand}"
 			</button>
@@ -203,12 +268,12 @@
 			<p class="text-sm text-gray-600">Couldn't find that product or its brand.</p>
 			<button
 				class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white"
-				onclick={startContribute}
+				onclick={startContributeFromResult}
 			>
 				Add it manually
 			</button>
 		{/if}
-		<button class="text-sm text-gray-500 underline" onclick={startOver}>Scan another</button>
+		<button class="text-sm text-gray-500 underline" onclick={startOver}>Search again</button>
 	{/if}
 
 	{#if phase === 'contribute'}
@@ -268,7 +333,7 @@
 			>
 		</p>
 		<button class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white" onclick={startOver}>
-			Scan another
+			Search again
 		</button>
 	{/if}
 </main>

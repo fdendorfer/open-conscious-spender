@@ -7,7 +7,7 @@ import {
 import { lookupOpenFoodFacts } from './openFoodFacts';
 
 export type LookupResult =
-	| { status: 'found'; company: Company; via: 'barcode-override' | 'brand-match' }
+	| { status: 'found'; company: Company; via: 'barcode-override' | 'brand-match' | 'name-search' }
 	| { status: 'unknown-brand'; brand: string; productName: string | null }
 	| { status: 'not-found' };
 

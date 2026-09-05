@@ -112,3 +112,16 @@ export function findCompanyByBrandName(dataset: Dataset, brandName: string): Com
 		(c) => c.name.toLowerCase() === needle || c.aliases.some((a) => a.toLowerCase() === needle)
 	);
 }
+
+/** Live-search companies by name/alias substring match — this is the app's primary lookup path. */
+export function searchCompaniesByName(dataset: Dataset, query: string, limit = 8): Company[] {
+	const needle = query.trim().toLowerCase();
+	if (!needle) return [];
+	return dataset.companies
+		.filter(
+			(c) =>
+				c.name.toLowerCase().includes(needle) ||
+				c.aliases.some((a) => a.toLowerCase().includes(needle))
+		)
+		.slice(0, limit);
+}
