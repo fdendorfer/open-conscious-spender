@@ -1,0 +1,72 @@
+[
+  {
+    "id": "boycott-conflict",
+    "name": "Boycott / conflict complicity",
+    "description": "Named in active boycott campaigns, or material involvement in an ongoing armed conflict or occupation.",
+    "icon": "Megaphone",
+    "defaultWeight": 3
+  },
+  {
+    "id": "human-rights",
+    "name": "Human rights",
+    "description": "Documented human rights abuses not already covered by labor rights (e.g. surveillance of dissidents, complicity in state repression).",
+    "icon": "HandFist",
+    "defaultWeight": 3
+  },
+  {
+    "id": "labor-rights",
+    "name": "Labor rights",
+    "description": "Forced labor, unsafe working conditions, union-busting, wage theft, exploitative supply-chain practices.",
+    "icon": "HardHat",
+    "defaultWeight": 2.5
+  },
+  {
+    "id": "environment",
+    "name": "Environment",
+    "description": "Significant pollution, deforestation, greenwashing found to be materially false, or major climate-related harm.",
+    "icon": "Leaf",
+    "defaultWeight": 2
+  },
+  {
+    "id": "animal-welfare",
+    "name": "Animal welfare",
+    "description": "Animal testing beyond legal requirement, factory-farming practices, documented cruelty in supply chain.",
+    "icon": "PawPrint",
+    "defaultWeight": 2
+  },
+  {
+    "id": "corruption",
+    "name": "Corruption",
+    "description": "Bribery, embezzlement, or other corrupt practices confirmed by investigation, conviction, or credible reporting.",
+    "icon": "Scales",
+    "defaultWeight": 2
+  },
+  {
+    "id": "tax-avoidance",
+    "name": "Tax avoidance",
+    "description": "Aggressive tax avoidance structures (e.g. profit shifting) beyond routine legal optimization.",
+    "icon": "Coins",
+    "defaultWeight": 1.5
+  },
+  {
+    "id": "political-influence",
+    "name": "Political influence",
+    "description": "Lobbying or political donations directed at undermining regulation, human rights, or democratic process.",
+    "icon": "Bank",
+    "defaultWeight": 1.5
+  },
+  {
+    "id": "data-privacy",
+    "name": "Data privacy",
+    "description": "Confirmed misuse of user data, surveillance overreach, or major data-protection violations.",
+    "icon": "ShieldWarning",
+    "defaultWeight": 1.5
+  },
+  {
+    "id": "monopoly-practices",
+    "name": "Anti-competitive practices",
+    "description": "Confirmed antitrust violations, predatory pricing, or market-dominance abuse.",
+    "icon": "Buildings",
+    "defaultWeight": 1
+  }
+]
