@@ -39,6 +39,8 @@
 		"wrangler": "^4.97.0"
 	},
 	"dependencies": {
+		"barcode-detector": "^3.2.2",
+		"idb-keyval": "^6.3.0",
 		"phosphor-svelte": "^3.1.0"
 	}
 }

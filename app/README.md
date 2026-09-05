@@ -1,42 +1,35 @@
-# sv
+# app
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.17.0 create --template minimal --types ts --add prettier eslint tailwindcss="plugins:none" sveltekit-adapter="adapter:cloudflare+cfTarget:pages" --install npm app
-```
+The Open Conscious Spender PWA. SvelteKit, deployed to Cloudflare Pages.
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
 ```sh
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+## Environment
 
-To create a production version of your app:
+`PUBLIC_PR_BOT_URL` — base URL of the deployed `workers/pr-bot` Worker. Without
+it set, everything works (scanning, lookup, local drafts) except the final
+"submit as PR" step, which shows a "not configured yet" message. Set it as a
+Cloudflare Pages environment variable, or locally in an untracked `.env`
+file (`PUBLIC_PR_BOT_URL=http://localhost:8787` against `wrangler dev`).
+
+## Building / checking
 
 ```sh
-npm run build
+npm run build   # also runs `wrangler types --check`
+npm run check   # svelte-check
+npm run lint    # prettier --check + eslint
 ```
 
-You can preview the production build with `npm run preview`.
+## Key modules
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- `src/lib/dataset.ts` — fetches/caches the dataset bundle built by `scripts/build-dataset.mjs`
+- `src/lib/scoring.ts` — implements `docs/SCORING.md`; keep both in sync
+- `src/lib/lookup.ts` + `src/lib/openFoodFacts.ts` — barcode → brand → company resolution
+- `src/lib/barcodeScanner.ts` — camera-based barcode detection
+- `src/lib/contribute.ts` — local drafts, on-device rate limiting, submission to the PR bot
+- `src/routes/scan/` — the actual scan → result → contribute flow
