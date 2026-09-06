@@ -1,0 +1,18 @@
+{
+  "id": "mondelez",
+  "name": "Mondelez International",
+  "aliases": ["Mondelez", "Cadbury", "Oreo"],
+  "country": "US",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "boycott-conflict",
+      "description": "Mondelez continued operating three factories in Russia after the 2022 invasion of Ukraine, reporting $1.417 billion in Russian revenue and paying over $62 million in profit taxes to the Russian government in 2024; Ukraine's anti-corruption agency designated it an 'International Sponsor of War' in 2023, and Buckingham Palace revoked its Cadbury brand's royal warrant in December 2024 over the continued operations.",
+      "sourceUrl": "https://b4ukraine.org/what-we-do/mondelez",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

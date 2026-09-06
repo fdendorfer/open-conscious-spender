@@ -15,7 +15,7 @@ export const CONFIDENCE_MULTIPLIER = {
 export type FlagStatus = keyof typeof CONFIDENCE_MULTIPLIER;
 
 /** Saturation constant — see docs/SCORING.md for the reasoning and example table. */
-export const SATURATION_K = 6;
+export const SATURATION_K = 12;
 
 export const SCORE_BANDS = {
 	green: [0, 29],

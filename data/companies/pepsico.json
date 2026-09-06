@@ -1,0 +1,26 @@
+{
+  "id": "pepsico",
+  "name": "PepsiCo",
+  "aliases": ["Pepsi"],
+  "country": "US",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "environment",
+      "description": "Break Free From Plastic's annual global brand audits have repeatedly named PepsiCo among the world's top plastic polluters for several consecutive years, based on volunteer-collected plastic waste counts across dozens of countries.",
+      "sourceUrl": "https://www.breakfreefromplastic.org/2024/02/07/bffp-movement-unveils-2023-global-brand-audit-results/",
+      "dateAdded": "2026-09-06",
+      "severity": "moderate",
+      "status": "sourced"
+    },
+    {
+      "category": "labor-rights",
+      "description": "A 2016 report by Rainforest Action Network, OPPUK, and the International Labor Rights Forum documented child labor, hazardous pesticide exposure, and below-minimum-wage pay on Indonesian palm oil plantations supplying PepsiCo through its partner Indofood; PepsiCo suspended sourcing from Indofood in 2018 pending progress on the issues.",
+      "sourceUrl": "https://www.ran.org/new_report_finds_food_giants_pepsico_indofood_linked_to_child_labor_poverty_wages_and_worker_exploitation",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

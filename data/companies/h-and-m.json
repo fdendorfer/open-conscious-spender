@@ -1,0 +1,18 @@
+{
+  "id": "h-and-m",
+  "name": "H&M",
+  "aliases": ["H&M Group", "Hennes & Mauritz"],
+  "country": "SE",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "environment",
+      "description": "The Changing Markets Foundation found that roughly 60-96% of sustainability claims tied to H&M's \"Conscious Collection\" were unsubstantiated or misleading; a related 2022 US class-action lawsuit alleged the collection often contained more synthetic fiber than H&M's regular lines despite being marketed as more sustainable.",
+      "sourceUrl": "https://greenisthenewblack.com/hm-has-been-caught-greenwashing-again-now-what/",
+      "dateAdded": "2026-09-06",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "ubs",
+  "name": "UBS",
+  "aliases": ["UBS Group AG"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "tax-avoidance",
+      "description": "UBS agreed in 2023 to pay France roughly €835 million to settle a long-running case over illegally soliciting wealthy clients in France to hide money in undeclared Swiss accounts between 2004 and 2012; a French court had originally fined UBS a record €4.5 billion in 2019 for tax fraud and money laundering, later reduced on appeal.",
+      "sourceUrl": "https://www.swissinfo.ch/eng/ubs-ends-french-tax-dodge-saga-with-$985-million-settlement/90052402",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

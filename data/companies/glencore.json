@@ -1,0 +1,26 @@
+{
+  "id": "glencore",
+  "name": "Glencore",
+  "aliases": ["Glencore International", "Glencore plc"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "corruption",
+      "description": "In 2022 Glencore pleaded guilty in the US to conspiracy to violate the Foreign Corrupt Practices Act, admitting to paying over $100 million in bribes to officials in Nigeria, Cameroon, Ivory Coast, Equatorial Guinea, DR Congo, Venezuela and Brazil between 2007 and 2018, as part of a combined global resolution exceeding $1.1 billion.",
+      "sourceUrl": "https://www.justice.gov/archives/opa/pr/glencore-entered-guilty-pleas-foreign-bribery-and-market-manipulation-schemes",
+      "dateAdded": "2026-09-06",
+      "severity": "systemic",
+      "status": "sourced"
+    },
+    {
+      "category": "monopoly-practices",
+      "description": "In the same 2022 resolution, Glencore's US subsidiary separately pleaded guilty to a conspiracy to manipulate fuel oil price benchmarks at US ports via a South Africa-based trading desk.",
+      "sourceUrl": "https://www.justice.gov/archives/opa/pr/glencore-entered-guilty-pleas-foreign-bribery-and-market-manipulation-schemes",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

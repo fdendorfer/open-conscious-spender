@@ -1,0 +1,26 @@
+{
+  "id": "loreal",
+  "name": "L'Oréal",
+  "aliases": ["Maybelline", "Garnier", "Lancôme", "Kiehl's"],
+  "country": "FR",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "A 2024 BBC World Service investigation found children as young as five picking jasmine overnight for as little as $1/day on Egyptian farms supplying fragrance suppliers used by L'Oréal; L'Oréal acknowledged certain supplier practices don't meet its commitments.",
+      "sourceUrl": "https://www.business-humanrights.org/en/latest-news/egypt-perfume-companies-linked-to-child-labour-in-jasmine-farms-incl-co-responses/",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    },
+    {
+      "category": "animal-welfare",
+      "description": "Animal-rights groups do not recognize L'Oréal as cruelty-free because it continues to sell finished cosmetics in mainland China, where regulators have required animal testing for certain product categories.",
+      "sourceUrl": "https://www.ethicalconsumer.org/company-profile/loreal-sa",
+      "dateAdded": "2026-09-06",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

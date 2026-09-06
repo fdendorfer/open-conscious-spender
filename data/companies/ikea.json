@@ -1,0 +1,26 @@
+{
+  "id": "ikea",
+  "name": "IKEA",
+  "aliases": ["Inter IKEA", "Ingka Group"],
+  "country": "SE",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "environment",
+      "description": "Investigative NGO Earthsight documented an IKEA supplier's involvement in illegally logging roughly 4 million trees over a decade in protected, climate-critical forests in Siberia, despite FSC audits failing to flag it.",
+      "sourceUrl": "https://www.earthsight.org.uk/news/investigations/ikea-house-of-horrors",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    },
+    {
+      "category": "labor-rights",
+      "description": "IKEA acknowledged that political prisoners in communist East Germany were used as forced labor to produce components for its furniture in the 1970s-80s, and pledged €6 million in 2024 to a fund compensating survivors.",
+      "sourceUrl": "https://www.business-humanrights.org/en/latest-news/germany-ikea-pledges-6-million-to-a-fund-compensating-former-east-german-prisoners-for-forced-labor/",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

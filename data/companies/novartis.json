@@ -1,0 +1,18 @@
+{
+  "id": "novartis",
+  "name": "Novartis",
+  "aliases": [],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "corruption",
+      "description": "In 2020 Novartis AG and its former subsidiary Alcon agreed to pay a combined $345 million to the US DOJ and SEC to resolve Foreign Corrupt Practices Act charges, admitting employees bribed government-employed healthcare providers in Greece, Vietnam and South Korea to boost sales (following a separate, smaller 2016 FCPA settlement over conduct in China).",
+      "sourceUrl": "https://www.sec.gov/newsroom/press-releases/2020-144",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

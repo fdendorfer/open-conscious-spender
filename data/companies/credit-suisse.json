@@ -1,0 +1,26 @@
+{
+  "id": "credit-suisse",
+  "name": "Credit Suisse",
+  "aliases": ["Credit Suisse Group AG"],
+  "country": "CH",
+  "parentId": "ubs",
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "corruption",
+      "description": "Credit Suisse agreed in 2021 to pay roughly $475–547 million combined to US and UK authorities (including a $100 million SEC settlement) over fraud and FCPA violations in Mozambique's 'tuna bonds' scandal, where bankers received $50 million in hidden kickbacks for arranging loans nominally meant for a state tuna-fishing fleet and coast guard.",
+      "sourceUrl": "https://african.business/2021/10/finance-services/credit-suisse-fined-475m-over-tuna-bonds-scandal",
+      "dateAdded": "2026-09-06",
+      "severity": "systemic",
+      "status": "sourced"
+    },
+    {
+      "category": "corruption",
+      "description": "Following the March 2021 collapse of Archegos Capital, which cost Credit Suisse $5.5 billion, an independent review found the losses resulted from a fundamental failure of management and controls; the UK's PRA fined the bank £87 million in 2023 and Swiss regulator FINMA found Credit Suisse had 'seriously and systematically' breached financial market laws.",
+      "sourceUrl": "https://www.bankofengland.co.uk/news/2023/july/the-pra-imposes-record-fine-of-87m-on-credit-suisse",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "richemont",
+  "name": "Richemont",
+  "aliases": ["Cartier", "Montblanc", "IWC", "Van Cleef & Arpels", "Piaget"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "Pakistani workers at a Florence subcontractor producing Montblanc leather goods were paid roughly €3/hour for up to 70-hour weeks; after unionizing and winning legal working conditions, Richemont dropped the supplier, and in January 2025 filed a defamation/coercion complaint against the union organizers, which labor-rights groups characterize as a SLAPP suit.",
+      "sourceUrl": "https://www.business-humanrights.org/en/latest-news/montblanc-contract-workers-take-luxury-giant-richemont-to-court/",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

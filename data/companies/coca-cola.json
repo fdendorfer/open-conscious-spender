@@ -1,0 +1,26 @@
+{
+  "id": "coca-cola",
+  "name": "The Coca-Cola Company",
+  "aliases": ["Coca-Cola", "Coke"],
+  "country": "US",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "environment",
+      "description": "A Coca-Cola bottling plant in Plachimada, Kerala (India) had its operating licence revoked in 2003 amid findings of water scarcity and environmental damage; a 2010 government-appointed committee recommended the company pay about $48 million in damages, and the plant was permanently abandoned in 2017 after years of litigation.",
+      "sourceUrl": "https://www.business-humanrights.org/en/latest-news/coca-cola-lawsuit-re-india/",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    },
+    {
+      "category": "political-influence",
+      "description": "In 2015, Coca-Cola provided $1 million to launch the Global Energy Balance Network, a research group that promoted the message that physical inactivity, not sugary drinks, was the primary driver of obesity; the network disbanded within a year after reporting exposed Coca-Cola's role in shaping its message and choosing its leadership.",
+      "sourceUrl": "https://www.cnbc.com/2015/08/10/coca-cola-funds-scientists-who-shift-blame-for-obesity-away-from-bad-diets.html",
+      "dateAdded": "2026-09-06",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

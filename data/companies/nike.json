@@ -1,0 +1,18 @@
+{
+  "id": "nike",
+  "name": "Nike",
+  "aliases": [],
+  "country": "US",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "Through the 1990s, Nike's contract factories in Indonesia and Vietnam were documented (starting with a 1991 report by Jeff Ballinger) subjecting workers to poverty wages, excessive overtime, and unsafe conditions; CEO Phil Knight publicly acknowledged unfair labor practices in a May 1998 speech and committed to reforms, leading to the 1999 founding of the Fair Labor Association.",
+      "sourceUrl": "https://harbert.auburn.edu/binaries/documents/center-for-ethical-organizational-cultures/cases/nike.pdf",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

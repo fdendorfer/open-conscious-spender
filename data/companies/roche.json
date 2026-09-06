@@ -1,0 +1,18 @@
+{
+  "id": "roche",
+  "name": "Roche",
+  "aliases": ["Roche Holding AG"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "monopoly-practices",
+      "description": "South Africa's Competition Commission is prosecuting Roche over allegedly excessive pricing of the breast cancer drug trastuzumab (Herceptin), estimating that around 10,000 women were unable to afford the roughly $32,000/year treatment between 2011 and 2019 as a result; the Commission has described the pricing as a violation of basic human rights and is seeking maximum penalties. This is an ongoing case, not yet concluded.",
+      "sourceUrl": "https://healthpolicy-watch.news/roche-excessive-pricing/",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

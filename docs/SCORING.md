@@ -46,13 +46,17 @@ A straight sum would let a company with many flags blow past any sensible scale,
 score(company) = round(100 × (1 − e^(−raw / K)))
 ```
 
-`K` is a single tunable constant (starting value: **6**) controlling how quickly the score saturates. Raising `K` makes the score more forgiving of multiple flags; lowering it makes individual flags hit harder. Example at `K = 6`:
+`K` is a single tunable constant controlling how quickly the score saturates. Raising `K` makes the score more forgiving of multiple flags; lowering it makes individual flags hit harder.
+
+Started at **6**, but calibrating against the first ~20 real seeded companies (`data/companies/`) showed that value saturates too fast — most real, multi-flag companies landed in the red band regardless of how they actually compared to each other, which defeats the point of a quick-glance signal. Raised to **12**, which spreads that same real seed set from 18 to 75 across all three bands. Revisit again as more companies are added — this is an empirical calibration, not a formula derived from first principles.
+
+Example at `K = 12`:
 
 | scenario                                              | raw | score |
 |--------------------------------------------------------|-----|-------|
-| one sourced, severe flag in a weight-3 category         | 9   | ~78   |
-| one sourced, minor flag in a weight-2 category          | 2   | ~28   |
-| two sourced, minor flags in weight-2 categories         | 4   | ~49   |
+| one sourced, severe flag in a weight-3 category         | 9   | ~53   |
+| one sourced, minor flag in a weight-2 category          | 2   | ~15   |
+| two sourced, minor flags in weight-2 categories         | 4   | ~28   |
 
 ## Step 4 — traffic-light band
 

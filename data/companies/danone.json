@@ -1,0 +1,26 @@
+{
+  "id": "danone",
+  "name": "Danone",
+  "aliases": ["Danone S.A.", "Evian", "Volvic"],
+  "country": "FR",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "environment",
+      "description": "Danone was among several companies that suspended palm oil sourcing from First Resources after a 2021 investigation found the supplier controlled a network of shadow companies responsible for more deforestation in Southeast Asia than any other palm oil company.",
+      "sourceUrl": "https://www.icij.org/investigations/deforestation-inc/brands-drop-singapore-listed-palm-oil-giant-after-deforestation-inc-expose/",
+      "dateAdded": "2026-09-06",
+      "severity": "moderate",
+      "status": "sourced"
+    },
+    {
+      "category": "environment",
+      "description": "A local trout farmer sued Danone's Volvic operation after the stream feeding his fish farm dried up, separately also suing the French state; annual water pumping for the Volvic brand grew from about 200,000 litres in 1950 to 1.7 billion litres in 2020, raising local concern about groundwater depletion.",
+      "sourceUrl": "https://www.enca.com/business/volvic-front-line-frances-new-water-fears",
+      "dateAdded": "2026-09-06",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

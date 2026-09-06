@@ -1,0 +1,26 @@
+{
+  "id": "unilever",
+  "name": "Unilever",
+  "aliases": ["Dove", "Knorr", "Hellmann's", "Ben & Jerry's", "Lipton", "Axe"],
+  "country": "GB",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "A 2016 Amnesty International investigation traced palm oil from Wilmar plantations in Indonesia — where children as young as 8 worked in hazardous conditions without protective equipment — into Unilever's supply chain; Unilever confirmed it bought palm oil from Wilmar.",
+      "sourceUrl": "https://www.amnesty.org/en/latest/news/2016/11/palm-oil-global-brands-profiting-from-child-and-forced-labour/",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    },
+    {
+      "category": "boycott-conflict",
+      "description": "Unilever continued operating in Russia for over two years after the 2022 invasion of Ukraine, only completing the sale of its Russian business in October 2024; Ukraine's anti-corruption agency designated it an 'International Sponsor of War' in July 2023 citing its tax contributions to the Russian state, and Buckingham Palace revoked its royal warrant in December 2024 over the continued operations.",
+      "sourceUrl": "https://b4ukraine.org/what-we-do/unilever",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

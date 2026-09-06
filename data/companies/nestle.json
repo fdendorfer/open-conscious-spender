@@ -1,0 +1,18 @@
+{
+  "id": "nestle",
+  "name": "Nestlé",
+  "aliases": ["Nestle"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "human-rights",
+      "description": "Nestlé has been the target of an international consumer boycott, ongoing since 1989, over marketing of infant formula in developing countries in ways that critics and independent audits say violate the WHO's International Code of Marketing of Breast-Milk Substitutes.",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1127711/",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

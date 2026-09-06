@@ -1,0 +1,26 @@
+{
+  "id": "inditex",
+  "name": "Inditex",
+  "aliases": ["Zara", "Bershka", "Pull&Bear", "Massimo Dutti", "Stradivarius"],
+  "country": "ES",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "In 2011, Brazilian labor inspectors found migrant workers in slavery-like conditions (16-hour days, restricted movement) at a São Paulo workshop producing garments for Zara via a subcontracted supplier. Zara Brasil lost the resulting court case and its appeal, with the case closing in November 2017.",
+      "sourceUrl": "https://www.mindthegap.ngo/harmful-strategies/constructing-deniability/hiding-behind-complex-supply-chains/zara-fights-sanctions-for-forced-labour-in-brazilian-supply-chain/",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    },
+    {
+      "category": "human-rights",
+      "description": "French anti-terrorism prosecutors opened an investigation in July 2021 into Inditex and three other multinationals over alleged profiting from Uyghur forced labor in Xinjiang supply chains; Canada's ombudsperson (CORE) opened a separate probe into Zara in November 2023 following a civil-society complaint.",
+      "sourceUrl": "https://www.business-humanrights.org/en/latest-news/zaras-parent-company-inditex-reportedly-removes-statement-on-zero-tolerance-policy-for-forced-labour/",
+      "dateAdded": "2026-09-06",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "shein",
+  "name": "Shein",
+  "aliases": ["SHEIN"],
+  "country": "SG",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "A BBC investigation found workers at Shein's Chinese supplier factories working up to 75-hour weeks, exceeding Chinese labor-law limits, for pay below living-wage standards.",
+      "sourceUrl": "https://www.business-humanrights.org/en/latest-news/china-bbc-investigation-reveals-shein-suppliers-workers-face-75-hour-work-weeks-low-wages-incl-co-comment/",
+      "dateAdded": "2026-09-06",
+      "severity": "severe",
+      "status": "sourced"
+    },
+    {
+      "category": "human-rights",
+      "description": "The US House Select Committee on the CCP released interim findings in September 2024 from a bipartisan investigation into Shein's and Temu's potential supply-chain ties to Uyghur forced labor and Xinjiang cotton; Shein says tests show about 2.1% of its cotton originates from the region and that it has since stopped sourcing cotton from China, a claim disputed by lawmakers.",
+      "sourceUrl": "https://chinaselectcommittee.house.gov/media/press-releases/select-committee-releases-interim-findings-shein-temu-forced-labor",
+      "dateAdded": "2026-09-06",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}
