@@ -17,10 +17,11 @@ export type FlagStatus = keyof typeof CONFIDENCE_MULTIPLIER;
 /** Saturation constant — see docs/SCORING.md for the reasoning and example table. */
 export const SATURATION_K = 12;
 
+// Score is a "goodness" score: 100 = no concerning flags, 0 = heavily flagged.
 export const SCORE_BANDS = {
-	green: [0, 29],
-	yellow: [30, 64],
-	red: [65, 100]
+	red: [0, 35],
+	yellow: [36, 70],
+	green: [71, 100]
 } as const;
 export type Band = keyof typeof SCORE_BANDS;
 
@@ -55,13 +56,14 @@ export function rawScore(flags: Flag[], categories: CategoryWeight[]): number {
 	}, 0);
 }
 
+/** Converts raw flag weight into a 0-100 goodness score — 100 is best, 0 is worst. */
 export function normalizeScore(raw: number): number {
-	return Math.round(100 * (1 - Math.exp(-raw / SATURATION_K)));
+	return Math.round(100 * Math.exp(-raw / SATURATION_K));
 }
 
 export function scoreBand(score: number): Band {
-	if (score <= SCORE_BANDS.green[1]) return 'green';
-	if (score <= SCORE_BANDS.yellow[1]) return 'yellow';
+	if (score >= SCORE_BANDS.green[0]) return 'green';
+	if (score >= SCORE_BANDS.yellow[0]) return 'yellow';
 	return 'red';
 }
 

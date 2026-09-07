@@ -1,6 +1,6 @@
 # Scoring formula
 
-Goal: turn an arbitrary number of flags, across an arbitrary number of categories, into one 0–100 "concern score" plus a traffic-light band — without needing to touch code when categories, weights, or severities change. All tunable inputs below live in data files, not in application logic.
+Goal: turn an arbitrary number of flags, across an arbitrary number of categories, into one 0–100 "goodness score" (100 = no concerning flags, 0 = heavily flagged) plus a traffic-light band — without needing to touch code when categories, weights, or severities change. All tunable inputs below live in data files, not in application logic.
 
 ## Inputs (all data-driven, extendable)
 
@@ -40,33 +40,36 @@ raw(company) = Σ contribution(flag) for all flags on that company (and, optiona
 
 ## Step 3 — normalize to 0–100
 
-A straight sum would let a company with many flags blow past any sensible scale, and wouldn't saturate — diminishing-returns curve instead:
+A straight sum would let a company with many flags blow past any sensible scale, and wouldn't saturate — diminishing-returns curve instead. The score is framed as "goodness," not "concern" — a spotless company should read as a clean, reassuring 100, not a 0 the reader has to know is good:
 
 ```
-score(company) = round(100 × (1 − e^(−raw / K)))
+score(company) = round(100 × e^(−raw / K))
 ```
 
-`K` is a single tunable constant controlling how quickly the score saturates. Raising `K` makes the score more forgiving of multiple flags; lowering it makes individual flags hit harder.
+A company with no flags has `raw = 0`, so `score = 100` exactly. More/heavier flags push the score down toward 0.
 
-Started at **6**, but calibrating against the first ~20 real seeded companies (`data/companies/`) showed that value saturates too fast — most real, multi-flag companies landed in the red band regardless of how they actually compared to each other, which defeats the point of a quick-glance signal. Raised to **12**, which spreads that same real seed set from 18 to 75 across all three bands. Revisit again as more companies are added — this is an empirical calibration, not a formula derived from first principles.
+`K` is a single tunable constant controlling how quickly the score falls off. Raising `K` makes the score more forgiving of multiple flags; lowering it makes individual flags hit harder.
+
+Started at **6**, but calibrating against the first ~20 real seeded companies (`data/companies/`) showed that value saturates too fast — most real, multi-flag companies landed in the worst band regardless of how they actually compared to each other, which defeats the point of a quick-glance signal. Raised to **12**, which spreads that same real seed set across all three bands. Revisit again as more companies are added — this is an empirical calibration, not a formula derived from first principles.
 
 Example at `K = 12`:
 
 | scenario                                              | raw | score |
 |--------------------------------------------------------|-----|-------|
-| one sourced, severe flag in a weight-3 category         | 9   | ~53   |
-| one sourced, minor flag in a weight-2 category          | 2   | ~15   |
-| two sourced, minor flags in weight-2 categories         | 4   | ~28   |
+| no flags                                                | 0   | 100   |
+| one sourced, severe flag in a weight-3 category         | 9   | ~47   |
+| one sourced, minor flag in a weight-2 category          | 2   | ~85   |
+| two sourced, minor flags in weight-2 categories         | 4   | ~72   |
 
 ## Step 4 — traffic-light band
 
 | score   | band   |
 |---------|--------|
-| 0–29    | green  |
-| 30–64   | yellow |
-| 65–100  | red    |
+| 71–100  | green  |
+| 36–70   | yellow |
+| 0–35    | red    |
 
-Band thresholds are constants, not hardcoded logic branches — trivially adjustable.
+Band thresholds are constants, not hardcoded logic branches — trivially adjustable. They mirror the original concern-based cutoffs (0–29/30–64/65–100), just flipped around 100.
 
 ## Extending this later
 
