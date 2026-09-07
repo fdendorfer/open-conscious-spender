@@ -1,7 +1,7 @@
 {
   "id": "nestle",
   "name": "Nestlé",
-  "aliases": ["Nestle"],
+  "aliases": ["Nestle", "Maggi", "Thomy", "Cailler", "Nespresso"],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

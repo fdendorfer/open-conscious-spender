@@ -1,0 +1,18 @@
+{
+  "id": "galenica",
+  "name": "Galenica",
+  "aliases": ["Amavita", "Sun Store"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "Galenica announced in 2025 a consultation on cutting up to 170 jobs at its Bichsel subsidiary, stating prior measures to improve results had not been sufficient.",
+      "sourceUrl": "https://www.swissinfo.ch/eng/various/galenica-up-to-170-jobs-cut-at-bichsel/90987712",
+      "dateAdded": "2026-09-07",
+      "severity": "minor",
+      "status": "sourced"
+    }
+  ]
+}

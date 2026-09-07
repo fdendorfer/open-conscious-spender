@@ -1,0 +1,18 @@
+{
+  "id": "julius-baer",
+  "name": "Julius Bär",
+  "aliases": ["Julius Baer", "Bank Julius Bär"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "financial-misconduct",
+      "description": "Julius Bär booked CHF 606 million in write-downs in 2023 and a further CHF 586 million in credit losses in early 2024 tied to loans to René Benko's collapsed Signa real-estate group; FINMA opened enforcement proceedings over insufficient separation between the bank's risk-control and business functions, and the bank's CEO left as a result.",
+      "sourceUrl": "https://www.finews.ch/news/banken/60726-julius-baer-finma-rene-benko-risikokontrolle-evie-kostakis",
+      "dateAdded": "2026-09-07",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

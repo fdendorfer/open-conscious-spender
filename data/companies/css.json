@@ -1,0 +1,18 @@
+{
+  "id": "css",
+  "name": "CSS",
+  "aliases": ["CSS Versicherung", "CSS Krankenkasse"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "financial-misconduct",
+      "description": "Switzerland's financial regulator FINMA ordered CSS to reimburse CHF 129 million to supplementary-insurance policyholders after finding it had improperly folded unjustified administrative costs into premium calculations from 2013 to 2019. CSS is contesting the ruling before the Federal Administrative Court, so it is not yet legally final.",
+      "sourceUrl": "https://www.swissinfo.ch/ger/finma-css-muss-praemien-von-krankenzusatzversicherten-rueckerstatten/47829982",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

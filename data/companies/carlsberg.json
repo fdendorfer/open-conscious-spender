@@ -1,0 +1,18 @@
+{
+  "id": "carlsberg",
+  "name": "Carlsberg Group",
+  "aliases": ["Carlsberg", "Tuborg"],
+  "country": "DK",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "boycott-conflict",
+      "description": "Although Carlsberg stopped production of its own Carlsberg- and Tuborg-branded beer in Russia after the 2022 invasion of Ukraine, other Carlsberg-owned brands continued to be sold there via its Baltika subsidiary; in July 2023 the Russian government seized Carlsberg's stake in Baltika under a decree targeting companies from 'unfriendly' countries, and Carlsberg only completed an exit sale in December 2024.",
+      "sourceUrl": "https://fortune.com/europe/2024/12/03/carlsberg-sells-russian-business-putin/",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

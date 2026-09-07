@@ -68,5 +68,12 @@
     "description": "Confirmed antitrust violations, predatory pricing, or market-dominance abuse.",
     "icon": "Buildings",
     "defaultWeight": 1
+  },
+  {
+    "id": "financial-misconduct",
+    "name": "Financial misconduct",
+    "description": "Fraud, mis-selling, improper fee/premium practices, or risk-control failures that harmed customers or investors — distinct from corruption (which implies bribery or self-dealing).",
+    "icon": "ChartLineDown",
+    "defaultWeight": 2
   }
 ]

@@ -1,0 +1,18 @@
+{
+  "id": "fenaco",
+  "name": "fenaco",
+  "aliases": ["fenaco Genossenschaft"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "monopoly-practices",
+      "description": "fenaco, the cooperative federation controlling roughly 80% of Swiss farmers' upstream/downstream supply chain, has been repeatedly criticized (including by NZZ and think-tank Avenir Suisse) for using its dominant market position to pay producers — for example wine and cider growers — prices below production cost while extracting high margins at the retail end due to limited competition.",
+      "sourceUrl": "https://www.nzz.ch/wirtschaft/elmer-citro-volg-co-wie-fenaco-den-schweizer-markt-beherrscht-ld.1401535",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

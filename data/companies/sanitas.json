@@ -1,0 +1,9 @@
+{
+  "id": "sanitas",
+  "name": "Sanitas",
+  "aliases": ["Sanitas Krankenversicherung"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": []
+}

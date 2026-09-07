@@ -1,0 +1,18 @@
+{
+  "id": "weleda",
+  "name": "Weleda",
+  "aliases": [],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "human-rights",
+      "description": "In September 2025, historian Anne Sudrow's research (published under the Dachau Memorial's auspices, first reported by Der Spiegel) revealed Weleda skin cream was used by SS doctor Sigmund Rascher in brutal Nazi freezing experiments on roughly 300 Dachau prisoners to test frostbite prevention, of whom an estimated 80-90 died; Weleda announced it would re-investigate its Nazi-era history after previously concluding no direct link existed.",
+      "sourceUrl": "https://www.timesofisrael.com/cosmetics-firm-weleda-to-examine-nazi-ties-amid-revelation-of-role-in-dachau-experiments/",
+      "dateAdded": "2026-09-07",
+      "severity": "systemic",
+      "status": "sourced"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "oatly",
+  "name": "Oatly",
+  "aliases": ["Oatly Group AB"],
+  "country": "SE",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "environment",
+      "description": "Oatly's 2020 acceptance of a $200 million investment from Blackstone (alongside celebrity co-investors) triggered a consumer boycott after Blackstone was reported to be a part-owner of two Brazilian firms linked to Amazon deforestation; the deforestation link is to Oatly's investor, not to Oatly's own operations, which Oatly has publicly defended.",
+      "sourceUrl": "https://www.foodnavigator.com/Article/2020/09/04/Oatly-cancelled-Fans-pledge-boycott-over-contentious-shareholder-Blackstone/",
+      "dateAdded": "2026-09-07",
+      "severity": "minor",
+      "status": "sourced"
+    }
+  ]
+}

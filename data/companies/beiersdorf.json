@@ -1,0 +1,18 @@
+{
+  "id": "beiersdorf",
+  "name": "Beiersdorf",
+  "aliases": ["Nivea", "La Prairie", "Eucerin", "Chantecaille"],
+  "country": "DE",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "human-rights",
+      "description": "Nivea (Beiersdorf) pulled a 2017 deodorant ad captioned 'White is Purity' after backlash that it echoed white-supremacist rhetoric equating whiteness with purity; it was the second such incident in six years after a 2011 ad telling a Black man to 're-civilize' himself.",
+      "sourceUrl": "https://www.washingtonpost.com/news/business/wp/2017/04/05/niveas-white-is-purity-ad-campaign-didnt-end-well/",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

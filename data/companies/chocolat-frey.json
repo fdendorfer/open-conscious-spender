@@ -1,7 +1,7 @@
 {
   "id": "chocolat-frey",
   "name": "Chocolat Frey",
-  "aliases": ["Frey"],
+  "aliases": ["Frey", "Schweizer Armee Schokolade", "Risoletto"],
   "country": "CH",
   "parentId": "migros",
   "wikidataId": null,

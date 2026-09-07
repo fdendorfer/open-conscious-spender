@@ -1,0 +1,9 @@
+{
+  "id": "ramseier-suisse",
+  "name": "Ramseier Suisse AG",
+  "aliases": ["Ramseier", "Sinalco", "Elmer", "Elmer Citro"],
+  "country": "CH",
+  "parentId": "fenaco",
+  "wikidataId": null,
+  "flags": []
+}

@@ -1,0 +1,18 @@
+{
+  "id": "mars",
+  "name": "Mars, Incorporated",
+  "aliases": [],
+  "country": "US",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "Mars is named, alongside Cargill, Mondelez, Nestlé, Hershey, Olam, and Barry Callebaut, in ongoing US lawsuits (including a 2021 case brought by eight former child laborers, with litigation continuing as of 2023) alleging the companies knowingly sourced cocoa harvested by child and forced laborers on Ivory Coast plantations.",
+      "sourceUrl": "https://www.cnbc.com/2023/11/30/mars-accused-of-using-child-labor-in-cocoa-supply-chain.html",
+      "dateAdded": "2026-09-07",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}

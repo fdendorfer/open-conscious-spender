@@ -1,7 +1,7 @@
 {
   "id": "danone",
   "name": "Danone",
-  "aliases": ["Danone S.A.", "Evian", "Volvic"],
+  "aliases": ["Danone S.A.", "Evian", "Volvic", "Alpro"],
   "country": "FR",
   "parentId": null,
   "wikidataId": null,

@@ -1,0 +1,18 @@
+{
+  "id": "concordia",
+  "name": "Concordia",
+  "aliases": ["Concordia Krankenversicherung"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "financial-misconduct",
+      "description": "Switzerland's highest court ruled that a CHF 80 million capital transfer Concordia had used to prop up its mandatory basic-insurance business was unlawful, following a multi-year legal dispute.",
+      "sourceUrl": "https://www.luzernerzeitung.ch/wirtschaft/concordia-kunden-erhalten-108-millionen-franken-zuruck-ld.1101560",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "kellanova",
+  "name": "Kellanova",
+  "aliases": ["Pringles"],
+  "country": "US",
+  "parentId": "mars",
+  "wikidataId": null,
+  "flags": []
+}

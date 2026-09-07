@@ -337,7 +337,7 @@
 	</div>
 
 	<div class="grid gap-8 lg:grid-cols-2">
-		<section class="flex flex-col gap-3">
+		<section id="how-it-works" class="flex flex-col gap-3">
 			<h2 class="font-medium">How it works</h2>
 			<ol class="flex flex-col gap-2 text-sm text-gray-600">
 				<li>1. Search a company by name, or scan a barcode if you don't know it.</li>
@@ -367,7 +367,7 @@
 		</section>
 	</div>
 
-	<section class="flex flex-col gap-2 pb-8">
+	<section id="about" class="flex flex-col gap-2 pb-8">
 		<h2 class="font-medium">Open and community-maintained</h2>
 		<p class="text-sm text-gray-600">
 			Anyone can add a company or a flag — no account needed. The full dataset is public and openly

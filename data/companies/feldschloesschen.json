@@ -1,0 +1,9 @@
+{
+  "id": "feldschloesschen",
+  "name": "Feldschlösschen",
+  "aliases": ["Feldschlösschen Getränke AG"],
+  "country": "CH",
+  "parentId": "carlsberg",
+  "wikidataId": null,
+  "flags": []
+}

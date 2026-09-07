@@ -1,0 +1,18 @@
+{
+  "id": "allianz",
+  "name": "Allianz",
+  "aliases": ["Allianz SE", "Allianz Global Investors"],
+  "country": "DE",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "financial-misconduct",
+      "description": "Allianz Global Investors U.S. pleaded guilty to criminal securities fraud in 2022 after three of its senior portfolio managers orchestrated a multi-year scheme to conceal the true risk of its 'Structured Alpha' funds from roughly 114 institutional investors (including pension funds), who invested around $11 billion. The fraud caused over $5 billion in investor losses; Allianz paid over $1 billion in SEC penalties plus more than $5 billion total in restitution, and AGI US was barred from advising US-registered mutual funds and certain pension funds.",
+      "sourceUrl": "https://www.sec.gov/newsroom/press-releases/2022-84",
+      "dateAdded": "2026-09-07",
+      "severity": "systemic",
+      "status": "sourced"
+    }
+  ]
+}

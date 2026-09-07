@@ -1,0 +1,18 @@
+{
+  "id": "raiffeisen",
+  "name": "Raiffeisen",
+  "aliases": ["Raiffeisen Schweiz"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "corruption",
+      "description": "Former Raiffeisen CEO Pierin Vincenz (1999-2015) was convicted in 2022 by the Zurich District Court and sentenced to 3 years and 9 months in prison for fraud, breach of trust, and document forgery, after secretly holding stakes in companies he then had Raiffeisen and its Aduno subsidiary acquire without disclosing his conflict of interest. The Swiss Federal Supreme Court upheld the conviction; an appeal on sentencing continues.",
+      "sourceUrl": "https://www.nzz.ch/wirtschaft/pierin-vincenz-erhaelt-freiheitsstrafe-von-3-jahren-und-9-monaten-ld.1394412",
+      "dateAdded": "2026-09-07",
+      "severity": "severe",
+      "status": "sourced"
+    }
+  ]
+}
