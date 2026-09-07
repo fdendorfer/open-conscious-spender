@@ -5,5 +5,15 @@
   "country": "CH",
   "parentId": null,
   "wikidataId": null,
-  "flags": []
+  "flags": [
+    {
+      "category": "environment",
+      "description": "All of Ricola's medicinal herbs are grown by approximately 100 Swiss farming families under long-term contracts governed by strict Kräuter Guide standards (no synthetic pesticides, mandatory crop rotation, biodiversity requirements); Ricola pays above-market prices to keep herb cultivation in Switzerland.",
+      "sourceUrl": "https://www.ricola.com/en-global/our-story/the-herbs/",
+      "dateAdded": "2026-09-08",
+      "severity": "moderate",
+      "status": "sourced",
+      "polarity": "positive"
+    }
+  ]
 }

@@ -13,6 +13,24 @@
       "dateAdded": "2026-09-07",
       "severity": "moderate",
       "status": "sourced"
+    },
+    {
+      "category": "environment",
+      "description": "Coop's Naturaplan is Switzerland's largest organic label, offering over 2,500 Bio Suisse certified products since its launch in 1993, covering food, beverages, and household goods with independently audited organic and sustainability standards.",
+      "sourceUrl": "https://www.coop.ch/en/company/sustainability.html",
+      "dateAdded": "2026-09-08",
+      "severity": "moderate",
+      "status": "sourced",
+      "polarity": "positive"
+    },
+    {
+      "category": "animal-welfare",
+      "description": "Coop's Naturafarm label sets stricter animal welfare standards than Swiss law requires for pork, poultry, and veal, including mandatory outdoor access, group housing, and restrictions on routine antibiotic use; producers receive premium pricing for compliance.",
+      "sourceUrl": "https://www.coop.ch/en/company/sustainability.html",
+      "dateAdded": "2026-09-08",
+      "severity": "moderate",
+      "status": "sourced",
+      "polarity": "positive"
     }
   ]
 }

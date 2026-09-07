@@ -21,6 +21,15 @@
       "dateAdded": "2026-09-06",
       "severity": "severe",
       "status": "sourced"
+    },
+    {
+      "category": "environment",
+      "description": "IKEA owns and operates wind farms and solar parks globally; by 2022 the combined renewable energy generation capacity of Inter IKEA and Ingka Group exceeded IKEA's total global energy consumption, making the group a net energy exporter.",
+      "sourceUrl": "https://about.ikea.com/en/sustainability/becoming-climate-positive/",
+      "dateAdded": "2026-09-08",
+      "severity": "severe",
+      "status": "sourced",
+      "polarity": "positive"
     }
   ]
 }

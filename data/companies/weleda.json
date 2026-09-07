@@ -13,6 +13,15 @@
       "dateAdded": "2026-09-07",
       "severity": "systemic",
       "status": "sourced"
+    },
+    {
+      "category": "environment",
+      "description": "All Weleda products use 100% natural-origin ingredients and are certified to Demeter biodynamic or NATRUE organic standards, with no synthetic preservatives, synthetic colorants, or petroleum derivatives; several ingredient supply chains hold Fairtrade certification.",
+      "sourceUrl": "https://www.weleda.com/about-weleda/our-values/",
+      "dateAdded": "2026-09-08",
+      "severity": "moderate",
+      "status": "sourced",
+      "polarity": "positive"
     }
   ]
 }

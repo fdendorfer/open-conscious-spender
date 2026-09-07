@@ -13,6 +13,15 @@
       "dateAdded": "2026-09-06",
       "severity": "severe",
       "status": "sourced"
+    },
+    {
+      "category": "environment",
+      "description": "Nike's Move to Zero initiative targets zero carbon and zero waste; by fiscal year 2023 Nike sourced 96% renewable electricity across owned-and-operated facilities and launched Nike Refurbished to resell and divert lightly worn shoes from landfill.",
+      "sourceUrl": "https://www.nike.com/purpose/impact",
+      "dateAdded": "2026-09-08",
+      "severity": "minor",
+      "status": "sourced",
+      "polarity": "positive"
     }
   ]
 }

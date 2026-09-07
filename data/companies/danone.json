@@ -21,6 +21,15 @@
       "dateAdded": "2026-09-06",
       "severity": "moderate",
       "status": "sourced"
+    },
+    {
+      "category": "environment",
+      "description": "In April 2018, Danone North America became a Certified B Corporation — at the time the world's largest B Corp by revenue — committing to rigorous independently verified standards for social and environmental performance, accountability, and transparency.",
+      "sourceUrl": "https://www.danonenorthamerica.com/b-corp",
+      "dateAdded": "2026-09-08",
+      "severity": "moderate",
+      "status": "sourced",
+      "polarity": "positive"
     }
   ]
 }

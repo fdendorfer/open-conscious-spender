@@ -13,6 +13,15 @@
       "dateAdded": "2026-09-06",
       "severity": "severe",
       "status": "sourced"
+    },
+    {
+      "category": "environment",
+      "description": "Nestlé set a science-based target to halve absolute greenhouse gas emissions by 2030 and reach net zero by 2050; by 2022 roughly 85% of Nestlé's global electricity consumption came from renewable sources.",
+      "sourceUrl": "https://www.nestle.com/sustainability/climate-change/net-zero",
+      "dateAdded": "2026-09-08",
+      "severity": "minor",
+      "status": "sourced",
+      "polarity": "positive"
     }
   ]
 }

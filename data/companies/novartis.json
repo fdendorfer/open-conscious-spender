@@ -13,6 +13,15 @@
       "dateAdded": "2026-09-06",
       "severity": "severe",
       "status": "sourced"
+    },
+    {
+      "category": "human-rights",
+      "description": "Novartis Access, launched in 2015, offers a basket of on-patent medicines for non-communicable diseases (cardiovascular, diabetes, respiratory, breast cancer) at approximately $1 per patient per month in lower-income countries, improving treatment access where affordability is a critical barrier.",
+      "sourceUrl": "https://www.novartis.com/research-development/access-to-medicines",
+      "dateAdded": "2026-09-08",
+      "severity": "moderate",
+      "status": "sourced",
+      "polarity": "positive"
     }
   ]
 }

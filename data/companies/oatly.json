@@ -13,6 +13,15 @@
       "dateAdded": "2026-09-07",
       "severity": "minor",
       "status": "sourced"
+    },
+    {
+      "category": "environment",
+      "description": "Independently verified lifecycle assessments show Oatly's oat drink produces significantly lower greenhouse gas emissions per litre than cow's milk; Oatly prints the carbon footprint directly on product packaging to enable consumers to compare environmental impact at the point of purchase.",
+      "sourceUrl": "https://www.oatly.com/impact",
+      "dateAdded": "2026-09-08",
+      "severity": "moderate",
+      "status": "sourced",
+      "polarity": "positive"
     }
   ]
 }

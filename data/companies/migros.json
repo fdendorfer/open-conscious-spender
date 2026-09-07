@@ -1,7 +1,18 @@
 {
   "id": "migros",
   "name": "Migros",
-  "aliases": ["Migros-Genossenschafts-Bund", "M-Budget", "Migros Sélection", "I am Vegan", "M-Classic", "Migros Ice Tea", "Mirador", "Y-Foods", "Valflora", "Handy"],
+  "aliases": [
+    "Migros-Genossenschafts-Bund",
+    "M-Budget",
+    "Migros Sélection",
+    "I am Vegan",
+    "M-Classic",
+    "Migros Ice Tea",
+    "Mirador",
+    "Y-Foods",
+    "Valflora",
+    "Handy"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,
@@ -29,6 +40,15 @@
       "dateAdded": "2026-09-07",
       "severity": "moderate",
       "status": "sourced"
+    },
+    {
+      "category": "human-rights",
+      "description": "Migros's Kulturprozent programme, enshrined in its cooperative statutes since 1957, dedicates 1% of domestic group revenue (roughly CHF 120-130 million per year) to cultural, social, and educational projects across Switzerland, including theatres, museums, language courses, and community initiatives.",
+      "sourceUrl": "https://kulturprozent.migros.ch/en/",
+      "dateAdded": "2026-09-08",
+      "severity": "moderate",
+      "status": "sourced",
+      "polarity": "positive"
     }
   ]
 }
