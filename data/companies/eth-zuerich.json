@@ -1,0 +1,18 @@
+{
+  "id": "eth-zuerich",
+  "name": "ETH Zürich",
+  "aliases": ["ETH", "Eidgenössische Technische Hochschule Zürich"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "About 15 former employees came forward with allegations against an ETH Zürich management-department professor describing over a decade of sexist and sexualized comments, manipulative leadership, and a climate of fear; ETH leadership began addressing complaints by 2019 and temporarily barred the professor from supervising doctoral students, but ETH's own reporting office criticized the institution's difficulty handling the complex conflict.",
+      "sourceUrl": "https://www.srf.ch/news/schweiz/neue-vorfaelle-an-der-eth-schlaffer-hintern-wie-ein-professor-mitarbeitende-schikanierte",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}
