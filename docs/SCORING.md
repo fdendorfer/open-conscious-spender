@@ -1,6 +1,6 @@
 # Scoring formula
 
-Goal: turn an arbitrary number of flags, across an arbitrary number of categories, into one 0–100 "goodness score" (100 = no concerning flags, 0 = heavily flagged) plus a traffic-light band — without needing to touch code when categories, weights, or severities change. All tunable inputs below live in data files, not in application logic.
+Goal: turn an arbitrary number of flags — positive and negative — into one 0–100 score plus a traffic-light band. 50 = neutral (no data). 100 = strongly positive. 0 = strongly negative.
 
 ## Inputs (all data-driven, extendable)
 
@@ -8,9 +8,10 @@ Goal: turn an arbitrary number of flags, across an arbitrary number of categorie
 ```json
 { "id": "boycott-conflict", "name": "Boycott / conflict complicity", "icon": "Megaphone", "defaultWeight": 3 }
 ```
-Adding a new category later is just adding a new object here — no formula change needed.
 
-**Severity multiplier** (per flag, chosen when the flag is added):
+**Flag polarity** — each flag is either a concern (`negative`, default) or a positive signal (`positive`).
+
+**Severity multiplier** (per flag):
 | severity   | multiplier |
 |------------|-----------|
 | minor      | 1         |
@@ -24,7 +25,7 @@ Adding a new category later is just adding a new object here — no formula chan
 | sourced     | 1.0       |
 | unverified  | 0.6       |
 
-**Decay multiplier** — reserved extension point, defaults to `1.0` for every flag in v1. A future version could reduce the weight of old, unresolved flags (e.g. `max(0.3, 1 - yearsSinceAdded * 0.1)`) without changing the rest of the formula.
+**Decay multiplier** — reserved extension point, defaults to `1.0`. A future version could reduce the weight of old flags without changing the rest of the formula.
 
 ## Step 1 — per-flag contribution
 
@@ -32,56 +33,59 @@ Adding a new category later is just adding a new object here — no formula chan
 contribution(flag) = category.weight × severity.multiplier × confidence.multiplier × decay.multiplier
 ```
 
-## Step 2 — raw total
+## Step 2 — raw totals (per polarity)
 
 ```
-raw(company) = Σ contribution(flag) for all flags on that company (and, optionally, inherited from its parent — see note below)
+rawNeg = Σ contribution(flag)  for all negative flags
+rawPos = Σ contribution(flag)  for all positive flags
 ```
 
-## Step 3 — normalize to 0–100
+## Step 3 — saturate each direction
 
-A straight sum would let a company with many flags blow past any sensible scale, and wouldn't saturate — diminishing-returns curve instead. The score is framed as "goodness," not "concern" — a spotless company should read as a clean, reassuring 100, not a 0 the reader has to know is good:
+A straight sum would let a company with many flags blow past any sensible scale. Apply diminishing returns separately to each direction so each component stays in [0, 50):
 
 ```
-score(company) = round(100 × e^(−raw / K))
+saturate(raw) = 50 × (1 − e^(−raw / K))
 ```
 
-A company with no flags has `raw = 0`, so `score = 100` exactly. More/heavier flags push the score down toward 0.
+At `raw = 0`: `saturate = 0` (no effect). As `raw → ∞`: `saturate → 50` (component maxes out).
 
-`K` is a single tunable constant controlling how quickly the score falls off. Raising `K` makes the score more forgiving of multiple flags; lowering it makes individual flags hit harder.
+## Step 4 — combine into 0–100 score
 
-Started at **6**, but calibrating against the first ~20 real seeded companies (`data/companies/`) showed that value saturates too fast — most real, multi-flag companies landed in the worst band regardless of how they actually compared to each other, which defeats the point of a quick-glance signal. Raised to **12**, which spreads that same real seed set across all three bands. Revisit again as more companies are added — this is an empirical calibration, not a formula derived from first principles.
+```
+score = round(50 + saturate(rawPos) − saturate(rawNeg))
+```
+
+A company with no flags has `rawPos = rawNeg = 0`, so `score = 50` exactly — neutral/unknown, not perfect. Green flags push toward 100; red flags push toward 0.
+
+`K` is a single tunable constant. Currently **12**. Raising it makes flags hit more gently; lowering makes them hit harder. Calibrated against the first ~20 real seeded companies — revisit as more data is added.
 
 Example at `K = 12`:
 
-| scenario                                              | raw | score |
-|--------------------------------------------------------|-----|-------|
-| no flags                                                | 0   | 100   |
-| one sourced, severe flag in a weight-3 category         | 9   | ~47   |
-| one sourced, minor flag in a weight-2 category          | 2   | ~85   |
-| two sourced, minor flags in weight-2 categories         | 4   | ~72   |
+| scenario                                              | rawNeg | rawPos | score |
+|-------------------------------------------------------|--------|--------|-------|
+| no flags                                              | 0      | 0      | 50    |
+| one sourced, severe flag in a weight-3 category        | 9      | 0      | 24    |
+| same, plus one sourced, severe green flag              | 9      | 9      | 50    |
+| one sourced, minor flag in a weight-2 category         | 2      | 0      | 42    |
+| two sourced, minor red flags in weight-2 categories    | 4      | 0      | 36    |
 
-## Step 4 — traffic-light band
+## Step 5 — traffic-light band
 
-| score   | band   |
-|---------|--------|
-| 71–100  | green  |
-| 36–70   | yellow |
-| 0–35    | red    |
-
-Band thresholds are constants, not hardcoded logic branches — trivially adjustable. They mirror the original concern-based cutoffs (0–29/30–64/65–100), just flipped around 100.
+| score   | band   | meaning                  |
+|---------|--------|--------------------------|
+| 66–100  | green  | low concern              |
+| 34–65   | yellow | neutral / insufficient data |
+| 0–33    | red    | high concern             |
 
 ## Extending this later
 
 - **New category**: add to `categories.json` with a `defaultWeight`. No formula change.
 - **New severity level**: add a row to the severity table + its multiplier.
 - **Decay**: implement the reserved `decay.multiplier` function; every flag already carries `dateAdded`.
-- **Per-user weighting**: since categories are already just weighted, a future "mute category X" or "double-weight category Y" personal setting is a per-user override of `category.weight` at render time — no server-side change needed.
+- **Per-user weighting**: categories are already just weighted numbers — a future "mute category X" is a per-user override of `category.weight` at render time, no server-side change.
+- **Parent-company inheritance**: a company's displayed score could become the worst of its own score and its parent chain's scores. Not yet implemented.
 
-## Open question / judgment call
+## Editorial note
 
-Default category weights (see `data/categories.json`) reflect a starting editorial judgment about relative severity (e.g. boycott/conflict complicity weighted above monopoly practices). This is a defensible starting point, not a claim of moral authority — it's a single number per category, meant to be argued over and changed via normal PRs.
-
-## Note on parent-company inheritance
-
-Whether a subsidiary's flags roll up into the parent's score (and vice versa) is a product decision not yet locked — likely: a company's *displayed* score is the max of its own score and its parent chain's scores, so buying from a clean subsidiary of a flagged conglomerate still surfaces the parent's flags. Revisit once the ownership graph (`docs/ARCHITECTURE.md`) is in place.
+Default category weights reflect a starting judgment about relative severity. This is a defensible starting point, not a claim of moral authority — change via normal PRs.

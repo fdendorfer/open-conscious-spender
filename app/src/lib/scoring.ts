@@ -17,11 +17,11 @@ export type FlagStatus = keyof typeof CONFIDENCE_MULTIPLIER;
 /** Saturation constant — see docs/SCORING.md for the reasoning and example table. */
 export const SATURATION_K = 12;
 
-// Score is a "goodness" score: 100 = no concerning flags, 0 = heavily flagged.
+// Bidirectional score: 50 = neutral (no data), 100 = strongly positive, 0 = strongly negative.
 export const SCORE_BANDS = {
-	red: [0, 35],
-	yellow: [36, 70],
-	green: [71, 100]
+	red: [0, 33],
+	yellow: [34, 65],
+	green: [66, 100]
 } as const;
 export type Band = keyof typeof SCORE_BANDS;
 
@@ -29,6 +29,7 @@ export interface Flag {
 	category: string;
 	severity: Severity;
 	status: FlagStatus;
+	polarity?: 'positive' | 'negative'; // defaults to 'negative'
 	decayMultiplier?: number; // reserved extension point; defaults to 1
 }
 
@@ -51,14 +52,17 @@ export function rawScore(flags: Flag[], categories: CategoryWeight[]): number {
 	const weightById = new Map(categories.map((c) => [c.id, c.defaultWeight]));
 	return flags.reduce((sum, flag) => {
 		const weight = weightById.get(flag.category);
-		if (weight === undefined) return sum; // unknown category — ignore rather than throw
+		if (weight === undefined) return sum;
 		return sum + flagContribution(flag, weight);
 	}, 0);
 }
 
-/** Converts raw flag weight into a 0-100 goodness score — 100 is best, 0 is worst. */
-export function normalizeScore(raw: number): number {
-	return Math.round(100 * Math.exp(-raw / SATURATION_K));
+/**
+ * Converts a raw flag weight into a 0–50 component.
+ * Maps 0 → 0 and ∞ → 50 with diminishing returns.
+ */
+export function saturate(raw: number): number {
+	return 50 * (1 - Math.exp(-raw / SATURATION_K));
 }
 
 export function scoreBand(score: number): Band {
@@ -67,10 +71,24 @@ export function scoreBand(score: number): Band {
 	return 'red';
 }
 
+/**
+ * Bidirectional score:
+ * - No flags → 50 (neutral / no data)
+ * - Green flags push toward 100
+ * - Red flags push toward 0
+ *
+ * score = 50 + saturate(rawPositive) − saturate(rawNegative)
+ */
 export function scoreCompany(
 	flags: Flag[],
 	categories: CategoryWeight[]
-): { score: number; band: Band } {
-	const score = normalizeScore(rawScore(flags, categories));
-	return { score, band: scoreBand(score) };
+): { score: number; band: Band; rawPos: number; rawNeg: number } {
+	const negFlags = flags.filter((f) => (f.polarity ?? 'negative') === 'negative');
+	const posFlags = flags.filter((f) => f.polarity === 'positive');
+
+	const rawNeg = rawScore(negFlags, categories);
+	const rawPos = rawScore(posFlags, categories);
+
+	const score = Math.round(50 + saturate(rawPos) - saturate(rawNeg));
+	return { score, band: scoreBand(score), rawPos, rawNeg };
 }

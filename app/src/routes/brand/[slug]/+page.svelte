@@ -14,6 +14,7 @@
 	let loaded = $state(false);
 
 	let showFlagForm = $state(false);
+	let flagPolarity = $state<'negative' | 'positive'>('negative');
 	let flagCategory = $state('');
 	let flagDescription = $state('');
 	let flagSeverity = $state<Severity>('moderate');
@@ -39,6 +40,7 @@
 			const draft = await saveDraft('flag', {
 				companyId: company.id,
 				flag: {
+					polarity: flagPolarity,
 					category: flagCategory,
 					description: flagDescription.trim(),
 					severity: flagSeverity,
@@ -82,6 +84,13 @@
 
 		{#if showFlagForm && !flagPrUrl}
 			<form class="flex flex-col gap-3" onsubmit={(e) => (e.preventDefault(), submitFlag())}>
+				<label class="flex flex-col gap-1 text-sm">
+					Flag type
+					<select class="rounded-xl border border-gray-300 px-3 py-2" bind:value={flagPolarity}>
+						<option value="negative">Red flag (concern)</option>
+						<option value="positive">Green flag (positive)</option>
+					</select>
+				</label>
 				<label class="flex flex-col gap-1 text-sm">
 					Flag category
 					<select class="rounded-xl border border-gray-300 px-3 py-2" bind:value={flagCategory}>

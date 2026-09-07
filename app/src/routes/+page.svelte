@@ -33,6 +33,7 @@
 	let manualBarcode = $state('');
 
 	let contributeName = $state('');
+	let contributePolarity = $state<'negative' | 'positive'>('negative');
 	let contributeCategory = $state('');
 	let contributeDescription = $state('');
 	let contributeSeverity = $state<Severity>('moderate');
@@ -136,6 +137,7 @@
 			name: contributeName.trim(),
 			flags: [
 				{
+					polarity: contributePolarity,
 					category: contributeCategory,
 					description: contributeDescription.trim(),
 					severity: contributeSeverity,
@@ -270,6 +272,16 @@
 				<label class="flex flex-col gap-1 text-sm">
 					Company name
 					<input class="rounded-xl border border-gray-300 px-3 py-2" bind:value={contributeName} />
+				</label>
+				<label class="flex flex-col gap-1 text-sm">
+					Flag type
+					<select
+						class="rounded-xl border border-gray-300 px-3 py-2"
+						bind:value={contributePolarity}
+					>
+						<option value="negative">Red flag (concern)</option>
+						<option value="positive">Green flag (positive)</option>
+					</select>
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
 					Flag category

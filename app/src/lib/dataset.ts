@@ -19,6 +19,7 @@ export interface StoredFlag {
 	dateAdded: string;
 	severity: 'minor' | 'moderate' | 'severe' | 'systemic';
 	status: 'sourced' | 'unverified';
+	polarity?: 'positive' | 'negative'; // defaults to 'negative'
 }
 
 export interface Company {
