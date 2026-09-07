@@ -1,0 +1,18 @@
+{
+  "id": "coop",
+  "name": "Coop",
+  "aliases": ["Coop Genossenschaft", "Naturaplan", "Prix Garantie", "Naturaline", "Oecoplan", "Betty Bossi", "Karma"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "monopoly-practices",
+      "description": "Coop and Migros together account for roughly 80% of Swiss grocery retail sales; Swiss consumer-protection group Konsumentenschutz has publicly called on the competition commission (WEKO) to act against the pair over high margins and large price gaps on organic food.",
+      "sourceUrl": "https://www.konsumentenschutz.ch/medienmitteilungen/preise-von-bio-lebensmitteln-weko-muss-gegen-coop-und-migros-vorgehen/",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

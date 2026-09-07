@@ -1,0 +1,9 @@
+{
+  "id": "denner",
+  "name": "Denner",
+  "aliases": ["Denner AG"],
+  "country": "CH",
+  "parentId": "migros",
+  "wikidataId": null,
+  "flags": []
+}

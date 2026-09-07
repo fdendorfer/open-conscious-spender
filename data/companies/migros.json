@@ -1,0 +1,34 @@
+{
+  "id": "migros",
+  "name": "Migros",
+  "aliases": ["Migros-Genossenschafts-Bund", "M-Budget", "Migros Sélection", "I am Vegan", "M-Classic"],
+  "country": "CH",
+  "parentId": null,
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "Migros announced a restructuring in May 2024 cutting an initial 150 head-office jobs as part of a wider plan to eliminate around 1,500 positions and close specialist store formats (e.g. Melectronics, Do it + Garden), stated as aimed at 'simplified processes, lean structures and clear roles.'",
+      "sourceUrl": "https://www.swissinfo.ch/eng/archive-multinational-companies/swiss-retailer-migros-starts-restructuring-with-150-job-losses/78179407",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    },
+    {
+      "category": "human-rights",
+      "description": "Migros is listed as a contacted stakeholder (Uyghur-labor concern category) in The Outlaw Ocean Project's investigation into forced labor in Chinese seafood processing; the investigation traced MSC-certified cod from supplier Donggang Jinhui, and seafood from Donggang Haimeng via Riberalves, into products sold on Migros's shelves and website.",
+      "sourceUrl": "https://theoutlawocean.com/investigations/china-the-superpower-of-seafood/discussion/stakeholders/migros/",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    },
+    {
+      "category": "monopoly-practices",
+      "description": "Migros and Coop together account for roughly 80% of Swiss grocery retail sales; Swiss consumer-protection group Konsumentenschutz has publicly called on the competition commission (WEKO) to act against the pair over high margins and large price gaps on organic food.",
+      "sourceUrl": "https://www.konsumentenschutz.ch/medienmitteilungen/preise-von-bio-lebensmitteln-weko-muss-gegen-coop-und-migros-vorgehen/",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}

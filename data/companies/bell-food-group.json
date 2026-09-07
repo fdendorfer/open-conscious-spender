@@ -1,0 +1,9 @@
+{
+  "id": "bell-food-group",
+  "name": "Bell Food Group",
+  "aliases": ["Bell", "Eisberg", "Hilcona", "Hügli"],
+  "country": "CH",
+  "parentId": "coop",
+  "wikidataId": null,
+  "flags": []
+}

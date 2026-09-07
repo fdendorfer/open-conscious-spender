@@ -1,0 +1,18 @@
+{
+  "id": "chocolat-frey",
+  "name": "Chocolat Frey",
+  "aliases": ["Frey"],
+  "country": "CH",
+  "parentId": "migros",
+  "wikidataId": null,
+  "flags": [
+    {
+      "category": "labor-rights",
+      "description": "Chocolat Frey ranked 26th (last among assessed Swiss producers) in the 2025 Chocolate Scorecard, an annual NGO/university-run assessment, which cited Migros as having the most room for improvement on cocoa-supply-chain transparency and pesticide use; Migros acknowledged the gap and pointed to a newer sustainability strategy including traceable certified cocoa and an anti-child-labor project in Ghana.",
+      "sourceUrl": "https://www.swissinfo.ch/ger/kakao-und-kinderarbeit:-so-transparent-sind-die-schokoladenfirmen/91200454",
+      "dateAdded": "2026-09-07",
+      "severity": "moderate",
+      "status": "sourced"
+    }
+  ]
+}
