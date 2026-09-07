@@ -56,7 +56,7 @@
 	<title>{company ? `${company.name} — Open Conscious Spender` : 'Open Conscious Spender'}</title>
 </svelte:head>
 
-<main class="mx-auto flex max-w-sm flex-col gap-6 p-6 sm:max-w-md">
+<main class="mx-auto flex max-w-4xl flex-col gap-6 p-6">
 	<a class="text-sm text-gray-500 underline" href={resolve('/')}>&larr; Search</a>
 
 	{#if !loaded}
