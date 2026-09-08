@@ -55,8 +55,8 @@
 </script>
 
 <div class="grid gap-8 lg:grid-cols-[1fr_300px]">
-	<!-- Main content -->
-	<div class="flex flex-col gap-6">
+	<!-- Main content: order-2 on mobile (after score), spans both sidebar rows on desktop -->
+	<div class="order-2 flex flex-col gap-6 lg:col-start-1 lg:row-start-1 lg:row-span-2">
 		<!-- Company header -->
 		<div>
 			<h1 class="text-2xl font-semibold">{company.name}</h1>
@@ -154,9 +154,8 @@
 		</div>
 	</div>
 
-	<!-- Sidebar -->
-	<div class="flex flex-col gap-4">
-		<!-- Score card -->
+	<!-- Score card: order-1 on mobile (first), desktop right col row 1 -->
+	<div class="order-1 lg:col-start-2 lg:row-start-1">
 		<div
 			class="flex flex-col items-center gap-1 rounded-xl p-6 text-center"
 			class:bg-green-50={band === 'green'}
@@ -178,7 +177,10 @@
 			>{BAND_LABEL[band]}</span>
 			<p class="mt-2 text-xs text-gray-400">50 = no data · 100 = all green · 0 = all red</p>
 		</div>
+	</div>
 
+	<!-- Breakdown + parent: order-3 on mobile (last), desktop right col row 2 -->
+	<div class="order-3 flex flex-col gap-4 lg:col-start-2 lg:row-start-2">
 		<!-- Score breakdown -->
 		<div class="flex flex-col gap-3 rounded-xl border border-gray-200 p-4">
 			<h3 class="text-sm font-medium">Score breakdown</h3>
