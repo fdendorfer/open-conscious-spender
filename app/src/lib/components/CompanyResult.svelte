@@ -65,16 +65,26 @@
 		severe: 'bg-orange-100 text-orange-800',
 		systemic: 'bg-red-100 text-red-800'
 	};
-</script>
 
-<style>
-	/* Reset browser default popover styles so Tailwind classes take full control */
-	:global([popover]) {
-		border: none;
-		padding: 0;
-		background: transparent;
+	// Shared inline style for the popover shell: transparent, anchor-positioned below the trigger.
+	// inset:auto overrides the UA's centering (inset:0 + margin:auto).
+	function popoverStyle(pid: string) {
+		return [
+			'position:fixed',
+			`position-anchor:--${pid}`,
+			'inset:auto',
+			'top:calc(anchor(bottom) + 6px)',
+			'right:calc(100vw - anchor(right))',
+			'margin:0',
+			'border:none',
+			'padding:0',
+			'background:transparent',
+			'overflow:visible',
+			'width:auto',
+			'max-width:none',
+		].join(';');
 	}
-</style>
+</script>
 
 <div class="grid gap-8 lg:grid-cols-[1fr_300px]">
 	<!-- Main content: order-2 on mobile (after score), spans both sidebar rows on desktop -->
@@ -119,7 +129,8 @@
 								<span class="font-mono text-xs text-red-400">−{points.toFixed(1)} pts</span>
 								<button
 									popovertarget={pid}
-									class="text-gray-300 hover:text-gray-500"
+									style="anchor-name: --{pid}"
+									class="text-xs text-gray-300 hover:text-gray-500"
 									aria-label="Scoring details"
 								>ⓘ</button>
 							</span>
@@ -137,28 +148,30 @@
 							<span class="text-xs text-gray-400">Added {flag.dateAdded}</span>
 						{/if}
 
-						<!-- Popover: per-flag scoring details -->
-						<div id={pid} popover class="max-w-xs rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xl">
-							<p class="mb-3 text-xs font-medium text-gray-700">How −{points.toFixed(1)} pts was scored</p>
-							<div class="flex flex-col gap-1.5 text-xs">
-								<div class="flex justify-between gap-6 text-gray-500">
-									<span>Category weight</span>
-									<span class="font-mono">×{category?.defaultWeight ?? 1}</span>
+						<!-- Popover shell (transparent, anchor-positioned) wraps the visible card -->
+						<div id={pid} popover style={popoverStyle(pid)}>
+							<div class="w-64 rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xl">
+								<p class="mb-3 text-xs font-medium text-gray-700">How −{points.toFixed(1)} pts was scored</p>
+								<div class="flex flex-col gap-1.5 text-xs">
+									<div class="flex justify-between gap-6 text-gray-500">
+										<span>Category weight</span>
+										<span class="font-mono">×{category?.defaultWeight ?? 1}</span>
+									</div>
+									<div class="flex justify-between gap-6 text-gray-500">
+										<span>Severity ({flag.severity})</span>
+										<span class="font-mono">×{SEVERITY_MULTIPLIER[flag.severity] ?? 1}</span>
+									</div>
+									<div class="flex justify-between gap-6 text-gray-500">
+										<span>Confidence ({flag.status})</span>
+										<span class="font-mono">×{CONFIDENCE_LABEL[flag.status] ?? '1.0'}</span>
+									</div>
+									<div class="mt-1 flex justify-between gap-6 border-t border-gray-100 pt-1.5 font-medium text-gray-700">
+										<span>Raw contribution</span>
+										<span class="font-mono">{points.toFixed(1)} pts</span>
+									</div>
 								</div>
-								<div class="flex justify-between gap-6 text-gray-500">
-									<span>Severity ({flag.severity})</span>
-									<span class="font-mono">×{SEVERITY_MULTIPLIER[flag.severity] ?? 1}</span>
-								</div>
-								<div class="flex justify-between gap-6 text-gray-500">
-									<span>Confidence ({flag.status})</span>
-									<span class="font-mono">×{CONFIDENCE_LABEL[flag.status] ?? '1.0'}</span>
-								</div>
-								<div class="mt-1 flex justify-between gap-6 border-t border-gray-100 pt-1.5 font-medium text-gray-700">
-									<span>Raw contribution</span>
-									<span class="font-mono">{points.toFixed(1)} pts</span>
-								</div>
+								<p class="mt-3 text-xs text-gray-400">Additional flags in the same direction count for progressively less.</p>
 							</div>
-							<p class="mt-3 text-xs text-gray-400">Additional flags in the same direction count for progressively less.</p>
 						</div>
 					</div>
 				{/each}
@@ -193,7 +206,8 @@
 								<span class="font-mono text-xs text-green-600">+{points.toFixed(1)} pts</span>
 								<button
 									popovertarget={pid}
-									class="text-gray-300 hover:text-gray-500"
+									style="anchor-name: --{pid}"
+									class="text-xs text-gray-300 hover:text-gray-500"
 									aria-label="Scoring details"
 								>ⓘ</button>
 							</span>
@@ -211,28 +225,30 @@
 							<span class="text-xs text-gray-400">Added {flag.dateAdded}</span>
 						{/if}
 
-						<!-- Popover: per-flag scoring details -->
-						<div id={pid} popover class="max-w-xs rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xl">
-							<p class="mb-3 text-xs font-medium text-gray-700">How +{points.toFixed(1)} pts was scored</p>
-							<div class="flex flex-col gap-1.5 text-xs">
-								<div class="flex justify-between gap-6 text-gray-500">
-									<span>Category weight</span>
-									<span class="font-mono">×{category?.defaultWeight ?? 1}</span>
+						<!-- Popover shell (transparent, anchor-positioned) wraps the visible card -->
+						<div id={pid} popover style={popoverStyle(pid)}>
+							<div class="w-64 rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xl">
+								<p class="mb-3 text-xs font-medium text-gray-700">How +{points.toFixed(1)} pts was scored</p>
+								<div class="flex flex-col gap-1.5 text-xs">
+									<div class="flex justify-between gap-6 text-gray-500">
+										<span>Category weight</span>
+										<span class="font-mono">×{category?.defaultWeight ?? 1}</span>
+									</div>
+									<div class="flex justify-between gap-6 text-gray-500">
+										<span>Severity ({flag.severity})</span>
+										<span class="font-mono">×{SEVERITY_MULTIPLIER[flag.severity] ?? 1}</span>
+									</div>
+									<div class="flex justify-between gap-6 text-gray-500">
+										<span>Confidence ({flag.status})</span>
+										<span class="font-mono">×{CONFIDENCE_LABEL[flag.status] ?? '1.0'}</span>
+									</div>
+									<div class="mt-1 flex justify-between gap-6 border-t border-gray-100 pt-1.5 font-medium text-gray-700">
+										<span>Raw contribution</span>
+										<span class="font-mono">{points.toFixed(1)} pts</span>
+									</div>
 								</div>
-								<div class="flex justify-between gap-6 text-gray-500">
-									<span>Severity ({flag.severity})</span>
-									<span class="font-mono">×{SEVERITY_MULTIPLIER[flag.severity] ?? 1}</span>
-								</div>
-								<div class="flex justify-between gap-6 text-gray-500">
-									<span>Confidence ({flag.status})</span>
-									<span class="font-mono">×{CONFIDENCE_LABEL[flag.status] ?? '1.0'}</span>
-								</div>
-								<div class="mt-1 flex justify-between gap-6 border-t border-gray-100 pt-1.5 font-medium text-gray-700">
-									<span>Raw contribution</span>
-									<span class="font-mono">{points.toFixed(1)} pts</span>
-								</div>
+								<p class="mt-3 text-xs text-gray-400">Additional flags in the same direction count for progressively less.</p>
 							</div>
-							<p class="mt-3 text-xs text-gray-400">Additional flags in the same direction count for progressively less.</p>
 						</div>
 					</div>
 				{/each}
@@ -270,6 +286,30 @@
 		<!-- Score breakdown -->
 		<div class="flex flex-col gap-4 rounded-xl border border-gray-200 p-4">
 			<h3 class="text-sm font-medium">How the score was calculated</h3>
+
+			<!-- Summary -->
+			<div class="flex flex-col gap-1 text-xs">
+				<div class="flex justify-between text-gray-500">
+					<span>Baseline (no data)</span>
+					<span class="font-mono">50</span>
+				</div>
+				{#if greenFlags.length > 0}
+					<div class="flex justify-between text-green-600">
+						<span>Positive signals</span>
+						<span class="font-mono">+{saturate(rawPos).toFixed(1)}</span>
+					</div>
+				{/if}
+				{#if redFlags.length > 0}
+					<div class="flex justify-between text-red-500">
+						<span>Concerns</span>
+						<span class="font-mono">−{saturate(rawNeg).toFixed(1)}</span>
+					</div>
+				{/if}
+				<div class="mt-1 flex justify-between border-t border-gray-100 pt-1.5 font-medium">
+					<span>Score</span>
+					<span class="font-mono">{score}</span>
+				</div>
+			</div>
 
 			<!-- By category -->
 			{#if categoryBreakdown.length > 0}
