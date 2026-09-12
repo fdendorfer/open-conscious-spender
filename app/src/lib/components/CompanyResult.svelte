@@ -312,15 +312,21 @@
 					<span class="font-mono">50</span>
 				</div>
 				{#if greenFlags.length > 0}
-					<div class="flex justify-between text-green-600">
-						<span>Positive signals</span>
-						<span class="font-mono">+{saturate(rawPos).toFixed(1)}</span>
+					<div class="text-green-600">
+						<div class="flex justify-between">
+							<span>Positive signals</span>
+							<span class="font-mono">+{saturate(rawPos).toFixed(1)}</span>
+						</div>
+						<p class="mt-0.5 text-xs text-gray-400">{rawPos.toFixed(1)} raw pts · diminishing returns applied</p>
 					</div>
 				{/if}
 				{#if redFlags.length > 0}
-					<div class="flex justify-between text-red-500">
-						<span>Concerns</span>
-						<span class="font-mono">−{saturate(rawNeg).toFixed(1)}</span>
+					<div class="text-red-500">
+						<div class="flex justify-between">
+							<span>Concerns</span>
+							<span class="font-mono">−{saturate(rawNeg).toFixed(1)}</span>
+						</div>
+						<p class="mt-0.5 text-xs text-gray-400">{rawNeg.toFixed(1)} raw pts · diminishing returns applied</p>
 					</div>
 				{/if}
 				<div class="mt-1 flex justify-between border-t border-gray-100 pt-1.5 font-medium">
@@ -332,7 +338,7 @@
 			<!-- By category -->
 			{#if categoryBreakdown.length > 0}
 				<div class="flex flex-col gap-1.5">
-					<p class="mb-0.5 text-xs font-medium text-gray-500">By category</p>
+					<p class="mb-0.5 text-xs font-medium text-gray-500">By category (raw pts)</p>
 					{#each categoryBreakdown as { name, redPts, greenPts }}
 						<div class="flex items-center justify-between gap-2 text-xs">
 							<span class="min-w-0 flex-1 truncate text-gray-600">{name}</span>
@@ -346,6 +352,18 @@
 							</div>
 						</div>
 					{/each}
+					<!-- Raw totals row — matches the numbers referenced in the summary above -->
+					<div class="flex items-center justify-between gap-2 border-t border-gray-100 pt-1.5 text-xs font-medium text-gray-500">
+						<span>Raw total</span>
+						<div class="flex shrink-0 gap-3">
+							{#if rawPos > 0}
+								<span class="font-mono text-green-600">+{rawPos.toFixed(1)}</span>
+							{/if}
+							{#if rawNeg > 0}
+								<span class="font-mono text-red-400">−{rawNeg.toFixed(1)}</span>
+							{/if}
+						</div>
+					</div>
 				</div>
 			{:else}
 				<p class="text-xs text-gray-400">No flags recorded yet — score defaults to 50.</p>
