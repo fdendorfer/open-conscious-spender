@@ -67,7 +67,7 @@
 
 <div class="grid gap-8 lg:grid-cols-[1fr_300px]">
 	<!-- Main content: order-2 on mobile (after score), spans both sidebar rows on desktop -->
-	<div class="order-2 flex flex-col gap-6 lg:col-start-1 lg:row-start-1 lg:row-span-2">
+	<div class="order-2 flex min-w-0 flex-col gap-6 overflow-hidden lg:col-start-1 lg:row-start-1 lg:row-span-2">
 		<!-- Company header -->
 		<div>
 			<h1 class="text-2xl font-semibold">{company.name}</h1>
@@ -111,7 +111,7 @@
 								href={flag.sourceUrl}
 								target="_blank"
 								rel="noreferrer external"
-								class="truncate text-xs text-blue-600 hover:underline">{flag.sourceUrl}</a
+								class="break-all text-xs text-blue-600 hover:underline">{flag.sourceUrl}</a
 							>
 						{/if}
 						{#if flag.dateAdded}
@@ -153,7 +153,7 @@
 								href={flag.sourceUrl}
 								target="_blank"
 								rel="noreferrer external"
-								class="truncate text-xs text-blue-600 hover:underline">{flag.sourceUrl}</a
+								class="break-all text-xs text-blue-600 hover:underline">{flag.sourceUrl}</a
 							>
 						{/if}
 						{#if flag.dateAdded}
