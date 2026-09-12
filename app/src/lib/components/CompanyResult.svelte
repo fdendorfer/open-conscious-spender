@@ -277,7 +277,28 @@
 				class:text-yellow-600={band === 'yellow'}
 				class:text-red-600={band === 'red'}
 			>{BAND_LABEL[band]}</span>
-			<p class="mt-2 text-xs text-gray-400">50 = no data · 100 = all green · 0 = all red</p>
+			<!-- Score gauge -->
+			<div class="relative mt-3 w-full">
+				<!-- Downward triangle marker positioned at the score -->
+				<div class="relative mb-1 h-2">
+					<div
+						class="absolute bottom-0"
+						style="left: clamp(0px, calc({score}% - 4px), calc(100% - 8px)); width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid #374151;"
+					></div>
+				</div>
+				<!-- Zone bar: red · yellow · green -->
+				<div class="flex h-2 w-full gap-[2px]">
+					<div class="flex-[33] rounded-l-full bg-red-400"></div>
+					<div class="flex-[32] bg-yellow-300"></div>
+					<div class="flex-[35] rounded-r-full bg-green-400"></div>
+				</div>
+				<!-- Scale labels -->
+				<div class="mt-1.5 flex justify-between text-xs text-gray-400">
+					<span>0</span>
+					<span>50</span>
+					<span>100</span>
+				</div>
+			</div>
 		</div>
 	</div>
 
