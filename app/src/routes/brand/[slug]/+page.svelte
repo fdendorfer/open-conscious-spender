@@ -58,10 +58,8 @@
 	<title>{company ? `${company.name} — Open Conscious Spender` : 'Open Conscious Spender'}</title>
 </svelte:head>
 
-<main class="mx-auto flex max-w-4xl flex-col gap-6 p-6">
-	<a class="text-sm text-gray-500 underline" href={resolve('/')}>&larr; Search</a>
-
-	{#if !loaded}
+<main class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-10">
+{#if !loaded}
 		<p class="text-sm text-gray-500">Loading…</p>
 	{:else if !company || !dataset}
 		<p class="text-sm text-gray-600">
