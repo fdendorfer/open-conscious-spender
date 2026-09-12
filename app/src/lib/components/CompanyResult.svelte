@@ -66,23 +66,22 @@
 		systemic: 'bg-red-100 text-red-800'
 	};
 
-	// Shared inline style for the popover shell: transparent, anchor-positioned below the trigger.
-	// inset:auto overrides the UA's centering (inset:0 + margin:auto).
-	function popoverStyle(pid: string) {
-		return [
-			'position:fixed',
-			`position-anchor:--${pid}`,
-			'inset:auto',
-			'top:calc(anchor(bottom) + 6px)',
-			'right:calc(100vw - anchor(right))',
-			'margin:0',
-			'border:none',
-			'padding:0',
-			'background:transparent',
-			'overflow:visible',
-			'width:auto',
-			'max-width:none',
-		].join(';');
+	// Position the popover below the trigger button using getBoundingClientRect.
+	// Reliable cross-browser alternative to CSS anchor positioning.
+	function positionPopover(e: Event) {
+		const ev = e as ToggleEvent;
+		if (ev.newState !== 'open') return;
+		const popoverEl = e.currentTarget as HTMLElement;
+		const button = document.querySelector<HTMLElement>(`[popovertarget="${popoverEl.id}"]`);
+		if (!button) return;
+		const rect = button.getBoundingClientRect();
+		const popoverWidth = 256; // matches w-64
+		const margin = 8;
+		const left = Math.max(margin, Math.min(rect.right - popoverWidth, window.innerWidth - popoverWidth - margin));
+		popoverEl.style.margin = '0';
+		popoverEl.style.inset = 'auto';
+		popoverEl.style.top = `${rect.bottom + 6}px`;
+		popoverEl.style.left = `${left}px`;
 	}
 </script>
 
@@ -129,7 +128,6 @@
 								<span class="font-mono text-xs text-red-400">−{points.toFixed(1)} pts</span>
 								<button
 									popovertarget={pid}
-									style="anchor-name: --{pid}"
 									class="text-xs text-gray-300 hover:text-gray-500"
 									aria-label="Scoring details"
 								>ⓘ</button>
@@ -149,7 +147,7 @@
 						{/if}
 
 						<!-- Popover shell (transparent, anchor-positioned) wraps the visible card -->
-						<div id={pid} popover style={popoverStyle(pid)}>
+						<div id={pid} popover ontoggle={positionPopover} style="border:none;padding:0;background:transparent;margin:0;overflow:visible;">
 							<div class="w-64 rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xl">
 								<p class="mb-3 text-xs font-medium text-gray-700">How −{points.toFixed(1)} pts was scored</p>
 								<div class="flex flex-col gap-1.5 text-xs">
@@ -206,7 +204,6 @@
 								<span class="font-mono text-xs text-green-600">+{points.toFixed(1)} pts</span>
 								<button
 									popovertarget={pid}
-									style="anchor-name: --{pid}"
 									class="text-xs text-gray-300 hover:text-gray-500"
 									aria-label="Scoring details"
 								>ⓘ</button>
@@ -226,7 +223,7 @@
 						{/if}
 
 						<!-- Popover shell (transparent, anchor-positioned) wraps the visible card -->
-						<div id={pid} popover style={popoverStyle(pid)}>
+						<div id={pid} popover ontoggle={positionPopover} style="border:none;padding:0;background:transparent;margin:0;overflow:visible;">
 							<div class="w-64 rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xl">
 								<p class="mb-3 text-xs font-medium text-gray-700">How +{points.toFixed(1)} pts was scored</p>
 								<div class="flex flex-col gap-1.5 text-xs">
