@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { ownershipChain, type Company, type Dataset } from '$lib/dataset';
-	import { scoreCompany, flagContribution, saturate } from '$lib/scoring';
+	import { scoreCompany, flagContribution, saturate, SEVERITY_MULTIPLIER } from '$lib/scoring';
 	import { CATEGORY_ICONS } from '$lib/categoryIcons';
 
 	let { company, dataset }: { company: Company; dataset: Dataset } = $props();
@@ -51,6 +51,8 @@
 		})()
 	);
 
+	const CONFIDENCE_LABEL: Record<string, string> = { sourced: '1.0', unverified: '0.6' };
+
 	const BAND_LABEL: Record<string, string> = {
 		green: 'Low concern',
 		yellow: 'Neutral / insufficient data',
@@ -64,6 +66,15 @@
 		systemic: 'bg-red-100 text-red-800'
 	};
 </script>
+
+<style>
+	/* Reset browser default popover styles so Tailwind classes take full control */
+	:global([popover]) {
+		border: none;
+		padding: 0;
+		background: transparent;
+	}
+</style>
 
 <div class="grid gap-8 lg:grid-cols-[1fr_300px]">
 	<!-- Main content: order-2 on mobile (after score), spans both sidebar rows on desktop -->
@@ -90,7 +101,8 @@
 			{#if redFlags.length === 0}
 				<p class="text-sm text-gray-400">No red flags recorded.</p>
 			{:else}
-				{#each redFlags as { flag, category, points, Icon }}
+				{#each redFlags as { flag, category, points, Icon }, i}
+					{@const pid = `${company.id}-r${i}`}
 					<div class="flex flex-col gap-2 rounded-xl border border-red-100 p-4">
 						<div class="flex flex-wrap items-center gap-2">
 							{#if Icon}<Icon size={16} />{/if}
@@ -103,7 +115,14 @@
 							{:else}
 								<span class="text-xs text-gray-400">○ Unverified</span>
 							{/if}
-							<span class="ml-auto font-mono text-xs text-red-400">−{points.toFixed(1)} pts</span>
+							<span class="ml-auto flex items-center gap-1.5">
+								<span class="font-mono text-xs text-red-400">−{points.toFixed(1)} pts</span>
+								<button
+									popovertarget={pid}
+									class="text-gray-300 hover:text-gray-500"
+									aria-label="Scoring details"
+								>ⓘ</button>
+							</span>
 						</div>
 						<p class="text-sm text-gray-700">{flag.description}</p>
 						{#if flag.sourceUrl}
@@ -117,6 +136,30 @@
 						{#if flag.dateAdded}
 							<span class="text-xs text-gray-400">Added {flag.dateAdded}</span>
 						{/if}
+
+						<!-- Popover: per-flag scoring details -->
+						<div id={pid} popover class="max-w-xs rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xl">
+							<p class="mb-3 text-xs font-medium text-gray-700">How −{points.toFixed(1)} pts was scored</p>
+							<div class="flex flex-col gap-1.5 text-xs">
+								<div class="flex justify-between gap-6 text-gray-500">
+									<span>Category weight</span>
+									<span class="font-mono">×{category?.defaultWeight ?? 1}</span>
+								</div>
+								<div class="flex justify-between gap-6 text-gray-500">
+									<span>Severity ({flag.severity})</span>
+									<span class="font-mono">×{SEVERITY_MULTIPLIER[flag.severity] ?? 1}</span>
+								</div>
+								<div class="flex justify-between gap-6 text-gray-500">
+									<span>Confidence ({flag.status})</span>
+									<span class="font-mono">×{CONFIDENCE_LABEL[flag.status] ?? '1.0'}</span>
+								</div>
+								<div class="mt-1 flex justify-between gap-6 border-t border-gray-100 pt-1.5 font-medium text-gray-700">
+									<span>Raw contribution</span>
+									<span class="font-mono">{points.toFixed(1)} pts</span>
+								</div>
+							</div>
+							<p class="mt-3 text-xs text-gray-400">Additional flags in the same direction count for progressively less.</p>
+						</div>
 					</div>
 				{/each}
 			{/if}
@@ -132,7 +175,8 @@
 			{#if greenFlags.length === 0}
 				<p class="text-sm text-gray-400">No green flags recorded.</p>
 			{:else}
-				{#each greenFlags as { flag, category, points, Icon }}
+				{#each greenFlags as { flag, category, points, Icon }, i}
+					{@const pid = `${company.id}-g${i}`}
 					<div class="flex flex-col gap-2 rounded-xl border border-green-100 p-4">
 						<div class="flex flex-wrap items-center gap-2">
 							{#if Icon}<Icon size={16} />{/if}
@@ -145,7 +189,14 @@
 							{:else}
 								<span class="text-xs text-gray-400">○ Unverified</span>
 							{/if}
-							<span class="ml-auto font-mono text-xs text-green-600">+{points.toFixed(1)} pts</span>
+							<span class="ml-auto flex items-center gap-1.5">
+								<span class="font-mono text-xs text-green-600">+{points.toFixed(1)} pts</span>
+								<button
+									popovertarget={pid}
+									class="text-gray-300 hover:text-gray-500"
+									aria-label="Scoring details"
+								>ⓘ</button>
+							</span>
 						</div>
 						<p class="text-sm text-gray-700">{flag.description}</p>
 						{#if flag.sourceUrl}
@@ -159,6 +210,30 @@
 						{#if flag.dateAdded}
 							<span class="text-xs text-gray-400">Added {flag.dateAdded}</span>
 						{/if}
+
+						<!-- Popover: per-flag scoring details -->
+						<div id={pid} popover class="max-w-xs rounded-xl border border-gray-200 bg-white p-4 text-left shadow-xl">
+							<p class="mb-3 text-xs font-medium text-gray-700">How +{points.toFixed(1)} pts was scored</p>
+							<div class="flex flex-col gap-1.5 text-xs">
+								<div class="flex justify-between gap-6 text-gray-500">
+									<span>Category weight</span>
+									<span class="font-mono">×{category?.defaultWeight ?? 1}</span>
+								</div>
+								<div class="flex justify-between gap-6 text-gray-500">
+									<span>Severity ({flag.severity})</span>
+									<span class="font-mono">×{SEVERITY_MULTIPLIER[flag.severity] ?? 1}</span>
+								</div>
+								<div class="flex justify-between gap-6 text-gray-500">
+									<span>Confidence ({flag.status})</span>
+									<span class="font-mono">×{CONFIDENCE_LABEL[flag.status] ?? '1.0'}</span>
+								</div>
+								<div class="mt-1 flex justify-between gap-6 border-t border-gray-100 pt-1.5 font-medium text-gray-700">
+									<span>Raw contribution</span>
+									<span class="font-mono">{points.toFixed(1)} pts</span>
+								</div>
+							</div>
+							<p class="mt-3 text-xs text-gray-400">Additional flags in the same direction count for progressively less.</p>
+						</div>
 					</div>
 				{/each}
 			{/if}
@@ -196,33 +271,9 @@
 		<div class="flex flex-col gap-4 rounded-xl border border-gray-200 p-4">
 			<h3 class="text-sm font-medium">How the score was calculated</h3>
 
-			<!-- Summary -->
-			<div class="flex flex-col gap-1 text-xs">
-				<div class="flex justify-between text-gray-500">
-					<span>Baseline (no data)</span>
-					<span class="font-mono">50</span>
-				</div>
-				{#if greenFlags.length > 0}
-					<div class="flex justify-between text-green-600">
-						<span>Positive signals</span>
-						<span class="font-mono">+{saturate(rawPos).toFixed(1)}</span>
-					</div>
-				{/if}
-				{#if redFlags.length > 0}
-					<div class="flex justify-between text-red-500">
-						<span>Concerns</span>
-						<span class="font-mono">−{saturate(rawNeg).toFixed(1)}</span>
-					</div>
-				{/if}
-				<div class="mt-1 flex justify-between border-t border-gray-100 pt-1.5 font-medium">
-					<span>Score</span>
-					<span class="font-mono">{score}</span>
-				</div>
-			</div>
-
-			<!-- Per category -->
+			<!-- By category -->
 			{#if categoryBreakdown.length > 0}
-				<div class="flex flex-col gap-1.5 border-t border-gray-100 pt-3">
+				<div class="flex flex-col gap-1.5">
 					<p class="mb-0.5 text-xs font-medium text-gray-500">By category</p>
 					{#each categoryBreakdown as { name, redPts, greenPts }}
 						<div class="flex items-center justify-between gap-2 text-xs">
@@ -238,12 +289,28 @@
 						</div>
 					{/each}
 				</div>
+			{:else}
+				<p class="text-xs text-gray-400">No flags recorded yet — score defaults to 50.</p>
 			{/if}
 
-			<!-- Plain language -->
-			<p class="border-t border-gray-100 pt-3 text-xs text-gray-400">
-				Points are based on category weight and severity. Each additional flag in the same direction counts for a little less, so no single issue or initiative can pin the score to an extreme. Unverified flags count at 60%.
-			</p>
+			<!-- Expandable: how points work -->
+			<details class="border-t border-gray-100 pt-3">
+				<summary class="cursor-pointer select-none text-xs text-gray-400 hover:text-gray-600">
+					How points work
+				</summary>
+				<div class="mt-3 flex flex-col gap-2 text-xs text-gray-500">
+					<div class="flex flex-col gap-1">
+						{#each Object.entries(SEVERITY_MULTIPLIER) as [sev, mult]}
+							<div class="flex items-center gap-2">
+								<span class="rounded-full px-2 py-0.5 {SEVERITY_COLOR[sev] ?? ''}">{sev}</span>
+								<span class="text-gray-400">×{mult}</span>
+							</div>
+						{/each}
+					</div>
+					<p>Unverified flags count at 60%.</p>
+					<p>Additional flags in the same direction count for progressively less — so no single issue or initiative can pin a score to 0 or 100.</p>
+				</div>
+			</details>
 		</div>
 
 		<!-- Parent company chain -->
