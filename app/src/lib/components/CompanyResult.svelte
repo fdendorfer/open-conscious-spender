@@ -1,14 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { ownershipChain, type Company, type Dataset } from '$lib/dataset';
-	import {
-		scoreCompany,
-		flagContribution,
-		rawScore,
-		saturate,
-		SATURATION_K,
-		SEVERITY_MULTIPLIER
-	} from '$lib/scoring';
+	import { scoreCompany, flagContribution, saturate } from '$lib/scoring';
 	import { CATEGORY_ICONS } from '$lib/categoryIcons';
 
 	let { company, dataset }: { company: Company; dataset: Dataset } = $props();
@@ -38,6 +31,24 @@
 				return { flag, category, points, Icon };
 			})
 			.sort((a, b) => b.points - a.points)
+	);
+
+	type CategoryRow = { name: string; redPts: number; greenPts: number };
+	let categoryBreakdown = $derived(
+		(() => {
+			const cats = new Map<string, CategoryRow>();
+			for (const { flag, category, points } of redFlags) {
+				const key = flag.category;
+				const e = cats.get(key) ?? { name: category?.name ?? key, redPts: 0, greenPts: 0 };
+				cats.set(key, { ...e, redPts: e.redPts + points });
+			}
+			for (const { flag, category, points } of greenFlags) {
+				const key = flag.category;
+				const e = cats.get(key) ?? { name: category?.name ?? key, redPts: 0, greenPts: 0 };
+				cats.set(key, { ...e, greenPts: e.greenPts + points });
+			}
+			return [...cats.values()].sort((a, b) => b.redPts - b.greenPts - (a.redPts - a.greenPts));
+		})()
 	);
 
 	const BAND_LABEL: Record<string, string> = {
@@ -182,68 +193,57 @@
 	<!-- Breakdown + parent: order-3 on mobile (last), desktop right col row 2 -->
 	<div class="order-3 flex flex-col gap-4 lg:col-start-2 lg:row-start-2">
 		<!-- Score breakdown -->
-		<div class="flex flex-col gap-3 rounded-xl border border-gray-200 p-4">
-			<h3 class="text-sm font-medium">Score breakdown</h3>
+		<div class="flex flex-col gap-4 rounded-xl border border-gray-200 p-4">
+			<h3 class="text-sm font-medium">How the score was calculated</h3>
 
+			<!-- Summary -->
 			<div class="flex flex-col gap-1 text-xs">
-				<div class="flex items-center justify-between text-gray-500">
-					<span>Base (no data)</span>
+				<div class="flex justify-between text-gray-500">
+					<span>Baseline (no data)</span>
 					<span class="font-mono">50</span>
 				</div>
 				{#if greenFlags.length > 0}
-					<div class="flex items-center justify-between text-green-600">
-						<span>Green flags (+{greenFlags.length})</span>
+					<div class="flex justify-between text-green-600">
+						<span>Positive signals</span>
 						<span class="font-mono">+{saturate(rawPos).toFixed(1)}</span>
 					</div>
 				{/if}
 				{#if redFlags.length > 0}
-					<div class="flex items-center justify-between text-red-500">
-						<span>Red flags ({redFlags.length})</span>
+					<div class="flex justify-between text-red-500">
+						<span>Concerns</span>
 						<span class="font-mono">−{saturate(rawNeg).toFixed(1)}</span>
 					</div>
 				{/if}
-				<div class="mt-1 flex items-center justify-between border-t border-gray-100 pt-1.5 font-medium">
+				<div class="mt-1 flex justify-between border-t border-gray-100 pt-1.5 font-medium">
 					<span>Score</span>
 					<span class="font-mono">{score}</span>
 				</div>
 			</div>
 
-			{#if redFlags.length > 0 || greenFlags.length > 0}
-				<div class="flex flex-col gap-1 border-t border-gray-100 pt-3">
-					<p class="text-xs text-gray-400 mb-1">Per flag:</p>
-					{#each [...redFlags].map(f => ({ ...f, polarity: 'negative' })) as { flag, category, points }}
-						<div class="flex items-center gap-2 text-xs">
-							<span class="min-w-0 flex-1 truncate text-gray-500">{category?.name ?? flag.category}</span>
-							<span class="shrink-0 text-gray-400">{flag.severity}</span>
-							<span class="w-14 shrink-0 text-right font-mono text-red-400">−{points.toFixed(1)}</span>
-						</div>
-					{/each}
-					{#each greenFlags as { flag, category, points }}
-						<div class="flex items-center gap-2 text-xs">
-							<span class="min-w-0 flex-1 truncate text-gray-500">{category?.name ?? flag.category}</span>
-							<span class="shrink-0 text-gray-400">{flag.severity}</span>
-							<span class="w-14 shrink-0 text-right font-mono text-green-600">+{points.toFixed(1)}</span>
+			<!-- Per category -->
+			{#if categoryBreakdown.length > 0}
+				<div class="flex flex-col gap-1.5 border-t border-gray-100 pt-3">
+					<p class="mb-0.5 text-xs font-medium text-gray-500">By category</p>
+					{#each categoryBreakdown as { name, redPts, greenPts }}
+						<div class="flex items-center justify-between gap-2 text-xs">
+							<span class="min-w-0 flex-1 truncate text-gray-600">{name}</span>
+							<div class="flex shrink-0 gap-3">
+								{#if greenPts > 0}
+									<span class="font-mono text-green-600">+{greenPts.toFixed(1)}</span>
+								{/if}
+								{#if redPts > 0}
+									<span class="font-mono text-red-400">−{redPts.toFixed(1)}</span>
+								{/if}
+							</div>
 						</div>
 					{/each}
 				</div>
 			{/if}
 
-			<div class="rounded bg-gray-50 px-3 py-2 font-mono text-xs text-gray-500">
-				50 + {saturate(rawPos).toFixed(1)} − {saturate(rawNeg).toFixed(1)} = {score}
-			</div>
-
-			<div class="flex flex-col gap-1 text-xs text-gray-400">
-				<p>Each component saturates at 50 (K = {SATURATION_K}).</p>
-				{#each Object.entries(SEVERITY_MULTIPLIER) as [sev, mult]}
-					<div class="flex items-center gap-2">
-						<span
-							class="rounded-full px-2 py-0.5 {SEVERITY_COLOR[sev] ?? ''}">{sev}</span
-						>
-						<span>×{mult}</span>
-					</div>
-				{/each}
-				<p class="mt-1">Unverified flags count at 60%.</p>
-			</div>
+			<!-- Plain language -->
+			<p class="border-t border-gray-100 pt-3 text-xs text-gray-400">
+				Points are based on category weight and severity. Each additional flag in the same direction counts for a little less, so no single issue or initiative can pin the score to an extreme. Unverified flags count at 60%.
+			</p>
 		</div>
 
 		<!-- Parent company chain -->
