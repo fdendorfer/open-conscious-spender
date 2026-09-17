@@ -66,22 +66,42 @@
 		systemic: 'bg-red-100 text-red-800'
 	};
 
-	// Position the popover below the trigger button using getBoundingClientRect.
-	// Reliable cross-browser alternative to CSS anchor positioning.
+	// Popovers render in the top layer with position:fixed, so they don't
+	// follow the page on scroll/resize — track the trigger button live while open.
+	let stopTrackingPopover: (() => void) | null = null;
+
 	function positionPopover(e: Event) {
 		const ev = e as ToggleEvent;
-		if (ev.newState !== 'open') return;
 		const popoverEl = e.currentTarget as HTMLElement;
+
+		if (ev.newState !== 'open') {
+			stopTrackingPopover?.();
+			stopTrackingPopover = null;
+			return;
+		}
+
 		const button = document.querySelector<HTMLElement>(`[popovertarget="${popoverEl.id}"]`);
 		if (!button) return;
-		const rect = button.getBoundingClientRect();
-		const popoverWidth = 256; // matches w-64
-		const margin = 8;
-		const left = Math.max(margin, Math.min(rect.right - popoverWidth, window.innerWidth - popoverWidth - margin));
-		popoverEl.style.margin = '0';
-		popoverEl.style.inset = 'auto';
-		popoverEl.style.top = `${rect.bottom + 6}px`;
-		popoverEl.style.left = `${left}px`;
+
+		const reposition = () => {
+			const rect = button.getBoundingClientRect();
+			const popoverWidth = 256; // matches w-64
+			const margin = 8;
+			const left = Math.max(margin, Math.min(rect.right - popoverWidth, window.innerWidth - popoverWidth - margin));
+			popoverEl.style.margin = '0';
+			popoverEl.style.inset = 'auto';
+			popoverEl.style.top = `${rect.bottom + 6}px`;
+			popoverEl.style.left = `${left}px`;
+		};
+
+		reposition();
+		window.addEventListener('scroll', reposition, { passive: true, capture: true });
+		window.addEventListener('resize', reposition);
+		stopTrackingPopover?.();
+		stopTrackingPopover = () => {
+			window.removeEventListener('scroll', reposition, true);
+			window.removeEventListener('resize', reposition);
+		};
 	}
 </script>
 
@@ -132,7 +152,7 @@
 								<span class="font-mono text-xs text-red-400">−{points.toFixed(1)} pts</span>
 								<button
 									popovertarget={pid}
-									class="text-xs text-gray-300 hover:text-gray-500"
+									class="-m-2.5 p-2.5 text-xs text-gray-300 hover:text-gray-500"
 									aria-label="Scoring details"
 								>ⓘ</button>
 							</span>
@@ -208,7 +228,7 @@
 								<span class="font-mono text-xs text-green-600">+{points.toFixed(1)} pts</span>
 								<button
 									popovertarget={pid}
-									class="text-xs text-gray-300 hover:text-gray-500"
+									class="-m-2.5 p-2.5 text-xs text-gray-300 hover:text-gray-500"
 									aria-label="Scoring details"
 								>ⓘ</button>
 							</span>

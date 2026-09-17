@@ -52,6 +52,17 @@ async function fetchJson<T>(url: string): Promise<T> {
 }
 
 /**
+ * Backfills fields added to the schema after older bundles/caches were written
+ * (e.g. IndexedDB may still hold a dataset fetched before `brands` existed).
+ */
+function normalizeDataset(raw: Dataset): Dataset {
+	return {
+		...raw,
+		companies: raw.companies.map((c) => ({ ...c, brands: c.brands ?? [] }))
+	};
+}
+
+/**
  * Returns the freshest dataset available: cached copy immediately if present,
  * refreshed in the background when online and stale. Never blocks on network
  * when a cached copy exists — this needs to work standing in a store aisle.
@@ -63,12 +74,12 @@ export async function loadDataset(): Promise<Dataset> {
 	// loadDataset() again later (e.g. on next app foreground)
 	void refreshIfStale(cached);
 
-	if (cached) return cached;
+	if (cached) return normalizeDataset(cached);
 
 	// no cache yet (first run) — this one has to block on the network
 	const bundle = await fetchJson<Omit<Dataset, 'version'>>(`${RAW_BASE}/bundle.json`);
 	const meta = await fetchJson<Meta>(`${RAW_BASE}/meta.json`);
-	const dataset: Dataset = { ...bundle, version: meta.version };
+	const dataset = normalizeDataset({ ...bundle, version: meta.version });
 	await set(CACHE_KEY, dataset);
 	return dataset;
 }
@@ -78,7 +89,7 @@ async function refreshIfStale(cached: Dataset | undefined): Promise<void> {
 		const meta = await fetchJson<Meta>(`${RAW_BASE}/meta.json`);
 		if (cached && cached.version === meta.version) return;
 		const bundle = await fetchJson<Omit<Dataset, 'version'>>(`${RAW_BASE}/bundle.json`);
-		await set(CACHE_KEY, { ...bundle, version: meta.version });
+		await set(CACHE_KEY, normalizeDataset({ ...bundle, version: meta.version }));
 	} catch {
 		// offline or GitHub unreachable — keep serving the cached copy
 	}
