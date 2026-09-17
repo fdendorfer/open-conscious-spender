@@ -1,7 +1,11 @@
 {
   "id": "julius-baer",
   "name": "Julius Bär",
-  "aliases": ["Julius Baer", "Bank Julius Bär"],
+  "aliases": [
+    "Julius Baer",
+    "Bank Julius Bär"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

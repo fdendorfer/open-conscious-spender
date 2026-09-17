@@ -1,7 +1,16 @@
 {
   "id": "loreal",
   "name": "L'Oréal",
-  "aliases": ["Maybelline", "Garnier", "Lancôme", "Kiehl's"],
+  "aliases": [],
+  "brands": [
+    "Maybelline",
+    "Garnier",
+    "Lancôme",
+    "Kiehl's",
+    "NYX",
+    "Vichy",
+    "La Roche-Posay"
+  ],
   "country": "FR",
   "parentId": null,
   "wikidataId": null,

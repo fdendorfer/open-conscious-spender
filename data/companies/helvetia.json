@@ -1,7 +1,10 @@
 {
   "id": "helvetia",
   "name": "Helvetia",
-  "aliases": ["Helvetia Versicherungen"],
+  "aliases": [
+    "Helvetia Versicherungen"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

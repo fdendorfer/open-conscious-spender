@@ -1,7 +1,10 @@
 {
   "id": "cembra",
   "name": "Cembra",
-  "aliases": ["Cembra Money Bank"],
+  "aliases": [
+    "Cembra Money Bank"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

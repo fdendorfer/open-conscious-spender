@@ -1,7 +1,19 @@
 {
   "id": "unilever",
   "name": "Unilever",
-  "aliases": ["Dove", "Knorr", "Hellmann's", "Ben & Jerry's", "Lipton", "Axe"],
+  "aliases": [],
+  "brands": [
+    "Dove",
+    "Knorr",
+    "Hellmann's",
+    "Ben & Jerry's",
+    "Lipton",
+    "Axe",
+    "Magnum",
+    "Cif",
+    "Domestos",
+    "Vaseline"
+  ],
   "country": "GB",
   "parentId": null,
   "wikidataId": null,

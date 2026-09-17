@@ -1,7 +1,16 @@
 {
   "id": "danone",
   "name": "Danone",
-  "aliases": ["Danone S.A.", "Evian", "Volvic", "Alpro"],
+  "aliases": [
+    "Danone S.A."
+  ],
+  "brands": [
+    "Evian",
+    "Volvic",
+    "Alpro",
+    "Actimel",
+    "Activia"
+  ],
   "country": "FR",
   "parentId": null,
   "wikidataId": null,

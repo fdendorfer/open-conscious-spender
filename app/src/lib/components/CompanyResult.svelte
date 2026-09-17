@@ -97,6 +97,10 @@
 					<span class="text-gray-300">·</span>
 					<span class="text-xs">Also known as: {company.aliases.join(', ')}</span>
 				{/if}
+				{#if company.brands.length > 0}
+					<span class="text-gray-300">·</span>
+					<span class="text-xs">Brands: {company.brands.join(', ')}</span>
+				{/if}
 			</div>
 		</div>
 

@@ -1,7 +1,11 @@
 {
   "id": "allianz",
   "name": "Allianz",
-  "aliases": ["Allianz SE", "Allianz Global Investors"],
+  "aliases": [
+    "Allianz SE",
+    "Allianz Global Investors"
+  ],
+  "brands": [],
   "country": "DE",
   "parentId": null,
   "wikidataId": null,

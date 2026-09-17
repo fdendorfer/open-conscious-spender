@@ -1,7 +1,10 @@
 {
   "id": "shein",
   "name": "Shein",
-  "aliases": ["SHEIN"],
+  "aliases": [
+    "SHEIN"
+  ],
+  "brands": [],
   "country": "SG",
   "parentId": null,
   "wikidataId": null,

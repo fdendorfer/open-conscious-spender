@@ -1,7 +1,20 @@
 {
   "id": "nestle",
   "name": "Nestlé",
-  "aliases": ["Nestle", "Maggi", "Thomy", "Cailler", "Nespresso"],
+  "aliases": [
+    "Nestle"
+  ],
+  "brands": [
+    "Maggi",
+    "Thomy",
+    "Cailler",
+    "Nespresso",
+    "KitKat",
+    "Nescafé",
+    "Smarties",
+    "Purina",
+    "Buitoni"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

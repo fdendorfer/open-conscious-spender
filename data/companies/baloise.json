@@ -1,7 +1,10 @@
 {
   "id": "baloise",
   "name": "Baloise Holding",
-  "aliases": ["Baloise"],
+  "aliases": [
+    "Baloise"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

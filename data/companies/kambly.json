@@ -1,7 +1,10 @@
 {
   "id": "kambly",
   "name": "Kambly Holding AG",
-  "aliases": ["Kambly"],
+  "aliases": [
+    "Kambly"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

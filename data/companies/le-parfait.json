@@ -1,7 +1,11 @@
 {
   "id": "le-parfait",
   "name": "Le Parfait",
-  "aliases": ["VMC", "Verreries Mécaniques Champenoises"],
+  "aliases": [
+    "VMC",
+    "Verreries Mécaniques Champenoises"
+  ],
+  "brands": [],
   "country": "FR",
   "parentId": null,
   "wikidataId": null,

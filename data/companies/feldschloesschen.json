@@ -1,7 +1,13 @@
 {
   "id": "feldschloesschen",
   "name": "Feldschlösschen",
-  "aliases": ["Feldschlösschen Getränke AG"],
+  "aliases": [
+    "Feldschlösschen Getränke AG"
+  ],
+  "brands": [
+    "Valser",
+    "Cardinal"
+  ],
   "country": "CH",
   "parentId": "carlsberg",
   "wikidataId": null,

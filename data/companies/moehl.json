@@ -1,7 +1,10 @@
 {
   "id": "moehl",
   "name": "Mosterei Möhl",
-  "aliases": ["Möhl"],
+  "aliases": [
+    "Möhl"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

@@ -1,7 +1,10 @@
 {
   "id": "luzern-laboratories",
   "name": "Luzern Laboratories",
-  "aliases": ["Luzern Labs"],
+  "aliases": [
+    "Luzern Labs"
+  ],
+  "brands": [],
   "country": "US",
   "parentId": null,
   "wikidataId": null,

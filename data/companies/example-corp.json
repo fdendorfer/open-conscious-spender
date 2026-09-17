@@ -1,7 +1,13 @@
 {
   "id": "example-corp",
   "name": "Example Corp",
-  "aliases": ["Example Corporation", "ExampleCo"],
+  "aliases": [
+    "Example Corporation",
+    "ExampleCo"
+  ],
+  "brands": [
+    "Example Sub-Brand"
+  ],
   "country": "ZZ",
   "parentId": null,
   "wikidataId": null,

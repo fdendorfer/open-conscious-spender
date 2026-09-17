@@ -2,6 +2,10 @@
   "id": "nike",
   "name": "Nike",
   "aliases": [],
+  "brands": [
+    "Converse",
+    "Jordan"
+  ],
   "country": "US",
   "parentId": null,
   "wikidataId": null,

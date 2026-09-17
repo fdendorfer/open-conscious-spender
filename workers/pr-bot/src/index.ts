@@ -87,6 +87,7 @@ async function handleNewCompany(env: Env, body: Record<string, unknown>): Promis
 		id: slug,
 		name,
 		aliases: [],
+		brands: [],
 		country,
 		parentId: null,
 		wikidataId: null,

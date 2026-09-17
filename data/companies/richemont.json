@@ -1,7 +1,16 @@
 {
   "id": "richemont",
   "name": "Richemont",
-  "aliases": ["Cartier", "Montblanc", "IWC", "Van Cleef & Arpels", "Piaget"],
+  "aliases": [],
+  "brands": [
+    "Cartier",
+    "Montblanc",
+    "IWC",
+    "Van Cleef & Arpels",
+    "Piaget",
+    "Jaeger-LeCoultre",
+    "Vacheron Constantin"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

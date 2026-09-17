@@ -1,7 +1,12 @@
 {
   "id": "roche",
   "name": "Roche",
-  "aliases": ["Roche Holding AG"],
+  "aliases": [
+    "Roche Holding AG"
+  ],
+  "brands": [
+    "Accu-Chek"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

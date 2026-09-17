@@ -1,7 +1,13 @@
 {
   "id": "vitamin-well-group",
   "name": "Vitamin Well Group",
-  "aliases": ["Nocco", "Vitamin Well", "Vitamin Well AB"],
+  "aliases": [
+    "Vitamin Well AB"
+  ],
+  "brands": [
+    "Nocco",
+    "Vitamin Well"
+  ],
   "country": "SE",
   "parentId": null,
   "wikidataId": null,

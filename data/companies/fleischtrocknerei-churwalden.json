@@ -1,7 +1,10 @@
 {
   "id": "fleischtrocknerei-churwalden",
   "name": "Fleischtrocknerei Churwalden",
-  "aliases": ["Grischuna"],
+  "aliases": [],
+  "brands": [
+    "Grischuna"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

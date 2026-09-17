@@ -1,7 +1,17 @@
 {
   "id": "emmi",
   "name": "Emmi AG",
-  "aliases": ["Toni", "Toni yogurt", "Gerber", "Gerber Fondue", "Emmi Fondue AG"],
+  "aliases": [
+    "Emmi Fondue AG"
+  ],
+  "brands": [
+    "Toni",
+    "Toni yogurt",
+    "Gerber",
+    "Gerber Fondue",
+    "Caffè Latte",
+    "Kaltbach"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

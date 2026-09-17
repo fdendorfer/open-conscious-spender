@@ -1,7 +1,16 @@
 {
   "id": "coca-cola",
   "name": "The Coca-Cola Company",
-  "aliases": ["Coca-Cola", "Coke"],
+  "aliases": [
+    "Coca-Cola",
+    "Coke"
+  ],
+  "brands": [
+    "Sprite",
+    "Fanta",
+    "Minute Maid",
+    "Costa Coffee"
+  ],
   "country": "US",
   "parentId": null,
   "wikidataId": null,

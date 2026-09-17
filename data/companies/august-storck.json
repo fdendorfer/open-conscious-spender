@@ -1,7 +1,14 @@
 {
   "id": "august-storck",
   "name": "August Storck KG",
-  "aliases": ["Toffifee", "Storck"],
+  "aliases": [
+    "Storck"
+  ],
+  "brands": [
+    "Toffifee",
+    "Werther's Original",
+    "Merci"
+  ],
   "country": "DE",
   "parentId": null,
   "wikidataId": null,

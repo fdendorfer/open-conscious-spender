@@ -1,7 +1,15 @@
 {
   "id": "bell-food-group",
   "name": "Bell Food Group",
-  "aliases": ["Bell", "Eisberg", "Hilcona", "Hügli", "Cenovis", "Heirler Cenovis"],
+  "aliases": [],
+  "brands": [
+    "Bell",
+    "Eisberg",
+    "Hilcona",
+    "Hügli",
+    "Cenovis",
+    "Heirler Cenovis"
+  ],
   "country": "CH",
   "parentId": "coop",
   "wikidataId": null,

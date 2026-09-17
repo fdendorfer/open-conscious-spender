@@ -1,7 +1,15 @@
 {
   "id": "henkel",
   "name": "Henkel",
-  "aliases": ["Got2b", "Syoss", "Schwarzkopf", "Persil"],
+  "aliases": [],
+  "brands": [
+    "Got2b",
+    "Syoss",
+    "Schwarzkopf",
+    "Persil",
+    "Pritt",
+    "Loctite"
+  ],
   "country": "DE",
   "parentId": null,
   "wikidataId": null,

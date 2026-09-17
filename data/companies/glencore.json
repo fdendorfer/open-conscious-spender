@@ -1,7 +1,11 @@
 {
   "id": "glencore",
   "name": "Glencore",
-  "aliases": ["Glencore International", "Glencore plc"],
+  "aliases": [
+    "Glencore International",
+    "Glencore plc"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

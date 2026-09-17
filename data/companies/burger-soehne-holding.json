@@ -1,7 +1,15 @@
 {
   "id": "burger-soehne-holding",
   "name": "Burger Söhne Holding",
-  "aliases": ["WM15 Holding", "Burger Söhne AG", "Kägi", "Kägi Fret", "Kägi Söhne AG"],
+  "aliases": [
+    "WM15 Holding",
+    "Burger Söhne AG",
+    "Kägi Söhne AG"
+  ],
+  "brands": [
+    "Kägi",
+    "Kägi Fret"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

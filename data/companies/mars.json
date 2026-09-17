@@ -2,6 +2,14 @@
   "id": "mars",
   "name": "Mars, Incorporated",
   "aliases": [],
+  "brands": [
+    "Snickers",
+    "M&M's",
+    "Twix",
+    "Pedigree",
+    "Whiskas",
+    "Skittles"
+  ],
   "country": "US",
   "parentId": null,
   "wikidataId": null,

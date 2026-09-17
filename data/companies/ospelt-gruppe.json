@@ -1,7 +1,10 @@
 {
   "id": "ospelt-gruppe",
   "name": "Ospelt Gruppe",
-  "aliases": ["Malbuner"],
+  "aliases": [],
+  "brands": [
+    "Malbuner"
+  ],
   "country": "LI",
   "parentId": null,
   "wikidataId": null,

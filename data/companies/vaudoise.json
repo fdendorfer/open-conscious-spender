@@ -1,7 +1,10 @@
 {
   "id": "vaudoise",
   "name": "Vaudoise",
-  "aliases": ["Vaudoise Assurances"],
+  "aliases": [
+    "Vaudoise Assurances"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

@@ -1,7 +1,18 @@
 {
   "id": "coop",
   "name": "Coop",
-  "aliases": ["Coop Genossenschaft", "Naturaplan", "Prix Garantie", "Naturaline", "Oecoplan", "Betty Bossi", "Karma"],
+  "aliases": [
+    "Coop Genossenschaft"
+  ],
+  "brands": [
+    "Naturaplan",
+    "Prix Garantie",
+    "Naturaline",
+    "Oecoplan",
+    "Betty Bossi",
+    "Karma",
+    "Qualité & Prix"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

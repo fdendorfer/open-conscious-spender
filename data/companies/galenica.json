@@ -1,7 +1,12 @@
 {
   "id": "galenica",
   "name": "Galenica",
-  "aliases": ["Amavita", "Sun Store"],
+  "aliases": [],
+  "brands": [
+    "Amavita",
+    "Sun Store",
+    "Coop Vitality"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

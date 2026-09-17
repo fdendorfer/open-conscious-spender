@@ -1,7 +1,10 @@
 {
   "id": "denner",
   "name": "Denner",
-  "aliases": ["Denner AG"],
+  "aliases": [
+    "Denner AG"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": "migros",
   "wikidataId": null,

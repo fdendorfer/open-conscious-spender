@@ -1,7 +1,16 @@
 {
   "id": "inditex",
   "name": "Inditex",
-  "aliases": ["Zara", "Bershka", "Pull&Bear", "Massimo Dutti", "Stradivarius"],
+  "aliases": [],
+  "brands": [
+    "Zara",
+    "Bershka",
+    "Pull&Bear",
+    "Massimo Dutti",
+    "Stradivarius",
+    "Oysho",
+    "Zara Home"
+  ],
   "country": "ES",
   "parentId": null,
   "wikidataId": null,

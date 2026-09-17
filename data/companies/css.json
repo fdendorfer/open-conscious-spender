@@ -1,7 +1,11 @@
 {
   "id": "css",
   "name": "CSS",
-  "aliases": ["CSS Versicherung", "CSS Krankenkasse"],
+  "aliases": [
+    "CSS Versicherung",
+    "CSS Krankenkasse"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

@@ -1,7 +1,10 @@
 {
   "id": "ricola",
   "name": "Ricola Group AG",
-  "aliases": ["Ricola"],
+  "aliases": [
+    "Ricola"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

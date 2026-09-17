@@ -1,7 +1,11 @@
 {
   "id": "ikea",
   "name": "IKEA",
-  "aliases": ["Inter IKEA", "Ingka Group"],
+  "aliases": [
+    "Inter IKEA",
+    "Ingka Group"
+  ],
+  "brands": [],
   "country": "SE",
   "parentId": null,
   "wikidataId": null,

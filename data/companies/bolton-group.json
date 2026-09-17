@@ -1,7 +1,13 @@
 {
   "id": "bolton-group",
   "name": "Bolton Group",
-  "aliases": ["Uhu", "Bison", "Griffon"],
+  "aliases": [],
+  "brands": [
+    "Uhu",
+    "Bison",
+    "Griffon",
+    "Rio Mare"
+  ],
   "country": "IT",
   "parentId": null,
   "wikidataId": null,

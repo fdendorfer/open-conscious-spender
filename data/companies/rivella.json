@@ -1,7 +1,11 @@
 {
   "id": "rivella",
   "name": "Rivella",
-  "aliases": ["Rivella AG", "Rivella Group"],
+  "aliases": [
+    "Rivella AG",
+    "Rivella Group"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

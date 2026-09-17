@@ -2,7 +2,9 @@
   "id": "migros",
   "name": "Migros",
   "aliases": [
-    "Migros-Genossenschafts-Bund",
+    "Migros-Genossenschafts-Bund"
+  ],
+  "brands": [
     "M-Budget",
     "Migros Sélection",
     "I am Vegan",

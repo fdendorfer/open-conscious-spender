@@ -1,7 +1,14 @@
 {
   "id": "beiersdorf",
   "name": "Beiersdorf",
-  "aliases": ["Nivea", "La Prairie", "Eucerin", "Chantecaille"],
+  "aliases": [],
+  "brands": [
+    "Nivea",
+    "La Prairie",
+    "Eucerin",
+    "Chantecaille",
+    "Hansaplast"
+  ],
   "country": "DE",
   "parentId": null,
   "wikidataId": null,

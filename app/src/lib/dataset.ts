@@ -26,6 +26,7 @@ export interface Company {
 	id: string;
 	name: string;
 	aliases: string[];
+	brands: string[];
 	country: string | null;
 	parentId: string | null;
 	wikidataId: string | null;
@@ -105,16 +106,19 @@ export function ownershipChain(dataset: Dataset, company: Company): Company[] {
 	return chain;
 }
 
-/** Case-insensitive match of a brand name against a company's name/aliases. */
+/** Case-insensitive match of a brand name against a company's name/aliases/brands. */
 export function findCompanyByBrandName(dataset: Dataset, brandName: string): Company | undefined {
 	const needle = brandName.trim().toLowerCase();
 	if (!needle) return undefined;
 	return dataset.companies.find(
-		(c) => c.name.toLowerCase() === needle || c.aliases.some((a) => a.toLowerCase() === needle)
+		(c) =>
+			c.name.toLowerCase() === needle ||
+			c.aliases.some((a) => a.toLowerCase() === needle) ||
+			c.brands.some((b) => b.toLowerCase() === needle)
 	);
 }
 
-/** Live-search companies by name/alias substring match — this is the app's primary lookup path. */
+/** Live-search companies by name/alias/brand substring match — this is the app's primary lookup path. */
 export function searchCompaniesByName(dataset: Dataset, query: string, limit = 8): Company[] {
 	const needle = query.trim().toLowerCase();
 	if (!needle) return [];
@@ -122,7 +126,8 @@ export function searchCompaniesByName(dataset: Dataset, query: string, limit = 8
 		.filter(
 			(c) =>
 				c.name.toLowerCase().includes(needle) ||
-				c.aliases.some((a) => a.toLowerCase().includes(needle))
+				c.aliases.some((a) => a.toLowerCase().includes(needle)) ||
+				c.brands.some((b) => b.toLowerCase().includes(needle))
 		)
 		.slice(0, limit);
 }

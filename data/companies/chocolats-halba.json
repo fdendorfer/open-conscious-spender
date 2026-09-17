@@ -1,7 +1,12 @@
 {
   "id": "chocolats-halba",
   "name": "Chocolats Halba",
-  "aliases": ["Halba", "Branche Classic"],
+  "aliases": [
+    "Halba"
+  ],
+  "brands": [
+    "Branche Classic"
+  ],
   "country": "CH",
   "parentId": "coop",
   "wikidataId": null,

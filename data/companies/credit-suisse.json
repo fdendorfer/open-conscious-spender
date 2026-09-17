@@ -1,7 +1,10 @@
 {
   "id": "credit-suisse",
   "name": "Credit Suisse",
-  "aliases": ["Credit Suisse Group AG"],
+  "aliases": [
+    "Credit Suisse Group AG"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": "ubs",
   "wikidataId": null,

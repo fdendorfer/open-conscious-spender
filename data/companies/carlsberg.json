@@ -1,7 +1,14 @@
 {
   "id": "carlsberg",
   "name": "Carlsberg Group",
-  "aliases": ["Carlsberg", "Tuborg"],
+  "aliases": [
+    "Carlsberg"
+  ],
+  "brands": [
+    "Tuborg",
+    "Somersby",
+    "Kronenbourg 1664"
+  ],
   "country": "DK",
   "parentId": null,
   "wikidataId": null,

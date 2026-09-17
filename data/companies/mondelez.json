@@ -1,7 +1,18 @@
 {
   "id": "mondelez",
   "name": "Mondelez International",
-  "aliases": ["Mondelez", "Cadbury", "Oreo", "Toblerone", "Sugus"],
+  "aliases": [
+    "Mondelez"
+  ],
+  "brands": [
+    "Cadbury",
+    "Oreo",
+    "Toblerone",
+    "Sugus",
+    "Milka",
+    "Philadelphia",
+    "Ritz"
+  ],
   "country": "US",
   "parentId": null,
   "wikidataId": null,

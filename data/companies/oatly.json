@@ -1,7 +1,10 @@
 {
   "id": "oatly",
   "name": "Oatly",
-  "aliases": ["Oatly Group AB"],
+  "aliases": [
+    "Oatly Group AB"
+  ],
+  "brands": [],
   "country": "SE",
   "parentId": null,
   "wikidataId": null,

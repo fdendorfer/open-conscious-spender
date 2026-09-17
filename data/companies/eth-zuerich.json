@@ -1,7 +1,11 @@
 {
   "id": "eth-zuerich",
   "name": "ETH Zürich",
-  "aliases": ["ETH", "Eidgenössische Technische Hochschule Zürich"],
+  "aliases": [
+    "ETH",
+    "Eidgenössische Technische Hochschule Zürich"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

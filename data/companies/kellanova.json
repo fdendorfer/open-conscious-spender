@@ -1,7 +1,12 @@
 {
   "id": "kellanova",
   "name": "Kellanova",
-  "aliases": ["Pringles"],
+  "aliases": [],
+  "brands": [
+    "Pringles",
+    "Cheez-It",
+    "Special K"
+  ],
   "country": "US",
   "parentId": "mars",
   "wikidataId": null,

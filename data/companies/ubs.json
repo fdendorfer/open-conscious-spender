@@ -1,7 +1,10 @@
 {
   "id": "ubs",
   "name": "UBS",
-  "aliases": ["UBS Group AG"],
+  "aliases": [
+    "UBS Group AG"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

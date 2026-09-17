@@ -1,7 +1,17 @@
 {
   "id": "h-and-m",
   "name": "H&M",
-  "aliases": ["H&M Group", "Hennes & Mauritz"],
+  "aliases": [
+    "H&M Group",
+    "Hennes & Mauritz"
+  ],
+  "brands": [
+    "COS",
+    "& Other Stories",
+    "Weekday",
+    "Monki",
+    "ARKET"
+  ],
   "country": "SE",
   "parentId": null,
   "wikidataId": null,

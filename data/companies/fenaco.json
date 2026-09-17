@@ -1,7 +1,16 @@
 {
   "id": "fenaco",
   "name": "fenaco",
-  "aliases": ["fenaco Genossenschaft", "Ramseier", "Sinalco", "Elmer", "Elmer Citro", "Ramseier Suisse AG"],
+  "aliases": [
+    "fenaco Genossenschaft",
+    "Ramseier Suisse AG"
+  ],
+  "brands": [
+    "Ramseier",
+    "Sinalco",
+    "Elmer",
+    "Elmer Citro"
+  ],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

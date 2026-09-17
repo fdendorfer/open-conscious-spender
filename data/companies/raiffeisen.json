@@ -1,7 +1,10 @@
 {
   "id": "raiffeisen",
   "name": "Raiffeisen",
-  "aliases": ["Raiffeisen Schweiz"],
+  "aliases": [
+    "Raiffeisen Schweiz"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,

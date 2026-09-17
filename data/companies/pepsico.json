@@ -1,7 +1,15 @@
 {
   "id": "pepsico",
   "name": "PepsiCo",
-  "aliases": ["Pepsi"],
+  "aliases": [],
+  "brands": [
+    "Pepsi",
+    "Lay's",
+    "Doritos",
+    "Quaker",
+    "Gatorade",
+    "Mountain Dew"
+  ],
   "country": "US",
   "parentId": null,
   "wikidataId": null,

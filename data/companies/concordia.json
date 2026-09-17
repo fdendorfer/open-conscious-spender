@@ -1,7 +1,10 @@
 {
   "id": "concordia",
   "name": "Concordia",
-  "aliases": ["Concordia Krankenversicherung"],
+  "aliases": [
+    "Concordia Krankenversicherung"
+  ],
+  "brands": [],
   "country": "CH",
   "parentId": null,
   "wikidataId": null,
