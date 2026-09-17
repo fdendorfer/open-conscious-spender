@@ -321,7 +321,7 @@
 							<span>Positive signals</span>
 							<span class="font-mono">+{saturate(rawPos).toFixed(1)}</span>
 						</div>
-						<p class="mt-0.5 text-xs text-gray-400">{rawPos.toFixed(1)} raw pts · diminishing returns applied</p>
+						<p class="mt-0.5 text-xs text-gray-400">{rawPos.toFixed(1)} raw pts, capped on a curve (see "How points work")</p>
 					</div>
 				{/if}
 				{#if redFlags.length > 0}
@@ -330,7 +330,7 @@
 							<span>Concerns</span>
 							<span class="font-mono">−{saturate(rawNeg).toFixed(1)}</span>
 						</div>
-						<p class="mt-0.5 text-xs text-gray-400">{rawNeg.toFixed(1)} raw pts · diminishing returns applied</p>
+						<p class="mt-0.5 text-xs text-gray-400">{rawNeg.toFixed(1)} raw pts, capped on a curve (see "How points work")</p>
 					</div>
 				{/if}
 				<div class="mt-1 flex justify-between border-t border-gray-100 pt-1.5 font-medium">
@@ -388,7 +388,16 @@
 						{/each}
 					</div>
 					<p>Unverified flags count at 60%.</p>
-					<p>Additional flags in the same direction count for progressively less — so no single issue or initiative can pin a score to 0 or 100.</p>
+					<p>
+						Each flag's raw points (category weight × severity × confidence) are summed per
+						direction, then run through a curve that maxes out at 50 — so no combination of flags
+						can pin a score to exactly 0 or 100.
+					</p>
+					<p>
+						That curve is steepest near zero, so a single severe or systemic flag can already
+						swing the score sharply. It flattens out as raw points add up, so each further flag in
+						the same direction moves the score progressively less than the last.
+					</p>
 				</div>
 			</details>
 		</div>
