@@ -1,6 +1,6 @@
 # Scoring formula
 
-Goal: turn an arbitrary number of flags — positive and negative — into one 0–100 score plus a traffic-light band. 50 = neutral (no data). 100 = strongly positive. 0 = strongly negative.
+Goal: turn an arbitrary number of flags — positive and negative — into one -100–100 score plus a traffic-light band. 0 = neutral (no data). 100 = strongly positive. -100 = strongly negative.
 
 ## Inputs (all data-driven, extendable)
 
@@ -42,21 +42,21 @@ rawPos = Σ contribution(flag)  for all positive flags
 
 ## Step 3 — saturate each direction
 
-A straight sum would let a company with many flags blow past any sensible scale. Apply diminishing returns separately to each direction so each component stays in [0, 50):
+A straight sum would let a company with many flags blow past any sensible scale. Apply diminishing returns separately to each direction so each component stays in [0, 100):
 
 ```
-saturate(raw) = 50 × (1 − e^(−raw / K))
+saturate(raw) = 100 × (1 − e^(−raw / K))
 ```
 
-At `raw = 0`: `saturate = 0` (no effect). As `raw → ∞`: `saturate → 50` (component maxes out).
+At `raw = 0`: `saturate = 0` (no effect). As `raw → ∞`: `saturate → 100` (component maxes out).
 
-## Step 4 — combine into 0–100 score
+## Step 4 — combine into -100–100 score
 
 ```
-score = round(50 + saturate(rawPos) − saturate(rawNeg))
+score = round(saturate(rawPos) − saturate(rawNeg))
 ```
 
-A company with no flags has `rawPos = rawNeg = 0`, so `score = 50` exactly — neutral/unknown, not perfect. Green flags push toward 100; red flags push toward 0.
+A company with no flags has `rawPos = rawNeg = 0`, so `score = 0` exactly — neutral/unknown, not perfect. Green flags push toward 100; red flags push toward -100.
 
 `K` is a single tunable constant. Currently **12**. Raising it makes flags hit more gently; lowering makes them hit harder. Calibrated against the first ~20 real seeded companies — revisit as more data is added.
 
@@ -64,19 +64,19 @@ Example at `K = 12`:
 
 | scenario                                              | rawNeg | rawPos | score |
 |-------------------------------------------------------|--------|--------|-------|
-| no flags                                              | 0      | 0      | 50    |
-| one sourced, severe flag in a weight-3 category        | 9      | 0      | 24    |
-| same, plus one sourced, severe green flag              | 9      | 9      | 50    |
-| one sourced, minor flag in a weight-2 category         | 2      | 0      | 42    |
-| two sourced, minor red flags in weight-2 categories    | 4      | 0      | 36    |
+| no flags                                              | 0      | 0      | 0     |
+| one sourced, severe flag in a weight-3 category        | 9      | 0      | -53   |
+| same, plus one sourced, severe green flag              | 9      | 9      | 0     |
+| one sourced, minor flag in a weight-2 category         | 2      | 0      | -15   |
+| two sourced, minor red flags in weight-2 categories    | 4      | 0      | -28   |
 
 ## Step 5 — traffic-light band
 
-| score   | band   | meaning                  |
-|---------|--------|--------------------------|
-| 66–100  | green  | low concern              |
-| 34–65   | yellow | neutral / insufficient data |
-| 0–33    | red    | high concern             |
+| score      | band   | meaning                  |
+|------------|--------|--------------------------|
+| 34–100     | green  | low concern              |
+| -33–33     | yellow | neutral / insufficient data |
+| -100–-34   | red    | high concern             |
 
 ## Extending this later
 

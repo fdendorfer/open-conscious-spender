@@ -17,11 +17,14 @@ export type FlagStatus = keyof typeof CONFIDENCE_MULTIPLIER;
 /** Saturation constant — see docs/SCORING.md for the reasoning and example table. */
 export const SATURATION_K = 12;
 
-// Bidirectional score: 50 = neutral (no data), 100 = strongly positive, 0 = strongly negative.
+/** Each direction saturates toward this value — the score's max magnitude in either direction. */
+export const SATURATION_CEILING = 100;
+
+// Bidirectional score: 0 = neutral (no data), 100 = strongly positive, -100 = strongly negative.
 export const SCORE_BANDS = {
-	red: [0, 33],
-	yellow: [34, 65],
-	green: [66, 100]
+	red: [-100, -34],
+	yellow: [-33, 33],
+	green: [34, 100]
 } as const;
 export type Band = keyof typeof SCORE_BANDS;
 
@@ -58,11 +61,11 @@ export function rawScore(flags: Flag[], categories: CategoryWeight[]): number {
 }
 
 /**
- * Converts a raw flag weight into a 0–50 component.
- * Maps 0 → 0 and ∞ → 50 with diminishing returns.
+ * Converts a raw flag weight into a 0–100 component.
+ * Maps 0 → 0 and ∞ → 100 with diminishing returns.
  */
 export function saturate(raw: number): number {
-	return 50 * (1 - Math.exp(-raw / SATURATION_K));
+	return SATURATION_CEILING * (1 - Math.exp(-raw / SATURATION_K));
 }
 
 export function scoreBand(score: number): Band {
@@ -73,11 +76,11 @@ export function scoreBand(score: number): Band {
 
 /**
  * Bidirectional score:
- * - No flags → 50 (neutral / no data)
+ * - No flags → 0 (neutral / no data)
  * - Green flags push toward 100
- * - Red flags push toward 0
+ * - Red flags push toward -100
  *
- * score = 50 + saturate(rawPositive) − saturate(rawNegative)
+ * score = saturate(rawPositive) − saturate(rawNegative)
  */
 export function scoreCompany(
 	flags: Flag[],
@@ -89,6 +92,6 @@ export function scoreCompany(
 	const rawNeg = rawScore(negFlags, categories);
 	const rawPos = rawScore(posFlags, categories);
 
-	const score = Math.round(50 + saturate(rawPos) - saturate(rawNeg));
+	const score = Math.round(saturate(rawPos) - saturate(rawNeg));
 	return { score, band: scoreBand(score), rawPos, rawNeg };
 }

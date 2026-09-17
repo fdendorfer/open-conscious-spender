@@ -8,6 +8,8 @@
 
 	let { score, band, rawPos, rawNeg } = $derived(scoreCompany(company.flags, dataset.categories));
 	let chain = $derived(ownershipChain(dataset, company));
+	// score runs -100..100; the gauge bar below is laid out as a 0%..100% width
+	let gaugePercent = $derived((score + 100) / 2);
 
 	let redFlags = $derived(
 		company.flags
@@ -304,19 +306,19 @@
 				<div class="relative mb-1 h-2">
 					<div
 						class="absolute bottom-0"
-						style="left: clamp(0px, calc({score}% - 4px), calc(100% - 8px)); width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid #374151;"
+						style="left: clamp(0px, calc({gaugePercent}% - 4px), calc(100% - 8px)); width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid #374151;"
 					></div>
 				</div>
-				<!-- Zone bar: red · yellow · green -->
+				<!-- Zone bar: red · yellow · green — each third matches a SCORE_BANDS range -->
 				<div class="flex h-2 w-full gap-[2px]">
-					<div class="flex-[33] rounded-l-full bg-red-400"></div>
-					<div class="flex-[32] bg-yellow-300"></div>
-					<div class="flex-[35] rounded-r-full bg-green-400"></div>
+					<div class="flex-1 rounded-l-full bg-red-400"></div>
+					<div class="flex-1 bg-yellow-300"></div>
+					<div class="flex-1 rounded-r-full bg-green-400"></div>
 				</div>
 				<!-- Scale labels -->
 				<div class="mt-1.5 flex justify-between text-xs text-gray-400">
+					<span>-100</span>
 					<span>0</span>
-					<span>50</span>
 					<span>100</span>
 				</div>
 			</div>
@@ -333,7 +335,7 @@
 			<div class="flex flex-col gap-1 text-xs">
 				<div class="flex justify-between text-gray-500">
 					<span>Baseline (no data)</span>
-					<span class="font-mono">50</span>
+					<span class="font-mono">0</span>
 				</div>
 				{#if greenFlags.length > 0}
 					<div class="text-green-600">
@@ -390,7 +392,7 @@
 					</div>
 				</div>
 			{:else}
-				<p class="text-xs text-gray-400">No flags recorded yet — score defaults to 50.</p>
+				<p class="text-xs text-gray-400">No flags recorded yet — score defaults to 0.</p>
 			{/if}
 
 			<!-- Expandable: how points work -->
@@ -410,8 +412,8 @@
 					<p>Unverified flags count at 60%.</p>
 					<p>
 						Each flag's raw points (category weight × severity × confidence) are summed per
-						direction, then run through a curve that maxes out at 50 — so no combination of flags
-						can pin a score to exactly 0 or 100.
+						direction, then run through a curve that maxes out at 100 — so no combination of flags
+						can pin a score to exactly -100 or 100.
 					</p>
 					<p>
 						That curve is steepest near zero, so a single severe or systemic flag can already
