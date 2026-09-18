@@ -43,6 +43,14 @@
 		if (outcome === 'accepted') deferredPrompt = null;
 	}
 
+	function onLogoClick(e: MouseEvent) {
+		// Let modifier-clicks (open in new tab, etc.) and desktop clicks behave like a normal link.
+		if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+		if (window.matchMedia('(min-width: 640px)').matches) return;
+		e.preventDefault();
+		logoMenuOpen = !logoMenuOpen;
+	}
+
 	async function openSearch() {
 		searchOpen = true;
 		logoMenuOpen = false;
@@ -69,18 +77,17 @@
 
 <nav class="sticky top-0 z-50 flex items-center gap-6 bg-white px-6 py-3">
 	<div class="relative flex shrink-0 items-center gap-1">
-		<a href={resolve('/')} class="flex items-center gap-2 font-semibold text-gray-900">
+		<a
+			href={resolve('/')}
+			class="flex items-center gap-2 font-semibold text-gray-900"
+			onclick={onLogoClick}
+			aria-haspopup="true"
+			aria-expanded={logoMenuOpen}
+		>
 			<Logo class="h-6 w-6" />
 			<span>Conscious</span>
+			<CaretDown size={14} class="text-gray-400 sm:hidden" />
 		</a>
-		<button
-			class="cursor-pointer rounded p-1 text-gray-400 hover:text-gray-900 sm:hidden"
-			aria-label="Open navigation menu"
-			aria-expanded={logoMenuOpen}
-			onclick={() => (logoMenuOpen = !logoMenuOpen)}
-		>
-			<CaretDown size={14} />
-		</button>
 
 		{#if logoMenuOpen}
 			<div
@@ -95,6 +102,17 @@
 						{link.label}
 					</a>
 				{/each}
+				{#if deferredPrompt}
+					<button
+						class="block w-full cursor-pointer px-3 py-2 text-left text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+						onclick={() => {
+							logoMenuOpen = false;
+							installApp();
+						}}
+					>
+						Install
+					</button>
+				{/if}
 			</div>
 		{/if}
 	</div>
