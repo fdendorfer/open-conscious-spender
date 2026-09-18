@@ -43,6 +43,7 @@
 	"dependencies": {
 		"barcode-detector": "^3.2.2",
 		"idb-keyval": "^6.3.0",
+		"marked": "^18.0.13",
 		"phosphor-svelte": "^3.1.0"
 	}
 }

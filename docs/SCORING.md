@@ -72,11 +72,11 @@ Example at `K = 12`:
 
 ## Step 5 — traffic-light band
 
-| score      | band   | meaning                  |
-|------------|--------|--------------------------|
-| 34–100     | green  | low concern              |
-| -33–33     | yellow | neutral / insufficient data |
-| -100–-34   | red    | high concern             |
+| score        | band   | meaning                  |
+|--------------|--------|--------------------------|
+| 34 to 100    | green  | low concern              |
+| -33 to 33    | yellow | neutral / insufficient data |
+| -100 to -34  | red    | high concern             |
 
 ## Extending this later
 
