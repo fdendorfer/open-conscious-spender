@@ -9,8 +9,8 @@
 
 	let dataset = $state<Dataset | null>(null);
 	let filter = $state('');
-	let sortKey = $state<SortKey>('name');
-	let sortDir = $state<SortDir>('asc');
+	let sortKey = $state<SortKey>('score');
+	let sortDir = $state<SortDir>('desc');
 
 	function scored(company: Company) {
 		const { score, band } = dataset

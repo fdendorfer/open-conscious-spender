@@ -5,9 +5,10 @@
 	import categoriesSeed from '../../../data/categories.json';
 	import { CATEGORY_ICONS } from '$lib/categoryIcons';
 	import { startBarcodeScan, CameraUnavailableError, type ScanHandle } from '$lib/barcodeScanner';
-	import { loadDataset, searchCompaniesByName, type Dataset, type Company } from '$lib/dataset';
+	import { loadDataset, type Dataset, type Company } from '$lib/dataset';
 	import { lookupBarcode } from '$lib/lookup';
-	import { scoreCompany, type Severity } from '$lib/scoring';
+	import CompanySearch from '$lib/components/CompanySearch.svelte';
+	import type { Severity } from '$lib/scoring';
 	import {
 		saveDraft,
 		submitDraft,
@@ -22,8 +23,6 @@
 	let dataset = $state<Dataset | null>(null);
 
 	let searchQuery = $state('');
-	let searchResults = $derived(dataset ? searchCompaniesByName(dataset, searchQuery) : []);
-	let activeIndex = $state(-1);
 
 	let showScanner = $state(false);
 	let videoEl = $state<HTMLVideoElement | undefined>(undefined);
@@ -48,34 +47,12 @@
 
 	onDestroy(() => scanHandle?.stop());
 
-	function rowBand(company: Company) {
-		return dataset ? scoreCompany(company.flags, dataset.categories).band : 'green';
-	}
-
 	function goToCompany(company: Company) {
 		goto(resolve('/brand/[slug]', { slug: company.id }));
 	}
 
-	function onSearchKeydown(e: KeyboardEvent) {
-		if (e.key === 'ArrowDown') {
-			e.preventDefault();
-			activeIndex = Math.min(activeIndex + 1, searchResults.length - 1);
-		} else if (e.key === 'ArrowUp') {
-			e.preventDefault();
-			activeIndex = Math.max(activeIndex - 1, -1);
-		} else if (e.key === 'Enter') {
-			e.preventDefault();
-			if (activeIndex >= 0 && searchResults[activeIndex]) goToCompany(searchResults[activeIndex]);
-			else if (searchResults.length === 1) goToCompany(searchResults[0]);
-			else if (searchResults.length === 0 && searchQuery.trim().length >= 2) addByName();
-		} else if (e.key === 'Escape') {
-			searchQuery = '';
-			activeIndex = -1;
-		}
-	}
-
-	function addByName() {
-		contributeName = searchQuery.trim();
+	function addByName(name: string) {
+		contributeName = name;
 		phase = 'contribute';
 	}
 
@@ -173,54 +150,19 @@
 		{/if}
 
 		{#if phase === 'browsing'}
-			<div class="relative">
-				<input
-					class="w-full rounded-xl border border-gray-300 px-3 py-2"
-					placeholder="Search company name…"
-					bind:value={searchQuery}
-					oninput={() => (activeIndex = -1)}
-					onkeydown={onSearchKeydown}
-				/>
-
-				{#if searchQuery.trim().length >= 2}
-					<div
-						class="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-lg"
-					>
-						{#if searchResults.length > 0}
-							<ul>
-								{#each searchResults as company, i (company.id)}
-									<li>
-										<button
-											class="flex w-full items-center gap-2 px-3 py-2 text-left first:rounded-t-xl last:rounded-b-xl"
-											class:bg-gray-100={i === activeIndex}
-											onclick={() => goToCompany(company)}
-											onmouseenter={() => (activeIndex = i)}
-										>
-											<span
-												class="h-2 w-2 shrink-0 rounded-full"
-												class:bg-green-500={rowBand(company) === 'green'}
-												class:bg-yellow-500={rowBand(company) === 'yellow'}
-												class:bg-red-500={rowBand(company) === 'red'}
-											></span>
-											{company.name}
-										</button>
-									</li>
-								{/each}
-							</ul>
-						{:else}
-							<div class="flex flex-col gap-2 p-3">
-								<p class="text-sm text-gray-600">No match for "{searchQuery}".</p>
-								<button
-									class="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white"
-									onclick={addByName}
-								>
-									Add "{searchQuery}"
-								</button>
-							</div>
-						{/if}
+			<CompanySearch {dataset} bind:query={searchQuery} onSelect={goToCompany} onEnterNoResults={addByName}>
+				{#snippet emptyState(query)}
+					<div class="flex flex-col gap-2 p-3">
+						<p class="text-sm text-gray-600">No match for "{query}".</p>
+						<button
+							class="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white"
+							onclick={() => addByName(query)}
+						>
+							Add "{query}"
+						</button>
 					</div>
-				{/if}
-			</div>
+				{/snippet}
+			</CompanySearch>
 
 			<button class="text-sm text-gray-500 underline" onclick={() => (showScanner = !showScanner)}>
 				{showScanner ? 'Hide barcode scanner' : "Can't find it by name? Scan a barcode instead"}

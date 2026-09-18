@@ -129,16 +129,29 @@ export function findCompanyByBrandName(dataset: Dataset, brandName: string): Com
 	);
 }
 
+export interface CompanySearchResult {
+	company: Company;
+	/** Set when the query only matched a brand name, so the UI can show "Brand (Company)". */
+	matchedBrand: string | null;
+}
+
 /** Live-search companies by name/alias/brand substring match — this is the app's primary lookup path. */
-export function searchCompaniesByName(dataset: Dataset, query: string, limit = 8): Company[] {
+export function searchCompaniesByName(
+	dataset: Dataset,
+	query: string,
+	limit = 8
+): CompanySearchResult[] {
 	const needle = query.trim().toLowerCase();
 	if (!needle) return [];
-	return dataset.companies
-		.filter(
-			(c) =>
-				c.name.toLowerCase().includes(needle) ||
-				c.aliases.some((a) => a.toLowerCase().includes(needle)) ||
-				c.brands.some((b) => b.toLowerCase().includes(needle))
-		)
-		.slice(0, limit);
+	const results: CompanySearchResult[] = [];
+	for (const c of dataset.companies) {
+		const nameMatch =
+			c.name.toLowerCase().includes(needle) || c.aliases.some((a) => a.toLowerCase().includes(needle));
+		const matchedBrand = nameMatch
+			? null
+			: (c.brands.find((b) => b.toLowerCase().includes(needle)) ?? null);
+		if (nameMatch || matchedBrand) results.push({ company: c, matchedBrand });
+		if (results.length >= limit) break;
+	}
+	return results;
 }
