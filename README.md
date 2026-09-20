@@ -9,19 +9,31 @@ Inspired by [consciousspend.com](https://consciousspend.com), with three differe
 
 ## Status
 
-Planning stage. See `docs/` for the decisions made so far.
+Working prototype. The PWA (search, barcode scan, company/brand pages, score breakdown), the dataset pipeline, and the anonymous PR-bot Worker are all implemented; the dataset currently seeds 77 companies, weighted toward the Swiss market.
 
-## Repo layout (planned)
+## Repo layout
 
 ```
-data/            # the canonical dataset (companies, categories, ownership) — PRs land here
-docs/            # architecture, scoring, contribution docs
-scripts/         # maintenance scripts (e.g. Wikidata import)
-app/             # SvelteKit PWA (not yet scaffolded)
-workers/         # Cloudflare Worker(s), e.g. the anonymous PR bot (not yet scaffolded)
+data/            # the canonical dataset (companies, categories, barcode overrides) — PRs land here
+  dist/          # generated bundle + meta.json, committed by CI — never edit by hand
+docs/            # architecture and scoring docs
+scripts/         # dataset validation + bundle build
+app/             # SvelteKit PWA
+workers/pr-bot/  # Cloudflare Worker that opens contribution PRs
 ```
 
 One repo houses both the app and the dataset for now.
+
+## Working on it
+
+```sh
+cd app && pnpm install && pnpm dev     # run the PWA
+
+node scripts/validate-dataset.mjs      # check data/** against the schema
+node scripts/build-dataset.mjs         # regenerate data/dist/ (CI does this on push)
+```
+
+Edits to `data/**` are validated on every pull request. `data/dist/` is generated — CI rebuilds and commits it after a merge, so changing it by hand only creates conflicts.
 
 ## Stack decisions
 
@@ -33,6 +45,7 @@ One repo houses both the app and the dataset for now.
 
 ## Docs
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — hosting, data versioning, Wikidata import, PR-bot + rate limiting
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — hosting, data versioning, validation, PR-bot + rate limiting
 - [`docs/SCORING.md`](docs/SCORING.md) — the extendable flag → score formula
-- `data/categories.json` — seed flag-category taxonomy
+- [`workers/pr-bot/README.md`](workers/pr-bot/README.md) — contribution endpoints and Worker setup
+- `data/categories.json` — the flag-category taxonomy and its default weights
