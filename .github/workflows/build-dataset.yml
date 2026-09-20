@@ -6,6 +6,7 @@ on:
     paths:
       - 'data/**'
       - 'scripts/build-dataset.mjs'
+      - 'scripts/validate-dataset.mjs'
       - '!data/dist/**'
 
 permissions:
@@ -20,6 +21,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+
+      - name: Validate dataset
+        run: node scripts/validate-dataset.mjs
 
       - run: node scripts/build-dataset.mjs
 
