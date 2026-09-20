@@ -32,7 +32,9 @@
 
 <div class="grid gap-8 lg:grid-cols-[1fr_300px]">
 	<!-- Main content: order-2 on mobile (after score), spans both sidebar rows on desktop -->
-	<div class="order-2 flex min-w-0 flex-col gap-6 overflow-hidden lg:col-start-1 lg:row-start-1 lg:row-span-2">
+	<div
+		class="order-2 flex min-w-0 flex-col gap-6 overflow-hidden lg:col-start-1 lg:row-span-2 lg:row-start-1"
+	>
 		<CompanyHeader {company} />
 		<FlagList
 			companyId={company.id}

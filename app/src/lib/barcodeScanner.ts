@@ -6,6 +6,10 @@
 import 'barcode-detector';
 
 export interface ScanHandle {
+	/** Halts detection but keeps the camera stream live, so `resume()` is instant. */
+	pause: () => void;
+	resume: () => void;
+	/** Releases the camera. The handle is inert afterwards. */
 	stop: () => void;
 }
 
@@ -14,10 +18,9 @@ const PRODUCT_BARCODE_FORMATS: BarcodeFormat[] = ['ean_13', 'ean_8', 'upc_a', 'u
 export class CameraUnavailableError extends Error {}
 
 /**
- * Starts scanning `videoEl`'s camera feed for a product barcode. Calls
- * `onDetect` at most once per scan (caller decides whether to `stop()` or
- * keep scanning for another product). Always call `stop()` when done to
- * release the camera.
+ * Starts scanning `videoEl`'s camera feed for a product barcode. Detection
+ * pauses itself on each hit; call `resume()` to scan the next product.
+ * Always call `stop()` when done to release the camera.
  */
 export async function startBarcodeScan(
 	videoEl: HTMLVideoElement,
@@ -37,27 +40,44 @@ export async function startBarcodeScan(
 
 	const detector = new BarcodeDetector({ formats: PRODUCT_BARCODE_FORMATS });
 	let stopped = false;
+	let running = false;
 	let rafId = 0;
 
 	const tick = async () => {
-		if (stopped) return;
+		if (stopped || !running) return;
 		try {
 			const barcodes = await detector.detect(videoEl);
 			if (barcodes.length > 0) {
+				// Self-pause so one product can't fire a burst of detections.
+				running = false;
 				onDetect(barcodes[0].rawValue);
 				return;
 			}
 		} catch {
 			// transient mid-frame decode errors are expected — keep scanning
 		}
-		if (!stopped) rafId = requestAnimationFrame(tick);
+		if (!stopped && running) rafId = requestAnimationFrame(tick);
 	};
-	rafId = requestAnimationFrame(tick);
+
+	const pause = () => {
+		running = false;
+		cancelAnimationFrame(rafId);
+	};
+
+	const resume = () => {
+		if (stopped || running) return;
+		running = true;
+		rafId = requestAnimationFrame(tick);
+	};
+
+	resume();
 
 	return {
+		pause,
+		resume,
 		stop: () => {
 			stopped = true;
-			cancelAnimationFrame(rafId);
+			pause();
 			stream.getTracks().forEach((track) => track.stop());
 		}
 	};

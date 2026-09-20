@@ -146,7 +146,8 @@ export function searchCompaniesByName(
 	const results: CompanySearchResult[] = [];
 	for (const c of dataset.companies) {
 		const nameMatch =
-			c.name.toLowerCase().includes(needle) || c.aliases.some((a) => a.toLowerCase().includes(needle));
+			c.name.toLowerCase().includes(needle) ||
+			c.aliases.some((a) => a.toLowerCase().includes(needle));
 		const matchedBrand = nameMatch
 			? null
 			: (c.brands.find((b) => b.toLowerCase().includes(needle)) ?? null);

@@ -59,14 +59,14 @@
 </svelte:head>
 
 <main class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-10">
-{#if !loaded}
-		<p class="text-sm text-gray-500">Loading…</p>
+	{#if !loaded}
+		<p class="text-sm text-gray-500 dark:text-zinc-300">Loading…</p>
 	{:else if !company || !dataset}
-		<p class="text-sm text-gray-600">
+		<p class="text-sm text-gray-600 dark:text-zinc-300">
 			No company found for "{params.slug}".
 		</p>
 		<a
-			class="rounded-xl bg-gray-900 px-4 py-3 text-center font-medium text-white"
+			class="rounded-xl bg-gray-900 px-4 py-3 text-center font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 			href={resolve('/')}
 		>
 			Search instead
@@ -75,7 +75,10 @@
 		<CompanyResult {company} {dataset} />
 
 		{#if !showFlagForm && !flagPrUrl}
-			<button class="text-sm text-gray-500 underline" onclick={() => (showFlagForm = true)}>
+			<button
+				class="text-sm text-gray-500 underline dark:text-zinc-300"
+				onclick={() => (showFlagForm = true)}
+			>
 				Something we missed? Suggest a flag
 			</button>
 		{/if}
@@ -84,14 +87,20 @@
 			<form class="flex flex-col gap-3" onsubmit={(e) => (e.preventDefault(), submitFlag())}>
 				<label class="flex flex-col gap-1 text-sm">
 					Flag type
-					<select class="rounded-xl border border-gray-300 px-3 py-2" bind:value={flagPolarity}>
+					<select
+						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						bind:value={flagPolarity}
+					>
 						<option value="negative">Red flag (concern)</option>
 						<option value="positive">Green flag (positive)</option>
 					</select>
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
 					Flag category
-					<select class="rounded-xl border border-gray-300 px-3 py-2" bind:value={flagCategory}>
+					<select
+						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						bind:value={flagCategory}
+					>
 						{#each dataset.categories as category (category.id)}
 							<option value={category.id}>{category.name}</option>
 						{/each}
@@ -99,7 +108,10 @@
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
 					Severity
-					<select class="rounded-xl border border-gray-300 px-3 py-2" bind:value={flagSeverity}>
+					<select
+						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						bind:value={flagSeverity}
+					>
 						<option value="minor">Minor</option>
 						<option value="moderate">Moderate</option>
 						<option value="severe">Severe</option>
@@ -108,27 +120,34 @@
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
 					Description
-					<textarea class="rounded-xl border border-gray-300 px-3 py-2" bind:value={flagDescription}
-					></textarea>
+					<textarea
+						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						bind:value={flagDescription}></textarea>
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
 					Source URL (optional)
-					<input class="rounded-xl border border-gray-300 px-3 py-2" bind:value={flagSourceUrl} />
+					<input
+						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						bind:value={flagSourceUrl}
+					/>
 				</label>
-				<p class="text-xs text-gray-500">
+				<p class="text-xs text-gray-500 dark:text-zinc-300">
 					{submissionsRemainingToday()} submissions left today on this device.
 				</p>
 				{#if flagError}
-					<p class="text-sm text-red-600">{flagError}</p>
+					<p class="text-sm text-red-600 dark:text-red-400">{flagError}</p>
 				{/if}
-				<button class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white" type="submit">
+				<button
+					class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					type="submit"
+				>
 					Submit as a pull request
 				</button>
 			</form>
 		{/if}
 
 		{#if flagPrUrl}
-			<p class="text-sm text-gray-600">
+			<p class="text-sm text-gray-600 dark:text-zinc-300">
 				Thanks! Up for maintainer review:
 				<a class="underline" href={flagPrUrl} target="_blank" rel="noreferrer external"
 					>{flagPrUrl}</a

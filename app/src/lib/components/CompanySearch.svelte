@@ -3,12 +3,19 @@
 	import { resolve } from '$app/paths';
 	import type { Snippet } from 'svelte';
 	import { searchCompaniesByName, type Dataset, type Company } from '$lib/dataset';
-	import { scoreCompany } from '$lib/scoring';
+	import { scoreCompany, type Band } from '$lib/scoring';
+
+	const BAND_DOT: Record<Band, string> = {
+		green: 'bg-green-500 dark:bg-green-400',
+		yellow: 'bg-yellow-500 dark:bg-yellow-400',
+		red: 'bg-red-500 dark:bg-red-400'
+	};
 
 	let {
 		dataset,
 		placeholder = 'Search company name…',
 		query = $bindable(''),
+		floatResults = true,
 		onSelect,
 		onEnterNoResults,
 		onEscape,
@@ -17,6 +24,8 @@
 		dataset: Dataset | null;
 		placeholder?: string;
 		query?: string;
+		/** Float results over the page. Set false inside a panel that should grow instead. */
+		floatResults?: boolean;
 		onSelect?: (company: Company) => void;
 		onEnterNoResults?: (query: string) => void;
 		onEscape?: () => void;
@@ -65,7 +74,7 @@
 <div class="relative">
 	<input
 		bind:this={inputEl}
-		class="w-full rounded-xl border border-gray-300 px-3 py-2"
+		class="w-full rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder:text-zinc-400"
 		{placeholder}
 		bind:value={query}
 		oninput={() => (activeIndex = -1)}
@@ -73,25 +82,27 @@
 	/>
 
 	{#if query.trim().length >= 2}
-		<div class="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-lg">
+		<div
+			class="mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-lg dark:border-zinc-600 dark:bg-zinc-800 dark:shadow-black/60 {floatResults
+				? 'absolute z-10'
+				: 'max-h-[min(50vh,20rem)] overflow-y-auto'}"
+		>
 			{#if results.length > 0}
 				<ul>
 					{#each results as { company, matchedBrand }, i (company.id)}
 						<li>
 							<button
-								class="flex w-full items-center gap-2 px-3 py-2 text-left first:rounded-t-xl last:rounded-b-xl"
-								class:bg-gray-100={i === activeIndex}
+								class="flex w-full items-center gap-2 px-3 py-2 text-left first:rounded-t-xl last:rounded-b-xl {i ===
+								activeIndex
+									? 'bg-gray-100 dark:bg-zinc-700'
+									: ''}"
 								onclick={() => selectCompany(company)}
 								onmouseenter={() => (activeIndex = i)}
 							>
-								<span
-									class="h-2 w-2 shrink-0 rounded-full"
-									class:bg-green-500={rowBand(company) === 'green'}
-									class:bg-yellow-500={rowBand(company) === 'yellow'}
-									class:bg-red-500={rowBand(company) === 'red'}
-								></span>
+								<span class="h-2 w-2 shrink-0 rounded-full {BAND_DOT[rowBand(company)]}"></span>
 								{#if matchedBrand}
-									{matchedBrand} <span class="text-gray-400">({company.name})</span>
+									{matchedBrand}
+									<span class="text-gray-400 dark:text-zinc-400">({company.name})</span>
 								{:else}
 									{company.name}
 								{/if}
@@ -102,7 +113,7 @@
 			{:else if emptyState}
 				{@render emptyState(query.trim())}
 			{:else}
-				<p class="p-3 text-sm text-gray-500">No match for "{query}".</p>
+				<p class="p-3 text-sm text-gray-500 dark:text-zinc-300">No match for "{query}".</p>
 			{/if}
 		</div>
 	{/if}

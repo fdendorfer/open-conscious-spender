@@ -4,6 +4,26 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<meta name="theme-color" content="#111111" />
+		<!-- The app ships its own dark theme; stop Dark Reader from re-tinting light mode. -->
+		<meta name="darkreader-lock" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<script src="/registerSW.js" defer></script>
+		<script>
+			// Blocking on purpose: the theme class must land before the first paint.
+			try {
+				var stored = localStorage.getItem('ocs-theme');
+				var dark =
+					stored === 'dark' ||
+					(stored !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+				document.documentElement.classList.toggle('dark', dark);
+				document
+					.querySelector('meta[name="theme-color"]')
+					.setAttribute('content', dark ? '#09090b' : '#ffffff');
+			} catch (e) {
+				// storage or matchMedia blocked — fall through to the light default
+			}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
