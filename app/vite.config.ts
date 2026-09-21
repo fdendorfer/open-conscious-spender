@@ -17,6 +17,10 @@ export default defineConfig({
 		}),
 		SvelteKitPWA({
 			registerType: 'autoUpdate',
+			// Absolute, so registerSW.js does not resolve sw.js against the current
+			// document (on /brand/x that asked for /brand/sw.js and got the SPA fallback HTML).
+			base: '/',
+			scope: '/',
 			manifest: {
 				name: 'Open Conscious Spender',
 				short_name: 'OCS',
@@ -33,7 +37,9 @@ export default defineConfig({
 			workbox: {
 				// full dataset bundle is fetched by the app at runtime, not part of the build output,
 				// so it needs its own runtime caching rule once data/dist/ is served
-				globPatterns: ['**/*.{js,css,html,svg,png,ico}']
+				globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+				// the prerendered root doubles as the offline app shell for dynamic routes
+				navigateFallback: '/'
 			}
 		})
 	]
