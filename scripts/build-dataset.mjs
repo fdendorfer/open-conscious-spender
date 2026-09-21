@@ -32,8 +32,9 @@ async function build() {
 
 	const bundle = { categories, companies, barcodeOverrides };
 
+	const bundleJson = JSON.stringify(bundle);
 	await mkdir(distDir, { recursive: true });
-	await writeFile(path.join(distDir, 'bundle.json'), JSON.stringify(bundle));
+	await writeFile(path.join(distDir, 'bundle.json'), bundleJson);
 
 	let version = 'local';
 	try {
@@ -43,7 +44,13 @@ async function build() {
 		version = `local-${Date.now()}`;
 	}
 
-	const meta = { version, builtAt: new Date().toISOString() };
+	// bytes/companies let the app quote a download size before fetching the bundle itself
+	const meta = {
+		version,
+		builtAt: new Date().toISOString(),
+		bytes: Buffer.byteLength(bundleJson),
+		companies: companies.length
+	};
 	await writeFile(path.join(distDir, 'meta.json'), JSON.stringify(meta));
 
 	console.log(`Built dataset bundle: ${companies.length} companies, ${categories.length} categories, version ${version}`);

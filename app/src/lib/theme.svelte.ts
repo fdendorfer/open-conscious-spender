@@ -40,6 +40,11 @@ class Theme {
 	#systemDark = $state(false);
 	#watchingSystem = false;
 
+	/** The stored preference, including `'system'`. */
+	get setting(): ThemeSetting {
+		return this.#setting;
+	}
+
 	/** The theme actually rendered, with `'system'` resolved against the OS preference. */
 	resolved: ResolvedTheme = $derived(
 		this.#setting === 'system' ? (this.#systemDark ? 'dark' : 'light') : this.#setting
@@ -59,6 +64,12 @@ class Theme {
 			this.#watchingSystem = true;
 		}
 
+		this.#apply();
+	}
+
+	set(setting: ThemeSetting) {
+		this.#setting = setting;
+		writeSetting(setting);
 		this.#apply();
 	}
 

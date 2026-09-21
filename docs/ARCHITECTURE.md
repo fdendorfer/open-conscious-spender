@@ -6,6 +6,23 @@
 - **PR bot**: a single Cloudflare Worker in `workers/pr-bot/`.
 - Both comfortably fit Cloudflare's free tier at expected traffic (Pages: unlimited requests/500 builds-month free; Workers: 100k requests/day free) — no cost expected for the foreseeable future.
 
+## Offline behaviour
+
+The PWA has two independent caches, and the settings page (`/settings`) reports and clears both:
+
+- **Dataset** — `bundle.json` in IndexedDB (`idb-keyval`), refreshed on a `meta.json` version mismatch.
+- **App shell** — HTML/JS/CSS precached by the `vite-plugin-pwa` service worker.
+
+Two constraints shape the config in `app/vite.config.ts`:
+
+- `base`/`scope` are pinned to `'/'`. The generated `registerSW.js` resolves its script path against
+  the *document*, so the default relative `./sw.js` asked for `/brand/sw.js` on a company page, got
+  the SPA fallback HTML back, and failed registration on an unsupported MIME type.
+- The root route is prerendered (`app/src/routes/+layout.ts`), because workbox's `navigateFallback`
+  points at `/` and can only bind a handler to a URL that is actually in the precache manifest.
+  `/brand/[slug]` opts back out — one page per company id is not enumerable at build time, so it
+  falls back to the prerendered root and resolves its slug client-side.
+
 ## Icons
 
 [Phosphor Icons](https://phosphoricons.com) ([MIT license](https://github.com/phosphor-icons/core/blob/main/LICENSE)) — wide enough concept coverage that no custom icon set is needed. Icon names are referenced per-category in `data/categories.json` as PascalCase component names, matching what `phosphor-svelte` exports: `Megaphone`, `HandFist`, `HardHat`, `Leaf`, `PawPrint`, `Scales`, `Coins`, `Bank`, `ShieldWarning`, `Buildings`, `ChartLineDown`.
@@ -18,8 +35,10 @@ The client needs a cheap way to know "is my cached dataset stale?" without re-do
 
 - A build step (`.github/workflows/build-dataset.yml`, on push to the default branch touching `data/**`) validates `data/**`, packages it into a single bundle, and writes `data/dist/meta.json`:
   ```json
-  { "version": "<git short sha>", "builtAt": "<ISO timestamp>" }
+  { "version": "<git short sha>", "builtAt": "<ISO timestamp>", "bytes": 46931, "companies": 77 }
   ```
+  `bytes` (size of `bundle.json`) and `companies` let the settings page quote a download size
+  before fetching the bundle — GitHub's raw host does not expose `Content-Length` to CORS reads.
 - The PWA fetches `meta.json` (tiny) whenever it has connectivity, compares `version` against what it has cached in IndexedDB, and only re-fetches the full bundle on a mismatch.
 - No semantic versioning needed — the git commit SHA is already a unique, ordered-enough identifier, and it makes "what changed" traceable straight back to the commit/PR history.
 

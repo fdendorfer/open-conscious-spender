@@ -30,6 +30,7 @@
 		{ href: resolve('/'), label: 'Get Started' },
 		{ href: resolve('/companies'), label: 'Ranking' },
 		{ href: resolve('/scoring'), label: 'Scoring' },
+		{ href: resolve('/settings'), label: 'Settings' },
 		{ href: resolve('/#about'), label: 'About' }
 	];
 
