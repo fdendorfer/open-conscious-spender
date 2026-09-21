@@ -17,6 +17,7 @@
 	import ScannerOverlay from './ScannerOverlay.svelte';
 	import { loadDataset, type Dataset, type Company } from '$lib/dataset';
 	import { shoppingMode } from '$lib/shoppingMode.svelte';
+	import { searchHistory } from '$lib/searchHistory.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { scanner } from '$lib/scannerBus.svelte';
 
@@ -42,6 +43,7 @@
 	onMount(() => {
 		shoppingMode.hydrate();
 		theme.hydrate();
+		searchHistory.hydrate();
 		window.addEventListener('beforeinstallprompt', (e) => {
 			e.preventDefault();
 			deferredPrompt = e as BeforeInstallPromptEvent;
