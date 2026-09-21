@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { loadDataset, findCompanyById, type Dataset, type Company } from '$lib/dataset';
+	import { loadDataset, findCompanyById, type Dataset } from '$lib/dataset';
 	import { saveDraft, submitDraft, submissionsRemainingToday } from '$lib/contribute';
 	import type { Severity } from '$lib/scoring';
 	import CompanyResult from '$lib/components/CompanyResult.svelte';
@@ -10,8 +10,11 @@
 	let { params }: PageProps = $props();
 
 	let dataset = $state<Dataset | null>(null);
-	let company = $state<Company | undefined>(undefined);
 	let loaded = $state(false);
+
+	// Derived, not assigned once on mount: SvelteKit reuses this component when
+	// navigating from one brand page to another, so only the params change.
+	let company = $derived(dataset ? findCompanyById(dataset, params.slug) : undefined);
 
 	let showFlagForm = $state(false);
 	let flagPolarity = $state<'negative' | 'positive'>('negative');
@@ -24,9 +27,18 @@
 
 	onMount(async () => {
 		dataset = await loadDataset();
-		company = findCompanyById(dataset, params.slug);
 		flagCategory = dataset.categories[0]?.id ?? '';
 		loaded = true;
+	});
+
+	// Never carry a half-filled suggestion over to the company the user just opened.
+	$effect(() => {
+		void params.slug;
+		showFlagForm = false;
+		flagDescription = '';
+		flagSourceUrl = '';
+		flagError = null;
+		flagPrUrl = null;
 	});
 
 	async function submitFlag() {
