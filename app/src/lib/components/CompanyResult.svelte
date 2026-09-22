@@ -12,22 +12,23 @@
 	let { score, band, rawPos, rawNeg } = $derived(scoreCompany(company.flags, dataset.categories));
 	let chain = $derived(ownershipChain(dataset, company));
 
-	type CategoryRow = { name: string; redPts: number; greenPts: number };
-	let categoryBreakdown = $derived(
-		(() => {
-			const cats = new Map<string, CategoryRow>();
-			for (const flag of company.flags) {
-				const category = dataset.categories.find((c) => c.id === flag.category);
-				const points = category ? flagContribution(flag, category.defaultWeight) : 0;
-				const key = flag.category;
-				const e = cats.get(key) ?? { name: category?.name ?? key, redPts: 0, greenPts: 0 };
-				if ((flag.polarity ?? 'negative') === 'negative') e.redPts += points;
-				else e.greenPts += points;
-				cats.set(key, e);
-			}
-			return [...cats.values()].sort((a, b) => b.redPts - b.greenPts - (a.redPts - a.greenPts));
-		})()
-	);
+	type CategoryRow = { id: string; name: string; redPts: number; greenPts: number };
+	let categoryBreakdown = $derived.by(() => {
+		const cats: Record<string, CategoryRow> = {};
+		for (const flag of company.flags) {
+			const category = dataset.categories.find((c) => c.id === flag.category);
+			const points = category ? flagContribution(flag, category.defaultWeight) : 0;
+			const row = (cats[flag.category] ??= {
+				id: flag.category,
+				name: category?.name ?? flag.category,
+				redPts: 0,
+				greenPts: 0
+			});
+			if ((flag.polarity ?? 'negative') === 'negative') row.redPts += points;
+			else row.greenPts += points;
+		}
+		return Object.values(cats).sort((a, b) => b.redPts - b.greenPts - (a.redPts - a.greenPts));
+	});
 </script>
 
 <div class="grid gap-8 lg:grid-cols-[1fr_300px]">

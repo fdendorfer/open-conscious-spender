@@ -8,7 +8,7 @@
 <div class="flex flex-col gap-2 rounded-xl border border-gray-200 p-4 dark:border-zinc-700">
 	<h3 class="text-sm font-medium">Parent company</h3>
 	<div class="flex flex-col gap-1">
-		{#each chain as c, i}
+		{#each chain as c, i (c.id)}
 			<div class="flex items-center gap-1 text-sm" style:padding-left="{i * 12}px">
 				{#if i > 0}<span class="text-xs text-gray-300 dark:text-zinc-500">↳</span>{/if}
 				{#if i === 0}

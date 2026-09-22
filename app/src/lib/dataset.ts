@@ -139,15 +139,31 @@ export function ownershipChain(dataset: Dataset, company: Company): Company[] {
 	return chain;
 }
 
-/** Case-insensitive match of a brand name against a company's name/aliases/brands. */
+/** Lowercases and strips diacritics ("zurcher" reaches "Zürcher"); punctuation becomes a space so word boundaries survive for ranking. */
+function fold(text: string): string {
+	return text
+		.normalize('NFKD')
+		.replace(/[̀-ͯ]/g, '')
+		.replace(/ß/g, 'ss')
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, ' ')
+		.trim();
+}
+
+/** Folded and with separators removed, so "loreal" reaches "L'Oréal" and "cocacola" reaches "Coca-Cola". */
+function squash(text: string): string {
+	return fold(text).replace(/ /g, '');
+}
+
+/** Case-, accent- and punctuation-insensitive match of a brand name against a company's name/aliases/brands. */
 export function findCompanyByBrandName(dataset: Dataset, brandName: string): Company | undefined {
-	const needle = brandName.trim().toLowerCase();
+	const needle = squash(brandName);
 	if (!needle) return undefined;
 	return dataset.companies.find(
 		(c) =>
-			c.name.toLowerCase() === needle ||
-			c.aliases.some((a) => a.toLowerCase() === needle) ||
-			c.brands.some((b) => b.toLowerCase() === needle)
+			squash(c.name) === needle ||
+			c.aliases.some((a) => squash(a) === needle) ||
+			c.brands.some((b) => squash(b) === needle)
 	);
 }
 
@@ -157,24 +173,57 @@ export interface CompanySearchResult {
 	matchedBrand: string | null;
 }
 
-/** Live-search companies by name/alias/brand substring match — this is the app's primary lookup path. */
+// Lower is better; the brand penalty keeps a name match ahead of a brand match in the same tier.
+const TIER = { exact: 0, prefix: 1, word: 2, substring: 3, none: Infinity } as const;
+const BRAND_PENALTY = 0.5;
+
+function matchTier(candidate: string, needleFolded: string, needleSquashed: string): number {
+	const folded = fold(candidate);
+	const squashed = folded.replace(/ /g, '');
+	if (squashed === needleSquashed) return TIER.exact;
+	if (folded.startsWith(needleFolded)) return TIER.prefix;
+	if (folded.split(' ').some((word) => word.startsWith(needleFolded))) return TIER.word;
+	if (squashed.includes(needleSquashed)) return TIER.substring;
+	return TIER.none;
+}
+
+/** Live-search companies by name/alias/brand, ranked so exact and prefix hits beat mid-string ones. */
 export function searchCompaniesByName(
 	dataset: Dataset,
 	query: string,
 	limit = 8
 ): CompanySearchResult[] {
-	const needle = query.trim().toLowerCase();
-	if (!needle) return [];
-	const results: CompanySearchResult[] = [];
-	for (const c of dataset.companies) {
-		const nameMatch =
-			c.name.toLowerCase().includes(needle) ||
-			c.aliases.some((a) => a.toLowerCase().includes(needle));
-		const matchedBrand = nameMatch
-			? null
-			: (c.brands.find((b) => b.toLowerCase().includes(needle)) ?? null);
-		if (nameMatch || matchedBrand) results.push({ company: c, matchedBrand });
-		if (results.length >= limit) break;
+	const needleFolded = fold(query);
+	const needleSquashed = needleFolded.replace(/ /g, '');
+	if (!needleSquashed) return [];
+
+	const scored: { result: CompanySearchResult; rank: number; length: number }[] = [];
+	for (const company of dataset.companies) {
+		let rank = matchTier(company.name, needleFolded, needleSquashed);
+		for (const alias of company.aliases) {
+			rank = Math.min(rank, matchTier(alias, needleFolded, needleSquashed));
+		}
+
+		let matchedBrand: string | null = null;
+		for (const brand of company.brands) {
+			const brandRank = matchTier(brand, needleFolded, needleSquashed) + BRAND_PENALTY;
+			if (brandRank < rank) {
+				rank = brandRank;
+				matchedBrand = brand;
+			}
+		}
+
+		if (rank === TIER.none) continue;
+		scored.push({ result: { company, matchedBrand }, rank, length: company.name.length });
 	}
-	return results;
+
+	return scored
+		.sort(
+			(a, b) =>
+				a.rank - b.rank ||
+				a.length - b.length ||
+				a.result.company.id.localeCompare(b.result.company.id)
+		)
+		.slice(0, limit)
+		.map((s) => s.result);
 }

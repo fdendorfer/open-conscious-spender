@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { saturate } from '$lib/scoring';
 
-	type CategoryRow = { name: string; redPts: number; greenPts: number };
+	type CategoryRow = { id: string; name: string; redPts: number; greenPts: number };
 
 	let {
 		rawPos,
@@ -33,7 +33,7 @@
 		</p>
 	{:else}
 		<div class="flex flex-col gap-1 font-mono text-xs">
-			{#each categoryBreakdown as { name, redPts, greenPts }}
+			{#each categoryBreakdown as { id, name, redPts, greenPts } (id)}
 				{@const net = greenPts - redPts}
 				<div class="flex justify-between gap-4 text-gray-600 dark:text-zinc-300">
 					<span class="min-w-0 truncate">{name}</span>

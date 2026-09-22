@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'workers/**'
+      - '.github/workflows/ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'workers/**'
+      - '.github/workflows/ci.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: App (lint, check, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      # `build` shells out to `wrangler types --check`, which needs no Cloudflare
+      # credentials but does need the generated types to exist first.
+      - run: pnpm gen
+
+      - run: pnpm lint
+
+      - run: pnpm check
+
+      - run: pnpm build
+
+  worker:
+    name: PR bot (typecheck)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: workers/pr-bot
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: workers/pr-bot/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm check

@@ -110,7 +110,7 @@
 	{#if rows.length === 0}
 		<p class="text-sm text-gray-400 dark:text-zinc-400">{config.emptyText}</p>
 	{:else}
-		{#each rows as { flag, category, points, Icon }, i}
+		{#each rows as { flag, category, points, Icon }, i (flag)}
 			{@const pid = `${companyId}-${config.idPrefix}${i}`}
 			<div class="flex flex-col gap-2 rounded-xl border {config.borderColor} p-4">
 				<div class="flex flex-wrap items-center gap-2">

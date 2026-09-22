@@ -1,4 +1,3 @@
 {
-  "_comment": "FICTIONAL demo entry for testing the lookup pipeline end-to-end. GTIN below is not a real product. Community-submitted mappings land here via PR.",
-  "0000000000000": "example-corp"
+  "_comment": "GTIN -> company id, for barcodes Open Food Facts cannot resolve or resolves to the wrong owner. Community-submitted mappings land here via PR."
 }
