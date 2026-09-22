@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { marked } from 'marked';
 	import scoringDoc from '../../../../docs/SCORING.md?raw';
+	import { pageTitle } from '$lib/seo';
 
 	const html = marked.parse(scoringDoc, { async: false }) as string;
 </script>
 
 <svelte:head>
-	<title>Scoring methodology — Conscious</title>
+	<title>{pageTitle('Scoring')}</title>
 </svelte:head>
 
 <main class="mx-auto max-w-3xl px-6 py-10">

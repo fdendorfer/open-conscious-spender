@@ -6,6 +6,7 @@
 	import type { Severity } from '$lib/scoring';
 	import CompanyResult from '$lib/components/CompanyResult.svelte';
 	import type { PageProps } from './$types';
+	import { pageTitle } from '$lib/seo';
 
 	let { params }: PageProps = $props();
 
@@ -67,7 +68,7 @@
 </script>
 
 <svelte:head>
-	<title>{company ? `${company.name} — Open Conscious Spender` : 'Open Conscious Spender'}</title>
+	<title>{pageTitle(company?.name ?? 'Company')}</title>
 </svelte:head>
 
 <main class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-10">

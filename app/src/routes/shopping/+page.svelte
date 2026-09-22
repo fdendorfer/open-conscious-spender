@@ -2,6 +2,7 @@
 	import { Barcode, Check, MagnifyingGlass, WifiSlash } from 'phosphor-svelte';
 	import { shoppingMode } from '$lib/shoppingMode.svelte';
 	import { scanner } from '$lib/scannerBus.svelte';
+	import { pageTitle } from '$lib/seo';
 
 	const STEPS = [
 		{
@@ -26,7 +27,7 @@
 </script>
 
 <svelte:head>
-	<title>Shopping mode — Open Conscious Spender</title>
+	<title>{pageTitle('Shopping mode')}</title>
 </svelte:head>
 
 <main class="mx-auto flex max-w-lg flex-col gap-8 px-6 py-10">

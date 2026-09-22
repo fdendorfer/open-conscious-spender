@@ -2,6 +2,7 @@
 	import { onMount, tick } from 'svelte';
 	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import {
 		Barcode,
 		Basket,
@@ -33,6 +34,12 @@
 		{ href: resolve('/settings'), label: 'Settings' },
 		{ href: resolve('/#about'), label: 'About' }
 	];
+
+	// "About" is a hash link into the home page, so it never claims to be the
+	// current page — otherwise it would light up alongside "Get Started".
+	function isCurrent(href: string): boolean {
+		return !href.includes('#') && page.url.pathname === href;
+	}
 
 	let deferredPrompt = $state<BeforeInstallPromptEvent | null>(null);
 
@@ -137,7 +144,12 @@
 				{#each NAV_LINKS as link (link.label)}
 					<a
 						href={link.href}
-						class="block px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+						aria-current={isCurrent(link.href) ? 'page' : undefined}
+						class="block px-3 py-2 hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-zinc-700 dark:hover:text-zinc-100 {isCurrent(
+							link.href
+						)
+							? 'font-medium text-gray-900 dark:text-zinc-100'
+							: 'text-gray-600 dark:text-zinc-300'}"
 						onclick={() => (logoMenuOpen = false)}
 					>
 						{link.label}
@@ -149,8 +161,12 @@
 
 	<div class="hidden items-center gap-6 text-sm text-gray-500 sm:flex dark:text-zinc-300">
 		{#each NAV_LINKS as link (link.label)}
-			<a href={link.href} class="transition-colors hover:text-gray-900 dark:hover:text-zinc-100"
-				>{link.label}</a
+			<a
+				href={link.href}
+				aria-current={isCurrent(link.href) ? 'page' : undefined}
+				class="transition-colors hover:text-gray-900 dark:hover:text-zinc-100 {isCurrent(link.href)
+					? 'font-medium text-gray-900 dark:text-zinc-100'
+					: ''}">{link.label}</a
 			>
 		{/each}
 	</div>

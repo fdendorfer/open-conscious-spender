@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { loadDataset, type Company, type Dataset } from '$lib/dataset';
 	import { scoreCompany, type Band } from '$lib/scoring';
+	import { pageTitle } from '$lib/seo';
 
 	const BAND_DOT: Record<Band, string> = {
 		green: 'bg-green-500 dark:bg-green-400',
@@ -61,7 +62,7 @@
 </script>
 
 <svelte:head>
-	<title>Companies — Conscious</title>
+	<title>{pageTitle('Ranking')}</title>
 </svelte:head>
 
 <main class="mx-auto max-w-4xl px-6 py-10">

@@ -16,6 +16,7 @@
 		RateLimitedError,
 		SubmissionFailedError
 	} from '$lib/contribute';
+	import { pageTitle, SITE_FULL_NAME } from '$lib/seo';
 
 	type Phase = 'loading' | 'browsing' | 'looking-up' | 'contribute' | 'submitted';
 
@@ -88,9 +89,13 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{pageTitle('Ethical shopping lookups')}</title>
+</svelte:head>
+
 <main class="mx-auto flex max-w-sm flex-col gap-10 p-6 sm:max-w-xl lg:max-w-4xl">
 	<div class="flex flex-col items-center gap-4 pt-8 text-center">
-		<h1 class="text-2xl font-semibold sm:text-3xl">Open Conscious Spender</h1>
+		<h1 class="text-2xl font-semibold sm:text-3xl">{SITE_FULL_NAME}</h1>
 		<p class="max-w-md text-gray-600 dark:text-zinc-300">
 			Search a company (or scan its barcode). See its red flags at a glance. Decide in seconds —
 			before you're stuck reading in the aisle.

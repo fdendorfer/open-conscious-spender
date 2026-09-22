@@ -43,6 +43,12 @@
 	let focused = $state(false);
 	let inputEl = $state<HTMLInputElement | undefined>(undefined);
 
+	// This component is mounted twice (page and navbar overlay), so the ids
+	// aria-controls/aria-activedescendant point at have to be per-instance.
+	const uid = $props.id();
+	const listboxId = `${uid}-listbox`;
+	const optionId = (index: number) => `${uid}-option-${index}`;
+
 	let trimmedQuery = $derived(query.trim());
 	let searching = $derived(trimmedQuery.length >= 2);
 
@@ -60,6 +66,7 @@
 	// Recent picks are an affordance for an empty, focused box — never an unprompted popover.
 	let showRecent = $derived(!searching && focused && recent.length > 0);
 	let rows = $derived(searching ? results : recent);
+	let panelOpen = $derived(searching || showRecent);
 
 	function rowBand(company: Company) {
 		return dataset ? scoreCompany(company.flags, dataset.categories).band : 'green';
@@ -101,6 +108,12 @@
 		bind:this={inputEl}
 		class="w-full rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder:text-zinc-400"
 		{placeholder}
+		role="combobox"
+		aria-expanded={panelOpen}
+		aria-controls={panelOpen ? listboxId : undefined}
+		aria-autocomplete="list"
+		aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
+		autocomplete="off"
 		bind:value={query}
 		oninput={() => (activeIndex = -1)}
 		onfocus={() => (focused = true)}
@@ -108,7 +121,13 @@
 		onkeydown={onKeydown}
 	/>
 
-	{#if searching || showRecent}
+	<p class="sr-only" aria-live="polite">
+		{#if searching}
+			{results.length === 0 ? `No match for ${trimmedQuery}` : `${results.length} companies found`}
+		{/if}
+	</p>
+
+	{#if panelOpen}
 		<!-- Keeping focus in the input on mousedown lets a row's click land before blur closes the panel. -->
 		<div
 			class="mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-lg dark:border-zinc-600 dark:bg-zinc-800 dark:shadow-black/60 {floatResults
@@ -124,24 +143,28 @@
 			{/if}
 
 			{#if rows.length > 0}
-				<ul>
+				<!-- Options are not focusable by design: the input keeps focus and drives
+				     selection through aria-activedescendant, per the ARIA combobox pattern. -->
+				<ul id={listboxId} role="listbox" aria-label="Company results">
 					{#each rows as { company, matchedBrand }, i (company.id)}
-						<li>
-							<button
-								class="flex w-full items-center gap-2 px-3 py-2 text-left last:rounded-b-xl {showRecent
-									? ''
-									: 'first:rounded-t-xl'} {i === activeIndex ? 'bg-gray-100 dark:bg-zinc-700' : ''}"
-								onclick={() => selectCompany(company)}
-								onmouseenter={() => (activeIndex = i)}
-							>
-								<span class="h-2 w-2 shrink-0 rounded-full {BAND_DOT[rowBand(company)]}"></span>
-								{#if matchedBrand}
-									{matchedBrand}
-									<span class="text-gray-400 dark:text-zinc-400">({company.name})</span>
-								{:else}
-									{company.name}
-								{/if}
-							</button>
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<li
+							id={optionId(i)}
+							role="option"
+							aria-selected={i === activeIndex}
+							class="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left last:rounded-b-xl {showRecent
+								? ''
+								: 'first:rounded-t-xl'} {i === activeIndex ? 'bg-gray-100 dark:bg-zinc-700' : ''}"
+							onclick={() => selectCompany(company)}
+							onmouseenter={() => (activeIndex = i)}
+						>
+							<span class="h-2 w-2 shrink-0 rounded-full {BAND_DOT[rowBand(company)]}"></span>
+							{#if matchedBrand}
+								{matchedBrand}
+								<span class="text-gray-400 dark:text-zinc-400">({company.name})</span>
+							{:else}
+								{company.name}
+							{/if}
 						</li>
 					{/each}
 				</ul>

@@ -28,6 +28,7 @@
 	import { searchHistory } from '$lib/searchHistory.svelte';
 	import { shoppingMode } from '$lib/shoppingMode.svelte';
 	import { theme, type ThemeSetting } from '$lib/theme.svelte';
+	import { pageTitle } from '$lib/seo';
 
 	const THEME_OPTIONS: { value: ThemeSetting; label: string; icon: typeof Sun }[] = [
 		{ value: 'system', label: 'System', icon: Desktop },
@@ -106,7 +107,7 @@
 	}
 </script>
 
-<svelte:head><title>Settings — Open Conscious Spender</title></svelte:head>
+<svelte:head><title>{pageTitle('Settings')}</title></svelte:head>
 
 <main class="mx-auto flex max-w-xl flex-col gap-10 px-6 py-10">
 	<h1 class="text-2xl font-semibold">Settings</h1>
