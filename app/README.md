@@ -5,8 +5,8 @@ The Open Conscious Spender PWA. SvelteKit, deployed to Cloudflare Pages.
 ## Developing
 
 ```sh
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 ## Environment
@@ -20,9 +20,9 @@ file (`PUBLIC_PR_BOT_URL=http://localhost:8787` against `wrangler dev`).
 ## Building / checking
 
 ```sh
-npm run build   # also runs `wrangler types --check`
-npm run check   # svelte-check
-npm run lint    # prettier --check + eslint
+pnpm build   # also runs `wrangler types --check`
+pnpm check   # svelte-check
+pnpm lint    # prettier --check + eslint
 ```
 
 ## Key modules

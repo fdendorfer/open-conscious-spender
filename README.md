@@ -45,6 +45,7 @@ Edits to `data/**` are validated on every pull request. `data/dist/` is generate
 
 ## Docs
 
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to add a company or flag, and what makes a source usable
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — hosting, data versioning, validation, PR-bot + rate limiting
 - [`docs/SCORING.md`](docs/SCORING.md) — the extendable flag → score formula
 - [`workers/pr-bot/README.md`](workers/pr-bot/README.md) — contribution endpoints and Worker setup

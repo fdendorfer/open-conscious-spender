@@ -15,8 +15,8 @@ Every flag category is validated live against the repo's own `data/categories.js
 ## Setup
 
 ```sh
-npm install
-npx wrangler secret put GITHUB_PAT
+pnpm install
+pnpm exec wrangler secret put GITHUB_PAT
 ```
 
 Use a **fine-grained personal access token** scoped to only this repository, with:
@@ -28,7 +28,7 @@ Nothing broader — this token lives in a public-facing Worker's secret store.
 ## Local dev
 
 ```sh
-npm run dev
+pnpm dev
 ```
 
 Runs against the real GitHub API for reads (categories, existing files) but any write call will fail without a real `GITHUB_PAT` bound locally (`wrangler dev` reads secrets from `.dev.vars`, which is gitignored — create one with `GITHUB_PAT=...` to test the full write path).
@@ -36,7 +36,9 @@ Runs against the real GitHub API for reads (categories, existing files) but any 
 ## Deploy
 
 ```sh
-npm run deploy
+pnpm run deploy
 ```
+
+`run` is not optional here: `pnpm deploy` is pnpm's own built-in subcommand.
 
 Requires `wrangler login` once per machine.

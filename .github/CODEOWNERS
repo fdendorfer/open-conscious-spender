@@ -1,0 +1,16 @@
+# Every PR gets a maintainer review. Dataset PRs arrive from the public PR bot,
+# so nothing here should be left to merge itself.
+
+* @fdendorfer
+
+# The score formula and its implementation reprice every company at once.
+/docs/SCORING.md @fdendorfer
+/app/src/lib/scoring.ts @fdendorfer
+/data/categories.json @fdendorfer
+
+# The bot holds a write-scoped GitHub token.
+/workers/pr-bot/ @fdendorfer
+
+# Pipeline and release surface.
+/.github/ @fdendorfer
+/scripts/ @fdendorfer

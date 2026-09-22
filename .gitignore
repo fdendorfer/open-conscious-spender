@@ -1,0 +1,23 @@
+# Cross-cutting ignores. app/ and workers/pr-bot/ keep their own for
+# package-specific build output.
+
+# Dependencies
+node_modules/
+
+# Secrets — never commit; see workers/pr-bot/README.md for the Worker secret flow
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# Cloudflare local state
+.wrangler/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+*.swp
