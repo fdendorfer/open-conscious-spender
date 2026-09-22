@@ -9,7 +9,7 @@ export interface Category {
 }
 
 const RAW_BASE =
-	'https://raw.githubusercontent.com/fdendorfer/open-conscious-spender/master/data/dist';
+	'https://raw.githubusercontent.com/fdendorfer/open-conscious-spender/main/data/dist';
 const CACHE_KEY = 'ocs-dataset-v1';
 
 export interface StoredFlag {

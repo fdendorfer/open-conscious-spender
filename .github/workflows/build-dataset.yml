@@ -2,7 +2,7 @@ name: Build dataset bundle
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
     paths:
       - 'data/**'
       - 'scripts/build-dataset.mjs'

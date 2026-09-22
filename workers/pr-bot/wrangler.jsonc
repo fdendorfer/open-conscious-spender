@@ -6,7 +6,7 @@
 	"vars": {
 		"GITHUB_OWNER": "fdendorfer",
 		"GITHUB_REPO": "open-conscious-spender",
-		"GITHUB_DEFAULT_BRANCH": "master",
+		"GITHUB_DEFAULT_BRANCH": "main",
 		"ALLOWED_ORIGIN": "https://open-conscious-spender.pages.dev"
 	}
 	// GITHUB_PAT is a secret, not a var — set it with:
