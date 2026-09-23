@@ -1,0 +1,68 @@
+name: Deploy app
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      # bundled into the client at build time, unlike the rest of data/ which
+      # the app fetches at runtime — a change here needs a redeploy to show up
+      - 'data/categories.json'
+      - '.github/workflows/deploy-app.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+# Never let two deploys race to the same production alias; queue instead of
+# cancelling, so an in-flight upload is not abandoned half-done.
+concurrency:
+  group: deploy-app
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy to Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://open-conscious-spender.pages.dev
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: app/package.json
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm gen
+
+      # Re-run the PR gate against the merge result before anything ships.
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm check
+
+      - name: Build
+        run: pnpm build
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          pnpm exec wrangler pages deploy .svelte-kit/cloudflare \
+            --project-name open-conscious-spender \
+            --branch "${{ github.ref_name }}"

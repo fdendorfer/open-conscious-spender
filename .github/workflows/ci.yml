@@ -1,13 +1,10 @@
 name: CI
 
+# Pull requests only. On main the deploy workflows re-run the same gates
+# against the merge result before shipping, so running CI there too would
+# just duplicate them.
 on:
   pull_request:
-    paths:
-      - 'app/**'
-      - 'workers/**'
-      - '.github/workflows/ci.yml'
-  push:
-    branches: [main]
     paths:
       - 'app/**'
       - 'workers/**'
