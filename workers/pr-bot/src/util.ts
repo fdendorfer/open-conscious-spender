@@ -43,3 +43,13 @@ export function assertOneOf<T extends string>(
 	}
 	return value as T;
 }
+
+/** Company ids are kebab-case by dataset rule; enforcing it here also keeps caller-supplied
+ *  ids from walking out of `data/companies/` when they're interpolated into a path. */
+export function assertCompanyId(value: unknown, field: string): string {
+	const id = assertString(value, field, 80);
+	if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) {
+		throw new ValidationError(`"${field}" must be a kebab-case company id`);
+	}
+	return id;
+}

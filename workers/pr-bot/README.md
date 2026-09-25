@@ -1,10 +1,21 @@
 # PR bot
 
-Cloudflare Worker that turns an anonymous, on-device contribution draft into a real GitHub pull request against this repo's `data/`. See `docs/ARCHITECTURE.md` for the design rationale.
+Cloudflare Worker that turns an anonymous, on-device contribution into either a GitHub issue or a pull request against this repo's `data/`. See `docs/ARCHITECTURE.md` for the design rationale.
 
 ## Endpoints
 
 All `POST`, JSON body, CORS-restricted to `ALLOWED_ORIGIN`.
+
+### Issues — asking for work
+
+- `POST /request/brand` — `{ name, gtin?, note? }` → `{ issueUrl, requestCount }`
+- `POST /report/inaccuracy` — `{ companyId, note }` → `{ issueUrl }`
+
+Both deduplicate. A brand request looks for an open `brand-request` issue for `slugify(name)`; finding one, it bumps a counter in the title and body instead of opening a second issue. An inaccuracy report appends a comment to the company's open `data-correction` issue.
+
+Deduplication reads the open issue list rather than the search API, which is index-lagged enough to let duplicates through. The key is a marker comment in the issue body, falling back to the title so issues filed by hand on GitHub still match.
+
+### Pull requests — supplying content
 
 - `POST /submit/company` — `{ name, country?, flags: [{ category, description, severity, sourceUrl? }] }` (1-5 flags)
 - `POST /submit/flag` — `{ companyId, flag: { category, description, severity, sourceUrl? } }`
@@ -22,8 +33,16 @@ pnpm exec wrangler secret put GITHUB_PAT
 Use a **fine-grained personal access token** scoped to only this repository, with:
 - Contents: Read and write
 - Pull requests: Read and write
+- Issues: Read and write
 
 Nothing broader — this token lives in a public-facing Worker's secret store.
+
+Create the two labels the bot files under before first use, so they get sensible colours and descriptions rather than whatever the API assigns:
+
+```sh
+gh label create brand-request  -d "Someone asked for a company that isn't rated yet"
+gh label create data-correction -d "Something in the dataset is reported as wrong"
+```
 
 ## Local dev
 

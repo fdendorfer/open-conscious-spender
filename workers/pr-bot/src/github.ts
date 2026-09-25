@@ -110,3 +110,72 @@ export async function openPullRequest(
 	})) as { html_url: string };
 	return pr.html_url;
 }
+
+export interface Issue {
+	number: number;
+	title: string;
+	body: string | null;
+	html_url: string;
+	pull_request?: unknown;
+}
+
+const ISSUE_PAGE_SIZE = 100;
+const MAX_ISSUE_PAGES = 5;
+
+/** Open issues carrying `label`, newest first. Uses the list endpoint rather than the search
+ *  API because search is index-lagged and would let duplicate requests through. */
+export async function listOpenIssues(config: GithubConfig, label: string): Promise<Issue[]> {
+	const issues: Issue[] = [];
+	for (let page = 1; page <= MAX_ISSUE_PAGES; page++) {
+		const batch = (await gh(
+			config,
+			`/repos/${config.owner}/${config.repo}/issues?state=open&labels=${encodeURIComponent(label)}&per_page=${ISSUE_PAGE_SIZE}&page=${page}`
+		)) as Issue[];
+		issues.push(...batch.filter((i) => !i.pull_request));
+		if (batch.length < ISSUE_PAGE_SIZE) break;
+	}
+	return issues;
+}
+
+export async function createIssue(
+	config: GithubConfig,
+	title: string,
+	body: string,
+	labels: string[]
+): Promise<Issue> {
+	return (await gh(config, `/repos/${config.owner}/${config.repo}/issues`, {
+		method: 'POST',
+		body: JSON.stringify({ title, body, labels })
+	})) as Issue;
+}
+
+export async function updateIssue(
+	config: GithubConfig,
+	number: number,
+	fields: { title?: string; body?: string }
+): Promise<void> {
+	await gh(config, `/repos/${config.owner}/${config.repo}/issues/${number}`, {
+		method: 'PATCH',
+		body: JSON.stringify(fields)
+	});
+}
+
+export async function commentOnIssue(
+	config: GithubConfig,
+	number: number,
+	body: string
+): Promise<void> {
+	await gh(config, `/repos/${config.owner}/${config.repo}/issues/${number}/comments`, {
+		method: 'POST',
+		body: JSON.stringify({ body })
+	});
+}
+
+/** Existence check against raw.githubusercontent, which doesn't spend the bot token's API budget. */
+export async function publicFileExists(config: GithubConfig, path: string): Promise<boolean> {
+	const res = await fetch(
+		`https://raw.githubusercontent.com/${config.owner}/${config.repo}/${config.defaultBranch}/${path}`,
+		{ method: 'HEAD' }
+	);
+	return res.ok;
+}

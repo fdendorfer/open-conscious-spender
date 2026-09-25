@@ -116,6 +116,7 @@
 	function addMissingBrand() {
 		const target = new URL(resolve('/'), location.origin);
 		target.searchParams.set('add', missBrand ?? '');
+		if (missGtin) target.searchParams.set('gtin', missGtin);
 		onClose();
 		// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() can't carry a query string
 		goto(target);
@@ -204,7 +205,7 @@
 								class="cursor-pointer rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 								onclick={addMissingBrand}
 							>
-								Add "{missBrand}"
+								Request a rating
 							</button>
 						{:else}
 							<div>

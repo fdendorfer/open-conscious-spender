@@ -3,7 +3,7 @@
 A progressive web app for instant, low-reading ethical-shopping lookups: scan a barcode in-store, get an icon-based read on the parent company's red flags, decide in seconds.
 
 Inspired by [consciousspend.com](https://consciousspend.com), with three differences:
-- **Public contributions** — anyone can add a company/flag; a one-click button opens a PR against this repo's dataset.
+- **Public contributions** — anyone can request a brand in one tap, or open a dataset PR from the app if they have a source.
 - **Parent-company focus** — ownership graph so a flag on a subsidiary surfaces on the brand you're actually holding.
 - **Quick-lookup first** — result screen is icons + a score, not paragraphs.
 

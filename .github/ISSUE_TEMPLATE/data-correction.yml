@@ -1,0 +1,30 @@
+name: Data correction
+description: Report something inaccurate about a company already in the dataset
+title: 'Data correction: '
+labels: [data-correction]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep the title as `Data correction: <company name>` so repeat reports about the
+        same company collect on one issue.
+  - type: input
+    id: company
+    attributes:
+      label: Company id
+      description: The `id` from `data/companies/<id>.json`, or the slug in the app's URL.
+      placeholder: nestle
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's inaccurate?
+      placeholder: Wrong parent company, outdated flag, severity doesn't match the conduct…
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: Optional, but a link makes the fix much faster.

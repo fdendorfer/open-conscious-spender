@@ -1,0 +1,34 @@
+name: Brand request
+description: Ask for a company or brand that isn't rated yet
+title: 'Brand request: '
+labels: [brand-request]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Most requests come straight from the app when a scan or search finds no match.
+        Filing by hand is fine too — keep the title as `Brand request: <name>` so the bot
+        folds later requests for the same brand into this issue instead of opening a new one.
+  - type: input
+    id: name
+    attributes:
+      label: Brand or company name
+      placeholder: Nestlé Waters
+    validations:
+      required: true
+  - type: input
+    id: barcode
+    attributes:
+      label: A barcode you saw it on
+      description: Optional. Helps map the product to the right owner.
+      placeholder: '7613035123456'
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything worth knowing
+      description: Optional. Where you saw it, who you think owns it, anything you've already read.
+  - type: markdown
+    attributes:
+      value: |
+        No need to research the flags — a maintainer does the sourcing. See
+        [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md) if you'd rather submit a sourced flag directly.

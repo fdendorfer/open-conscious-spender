@@ -9,7 +9,15 @@ By contributing you agree your work is licensed under [MIT](LICENSE) for code an
 
 ## Contributing data
 
-The easiest path is the app itself: search or scan a company, hit "Suggest a flag", and the PR bot opens a pull request for you. No account, no git, no local checkout.
+### Asking vs. supplying
+
+Two different things, and only one of them is a pull request.
+
+**Asking.** Scanned something that isn't rated? Tap "Request a rating" — name only, nothing else. Spotted something wrong on a company page? "Report it", one text box. Both open or update a GitHub issue; no research expected, a maintainer does the sourcing. Repeat requests for the same brand collect on one issue and bump its counter, so the most-wanted brands rise to the top of the queue.
+
+You can file either by hand on GitHub instead — there are issue templates for both.
+
+**Supplying.** If you already have a source, the full form is still there behind "I already have a source" (or "Suggest a flag" on a company page), and the PR bot opens a pull request for you. No account, no git, no local checkout.
 
 To do it by hand, add or edit a file under `data/companies/<id>.json` and open a PR. Before pushing:
 
@@ -65,5 +73,7 @@ CI runs all three on every PR touching `app/**` or `workers/**`, plus a typechec
 `workers/pr-bot` is on TypeScript 7. `app` is pinned to TypeScript 6 on purpose: `typescript-eslint` and `svelte-check` do not support TS 7 yet, and moving the app forward today would mean giving up typed linting. Revisit once `typescript-eslint` ships TS 7 support.
 
 ## Review
+
+Issues are triaged by demand — brand requests carry a count of how many times they've been asked for. The count is app submissions rather than distinct people, since contributions are anonymous, so it's a rough signal.
 
 Every dataset PR is reviewed by a maintainer before merge. The most common reasons a flag is sent back are an unusable source, a severity that does not match the described conduct, and conduct attributed to the wrong legal entity.

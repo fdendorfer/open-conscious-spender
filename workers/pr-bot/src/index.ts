@@ -1,7 +1,30 @@
-import { createBranch, fetchPublicJson, getFile, openPullRequest, putFile } from './github';
+import {
+	commentOnIssue,
+	createBranch,
+	createIssue,
+	fetchPublicJson,
+	getFile,
+	listOpenIssues,
+	openPullRequest,
+	publicFileExists,
+	putFile,
+	updateIssue
+} from './github';
 import type { Category, Env, FlagInput } from './types';
 import { SEVERITIES } from './types';
 import {
+	BRAND_REQUEST_LABEL,
+	DATA_CORRECTION_LABEL,
+	brandRequestBody,
+	brandRequestTitle,
+	dataCorrectionBody,
+	dataCorrectionTitle,
+	issueKey,
+	readCount,
+	reportComment
+} from './issueBody';
+import {
+	assertCompanyId,
 	assertOneOf,
 	assertOptionalString,
 	assertString,
@@ -107,7 +130,7 @@ async function handleNewCompany(env: Env, body: Record<string, unknown>): Promis
 }
 
 async function handleNewFlag(env: Env, body: Record<string, unknown>): Promise<Response> {
-	const companyId = assertString(body.companyId, 'companyId', 80);
+	const companyId = assertCompanyId(body.companyId, 'companyId');
 	const validCategories = await validCategoryIds(env);
 	const flag = toStoredFlag(parseFlag(body.flag, validCategories));
 
@@ -134,7 +157,7 @@ async function handleNewFlag(env: Env, body: Record<string, unknown>): Promise<R
 async function handleNewBarcodeMapping(env: Env, body: Record<string, unknown>): Promise<Response> {
 	const gtin = assertString(body.gtin, 'gtin', 14);
 	if (!/^\d{8,14}$/.test(gtin)) throw new ValidationError('gtin must be 8-14 digits');
-	const companyId = assertString(body.companyId, 'companyId', 80);
+	const companyId = assertCompanyId(body.companyId, 'companyId');
 
 	const config = githubConfig(env);
 	const path = 'data/products/barcode-overrides.json';
@@ -153,6 +176,75 @@ async function handleNewBarcodeMapping(env: Env, body: Record<string, unknown>):
 		`Submitted via the app's barcode-lookup-miss flow.`
 	);
 	return jsonResponse({ prUrl });
+}
+
+async function handleBrandRequest(env: Env, body: Record<string, unknown>): Promise<Response> {
+	const name = assertString(body.name, 'name', 200);
+	const gtin = assertOptionalString(body.gtin, 'gtin', 14);
+	const note = assertOptionalString(body.note, 'note', 2000);
+	const slug = slugify(name);
+	if (!slug) throw new ValidationError('name did not produce a usable slug');
+
+	const config = githubConfig(env);
+	if (await publicFileExists(config, `data/companies/${slug}.json`)) {
+		throw new ValidationError(`"${name}" is already in the dataset`);
+	}
+
+	const open = await listOpenIssues(config, BRAND_REQUEST_LABEL);
+	const existing = open.find(
+		(i) => issueKey(i, BRAND_REQUEST_LABEL, 'Brand request: ', slugify) === slug
+	);
+
+	if (!existing) {
+		const issue = await createIssue(config, brandRequestTitle(name, 1), brandRequestBody(name, slug, 1), [
+			BRAND_REQUEST_LABEL
+		]);
+		if (gtin || note) await commentOnIssue(config, issue.number, requestDetail(gtin, note));
+		return jsonResponse({ issueUrl: issue.html_url, requestCount: 1 });
+	}
+
+	// Read-modify-write on the count: GitHub exposes no conditional write for an issue body, so two
+	// requests in the same instant can drop one increment. Acceptable for a soft priority number.
+	const count = readCount(existing.body) + 1;
+	await updateIssue(config, existing.number, {
+		title: brandRequestTitle(name, count),
+		body: brandRequestBody(name, slug, count)
+	});
+	if (gtin || note) await commentOnIssue(config, existing.number, requestDetail(gtin, note));
+	return jsonResponse({ issueUrl: existing.html_url, requestCount: count });
+}
+
+function requestDetail(gtin: string | null, note: string | null): string {
+	const lines: string[] = [];
+	if (gtin) lines.push(`Scanned barcode: \`${gtin}\``);
+	if (note) lines.push(note.replace(/^/gm, '> '));
+	return lines.join('\n\n');
+}
+
+async function handleInaccuracyReport(env: Env, body: Record<string, unknown>): Promise<Response> {
+	const companyId = assertCompanyId(body.companyId, 'companyId');
+	const note = assertString(body.note, 'note', 2000);
+
+	const config = githubConfig(env);
+	const company = (await fetchPublicJson(config, `data/companies/${companyId}.json`).catch(() => {
+		throw new ValidationError(`no company found with id "${companyId}"`);
+	})) as { name: string };
+
+	const open = await listOpenIssues(config, DATA_CORRECTION_LABEL);
+	const existing = open.find(
+		(i) => issueKey(i, DATA_CORRECTION_LABEL, 'Data correction: ', slugify) === companyId
+	);
+
+	const issue =
+		existing ??
+		(await createIssue(
+			config,
+			dataCorrectionTitle(company.name),
+			dataCorrectionBody(companyId, company.name),
+			[DATA_CORRECTION_LABEL]
+		));
+	await commentOnIssue(config, issue.number, reportComment(note, todayIso()));
+	return jsonResponse({ issueUrl: issue.html_url });
 }
 
 export default {
@@ -178,6 +270,12 @@ export default {
 					break;
 				case '/submit/barcode':
 					response = await handleNewBarcodeMapping(env, body);
+					break;
+				case '/request/brand':
+					response = await handleBrandRequest(env, body);
+					break;
+				case '/report/inaccuracy':
+					response = await handleInaccuracyReport(env, body);
 					break;
 				default:
 					return jsonResponse({ error: 'not found' }, { status: 404, headers: corsHeaders(env) });

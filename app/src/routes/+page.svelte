@@ -13,12 +13,16 @@
 		saveDraft,
 		submitDraft,
 		submissionsRemainingToday,
+		requestBrand,
+		requestsRemainingToday,
 		RateLimitedError,
-		SubmissionFailedError
+		SubmissionFailedError,
+		type BrandRequestResult
 	} from '$lib/contribute';
 	import { pageTitle, SITE_FULL_NAME } from '$lib/seo';
 
-	type Phase = 'loading' | 'browsing' | 'looking-up' | 'contribute' | 'submitted';
+	type Phase =
+		'loading' | 'browsing' | 'looking-up' | 'request' | 'requested' | 'contribute' | 'submitted';
 
 	let phase = $state<Phase>('loading');
 	let dataset = $state<Dataset | null>(null);
@@ -34,10 +38,16 @@
 	let contributeError = $state<string | null>(null);
 	let submittedPrUrl = $state<string | null>(null);
 
+	let requestGtin = $state<string | null>(null);
+	let requestNote = $state('');
+	let requestError = $state<string | null>(null);
+	let requestResult = $state<BrandRequestResult | null>(null);
+
 	onMount(async () => {
 		dataset = await loadDataset();
-		// The scanner hands off unknown brands here as ?add=<brand>.
+		// The scanner hands off unknown brands here as ?add=<brand>&gtin=<scanned>.
 		const pending = page.url.searchParams.get('add');
+		requestGtin = page.url.searchParams.get('gtin');
 		if (pending) addByName(pending);
 		else phase = 'browsing';
 	});
@@ -48,7 +58,7 @@
 
 	function addByName(name: string) {
 		contributeName = name;
-		phase = 'contribute';
+		phase = 'request';
 	}
 
 	function startOver() {
@@ -56,6 +66,27 @@
 		searchQuery = '';
 		submittedPrUrl = null;
 		contributeError = null;
+		requestNote = '';
+		requestError = null;
+		requestResult = null;
+		requestGtin = null;
+	}
+
+	async function sendRequest() {
+		requestError = null;
+		if (!contributeName.trim()) {
+			requestError = 'A brand name is required.';
+			return;
+		}
+		try {
+			requestResult = await requestBrand(contributeName.trim(), requestGtin, requestNote);
+			phase = 'requested';
+		} catch (err) {
+			requestError =
+				err instanceof RateLimitedError || err instanceof SubmissionFailedError
+					? err.message
+					: 'Something went wrong sending your request.';
+		}
 	}
 
 	async function submitContribution() {
@@ -121,7 +152,7 @@
 							class="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 							onclick={() => addByName(query)}
 						>
-							Add "{query}"
+							Request a rating for "{query}"
 						</button>
 					</div>
 				{/snippet}
@@ -149,6 +180,83 @@
 
 		{#if phase === 'looking-up'}
 			<p class="text-center text-sm text-gray-500 dark:text-zinc-300">Looking up…</p>
+		{/if}
+
+		{#if phase === 'request'}
+			<form class="flex flex-col gap-3" onsubmit={(e) => (e.preventDefault(), sendRequest())}>
+				<div>
+					<h2 class="text-lg font-semibold">Not rated yet</h2>
+					<p class="mt-1 text-sm text-gray-600 dark:text-zinc-300">
+						Ask for this brand to be looked into. No research needed — a maintainer does the
+						sourcing. The more people ask, the sooner it gets picked up.
+					</p>
+				</div>
+				<label class="flex flex-col gap-1 text-sm">
+					Brand or company name
+					<input
+						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						bind:value={contributeName}
+					/>
+				</label>
+				<label class="flex flex-col gap-1 text-sm">
+					Anything worth knowing? (optional)
+					<textarea
+						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						rows="2"
+						placeholder="Where you saw it, who you think owns it…"
+						bind:value={requestNote}></textarea>
+				</label>
+
+				<p class="text-xs text-gray-500 dark:text-zinc-300">
+					{requestsRemainingToday()} requests left today on this device.
+				</p>
+				{#if requestError}
+					<p class="text-sm text-red-600 dark:text-red-400">{requestError}</p>
+				{/if}
+				<button
+					class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					type="submit"
+				>
+					Request a rating
+				</button>
+				<button
+					class="text-sm text-gray-500 underline dark:text-zinc-300"
+					type="button"
+					onclick={() => (phase = 'contribute')}
+				>
+					I already have a source — add the details myself
+				</button>
+				<button
+					class="text-sm text-gray-500 underline dark:text-zinc-300"
+					type="button"
+					onclick={startOver}
+				>
+					Cancel
+				</button>
+			</form>
+		{/if}
+
+		{#if phase === 'requested' && requestResult}
+			<div class="flex flex-col gap-3">
+				<p class="text-sm text-gray-600 dark:text-zinc-300">
+					Thanks — <strong>{contributeName}</strong> is on the list.
+					{#if requestResult.requestCount > 1}
+						It's been requested {requestResult.requestCount} times now, which moves it up the queue.
+					{/if}
+				</p>
+				<a
+					class="text-sm underline"
+					href={requestResult.issueUrl}
+					target="_blank"
+					rel="noreferrer external">Follow it on GitHub</a
+				>
+				<button
+					class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					onclick={startOver}
+				>
+					Search something else
+				</button>
+			</div>
 		{/if}
 
 		{#if phase === 'contribute'}
@@ -255,7 +363,7 @@
 				<li>1. Search a company by name — or turn on shopping mode and scan its barcode.</li>
 				<li>2. See flag icons and a score — no reading required to make a call.</li>
 				<li>
-					3. Missing something? Add it — it goes straight into a public pull request for review.
+					3. Missing something? Request it in one tap — the most-asked-for brands get rated first.
 				</li>
 			</ol>
 		</section>

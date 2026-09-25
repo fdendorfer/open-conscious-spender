@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Category weights and scoring
+    url: https://github.com/fdendorfer/open-conscious-spender/blob/main/docs/SCORING.md
+    about: Changing a weight reprices every company — read this, then open a blank issue to discuss.

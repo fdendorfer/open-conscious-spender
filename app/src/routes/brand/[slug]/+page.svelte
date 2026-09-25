@@ -2,7 +2,13 @@
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { loadDataset, findCompanyById, type Dataset } from '$lib/dataset';
-	import { saveDraft, submitDraft, submissionsRemainingToday } from '$lib/contribute';
+	import {
+		saveDraft,
+		submitDraft,
+		submissionsRemainingToday,
+		reportInaccuracy,
+		requestsRemainingToday
+	} from '$lib/contribute';
 	import type { Severity } from '$lib/scoring';
 	import CompanyResult from '$lib/components/CompanyResult.svelte';
 	import type { PageProps } from './$types';
@@ -26,6 +32,11 @@
 	let flagError = $state<string | null>(null);
 	let flagPrUrl = $state<string | null>(null);
 
+	let showReportForm = $state(false);
+	let reportNote = $state('');
+	let reportError = $state<string | null>(null);
+	let reportIssueUrl = $state<string | null>(null);
+
 	onMount(async () => {
 		dataset = await loadDataset();
 		flagCategory = dataset.categories[0]?.id ?? '';
@@ -40,7 +51,25 @@
 		flagSourceUrl = '';
 		flagError = null;
 		flagPrUrl = null;
+		showReportForm = false;
+		reportNote = '';
+		reportError = null;
+		reportIssueUrl = null;
 	});
+
+	async function submitReport() {
+		reportError = null;
+		if (!company) return;
+		if (!reportNote.trim()) {
+			reportError = 'Tell us what looks wrong.';
+			return;
+		}
+		try {
+			reportIssueUrl = await reportInaccuracy(company.id, reportNote);
+		} catch (err) {
+			reportError = err instanceof Error ? err.message : 'Something went wrong sending this.';
+		}
+	}
 
 	async function submitFlag() {
 		flagError = null;
@@ -87,13 +116,55 @@
 	{:else}
 		<CompanyResult {company} {dataset} />
 
-		{#if !showFlagForm && !flagPrUrl}
-			<button
-				class="text-sm text-gray-500 underline dark:text-zinc-300"
-				onclick={() => (showFlagForm = true)}
-			>
-				Something we missed? Suggest a flag
-			</button>
+		{#if !showFlagForm && !flagPrUrl && !showReportForm && !reportIssueUrl}
+			<div class="flex flex-col items-start gap-2">
+				<button
+					class="text-sm text-gray-500 underline dark:text-zinc-300"
+					onclick={() => (showFlagForm = true)}
+				>
+					Something we missed? Suggest a flag
+				</button>
+				<button
+					class="text-sm text-gray-500 underline dark:text-zinc-300"
+					onclick={() => (showReportForm = true)}
+				>
+					Something here looks wrong? Report it
+				</button>
+			</div>
+		{/if}
+
+		{#if showReportForm && !reportIssueUrl}
+			<form class="flex flex-col gap-3" onsubmit={(e) => (e.preventDefault(), submitReport())}>
+				<label class="flex flex-col gap-1 text-sm">
+					What's inaccurate?
+					<textarea
+						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						rows="4"
+						placeholder="Wrong owner, outdated flag, severity looks off…"
+						bind:value={reportNote}></textarea>
+				</label>
+				<p class="text-xs text-gray-500 dark:text-zinc-300">
+					{requestsRemainingToday()} reports left today on this device.
+				</p>
+				{#if reportError}
+					<p class="text-sm text-red-600 dark:text-red-400">{reportError}</p>
+				{/if}
+				<button
+					class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					type="submit"
+				>
+					Send report
+				</button>
+			</form>
+		{/if}
+
+		{#if reportIssueUrl}
+			<p class="text-sm text-gray-600 dark:text-zinc-300">
+				Thanks — a maintainer will take a look:
+				<a class="underline" href={reportIssueUrl} target="_blank" rel="noreferrer external"
+					>{reportIssueUrl}</a
+				>
+			</p>
 		{/if}
 
 		{#if showFlagForm && !flagPrUrl}
