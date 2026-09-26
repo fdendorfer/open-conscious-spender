@@ -111,6 +111,15 @@
 		goto(resolve('/brand/[slug]', { slug: company.id }));
 	}
 
+	/** The request form lives on the home page, which picks the brand up from ?add=. */
+	function requestRating(query: string) {
+		closeSearch();
+		const target = new URL(resolve('/'), location.origin);
+		target.searchParams.set('add', query);
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() can't carry a query string
+		goto(target);
+	}
+
 	/** In shopping mode the primary action is the camera, not the name search. */
 	function onPrimaryAction() {
 		if (shoppingMode.enabled) scanner.open();
@@ -269,8 +278,21 @@
 			dataset={searchDataset}
 			floatResults={false}
 			onSelect={goToCompany}
+			onEnterNoResults={requestRating}
 			onEscape={closeSearch}
-		/>
+		>
+			{#snippet emptyState(query)}
+				<div class="flex flex-col gap-2 p-3">
+					<p class="text-sm text-gray-600 dark:text-zinc-300">No match for "{query}".</p>
+					<button
+						class="cursor-pointer rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+						onclick={() => requestRating(query)}
+					>
+						Request a rating for "{query}"
+					</button>
+				</div>
+			{/snippet}
+		</CompanySearch>
 	{/if}
 </dialog>
 

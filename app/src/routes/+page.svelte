@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { onMount, untrack } from 'svelte';
+	import { goto, replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { Barcode } from 'phosphor-svelte';
@@ -63,12 +63,21 @@
 			phase = 'load-failed';
 			return;
 		}
-		// The scanner hands off unknown brands here as ?add=<brand>&gtin=<scanned>.
-		const pending = page.url.searchParams.get('add');
-		requestGtin = page.url.searchParams.get('gtin');
-		if (pending) addByName(pending);
-		else phase = 'browsing';
+		phase = 'browsing';
 	}
+
+	// The scanner and the nav bar search both hand off an unrated brand as
+	// ?add=<brand>&gtin=<scanned>. An effect rather than onMount, because either
+	// can fire while this page is already the open one.
+	let pendingAdd = $derived(page.url.searchParams.get('add'));
+	$effect(() => {
+		const name = pendingAdd;
+		if (!name) return;
+		untrack(() => {
+			requestGtin = page.url.searchParams.get('gtin');
+			addByName(name);
+		});
+	});
 
 	function goToCompany(company: Company) {
 		goto(resolve('/brand/[slug]', { slug: company.id }));
@@ -80,6 +89,8 @@
 	}
 
 	function startOver() {
+		// Drop the hand-off params, so asking for the same brand again re-opens the form.
+		if (pendingAdd) replaceState(resolve('/'), page.state);
 		phase = 'browsing';
 		searchQuery = '';
 		submittedPrUrl = null;
