@@ -4,6 +4,7 @@
 	import { loadDataset, type Company, type Dataset } from '$lib/dataset';
 	import { scoreCompany, type Band } from '$lib/scoring';
 	import { pageTitle } from '$lib/seo';
+	import DatasetLoadError from '$lib/components/DatasetLoadError.svelte';
 
 	const BAND_DOT: Record<Band, string> = {
 		green: 'bg-green-500 dark:bg-green-400',
@@ -56,9 +57,18 @@
 		return sortDir === 'asc' ? '↑' : '↓';
 	}
 
-	onMount(async () => {
-		dataset = await loadDataset();
-	});
+	let loadFailed = $state(false);
+
+	async function load() {
+		loadFailed = false;
+		try {
+			dataset = await loadDataset();
+		} catch {
+			loadFailed = true;
+		}
+	}
+
+	onMount(load);
 </script>
 
 <svelte:head>
@@ -74,7 +84,9 @@
 		bind:value={filter}
 	/>
 
-	{#if !dataset}
+	{#if loadFailed}
+		<DatasetLoadError onRetry={load} />
+	{:else if !dataset}
 		<p class="text-sm text-gray-400 dark:text-zinc-400">Loading…</p>
 	{:else}
 		<div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-zinc-700">

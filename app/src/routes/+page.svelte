@@ -8,6 +8,7 @@
 	import { CATEGORY_ICONS } from '$lib/categoryIcons';
 	import { loadDataset, type Dataset, type Company } from '$lib/dataset';
 	import CompanySearch from '$lib/components/CompanySearch.svelte';
+	import DatasetLoadError from '$lib/components/DatasetLoadError.svelte';
 	import type { Severity } from '$lib/scoring';
 	import {
 		saveDraft,
@@ -22,7 +23,14 @@
 	import { pageTitle, SITE_FULL_NAME } from '$lib/seo';
 
 	type Phase =
-		'loading' | 'browsing' | 'looking-up' | 'request' | 'requested' | 'contribute' | 'submitted';
+		| 'loading'
+		| 'load-failed'
+		| 'browsing'
+		| 'looking-up'
+		| 'request'
+		| 'requested'
+		| 'contribute'
+		| 'submitted';
 
 	let phase = $state<Phase>('loading');
 	let dataset = $state<Dataset | null>(null);
@@ -44,13 +52,23 @@
 	let requestResult = $state<BrandRequestResult | null>(null);
 
 	onMount(async () => {
-		dataset = await loadDataset();
+		await load();
+	});
+
+	async function load() {
+		phase = 'loading';
+		try {
+			dataset = await loadDataset();
+		} catch {
+			phase = 'load-failed';
+			return;
+		}
 		// The scanner hands off unknown brands here as ?add=<brand>&gtin=<scanned>.
 		const pending = page.url.searchParams.get('add');
 		requestGtin = page.url.searchParams.get('gtin');
 		if (pending) addByName(pending);
 		else phase = 'browsing';
-	});
+	}
 
 	function goToCompany(company: Company) {
 		goto(resolve('/brand/[slug]', { slug: company.id }));
@@ -136,6 +154,10 @@
 	<div class="mx-auto flex w-full max-w-md flex-col gap-3">
 		{#if phase === 'loading'}
 			<p class="text-center text-sm text-gray-500 dark:text-zinc-300">Loading dataset…</p>
+		{/if}
+
+		{#if phase === 'load-failed'}
+			<DatasetLoadError onRetry={load} />
 		{/if}
 
 		{#if phase === 'browsing'}

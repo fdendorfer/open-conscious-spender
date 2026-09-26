@@ -11,6 +11,7 @@
 	} from '$lib/contribute';
 	import type { Severity } from '$lib/scoring';
 	import CompanyResult from '$lib/components/CompanyResult.svelte';
+	import DatasetLoadError from '$lib/components/DatasetLoadError.svelte';
 	import type { PageProps } from './$types';
 	import { pageTitle } from '$lib/seo';
 
@@ -18,6 +19,7 @@
 
 	let dataset = $state<Dataset | null>(null);
 	let loaded = $state(false);
+	let loadFailed = $state(false);
 
 	// Derived, not assigned once on mount: SvelteKit reuses this component when
 	// navigating from one brand page to another, so only the params change.
@@ -38,10 +40,19 @@
 	let reportIssueUrl = $state<string | null>(null);
 
 	onMount(async () => {
-		dataset = await loadDataset();
-		flagCategory = dataset.categories[0]?.id ?? '';
-		loaded = true;
+		await load();
 	});
+
+	async function load() {
+		loadFailed = false;
+		try {
+			dataset = await loadDataset();
+			flagCategory = dataset.categories[0]?.id ?? '';
+		} catch {
+			loadFailed = true;
+		}
+		loaded = true;
+	}
 
 	// Never carry a half-filled suggestion over to the company the user just opened.
 	$effect(() => {
@@ -103,6 +114,8 @@
 <main class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-10">
 	{#if !loaded}
 		<p class="text-sm text-gray-500 dark:text-zinc-300">Loading…</p>
+	{:else if loadFailed}
+		<DatasetLoadError onRetry={load} />
 	{:else if !company || !dataset}
 		<p class="text-sm text-gray-600 dark:text-zinc-300">
 			No company found for "{params.slug}".
