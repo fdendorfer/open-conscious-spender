@@ -31,6 +31,7 @@ cd app && pnpm install && pnpm dev     # run the PWA
 
 node scripts/validate-dataset.mjs      # check data/** against the schema
 node scripts/build-dataset.mjs         # regenerate data/dist/ (CI does this on push)
+node scripts/import-wikidata.mjs       # dry-run ownership/QID import (maintainers)
 ```
 
 Edits to `data/**` are validated on every pull request. `data/dist/` is generated — CI rebuilds and commits it after a merge, so changing it by hand only creates conflicts.
@@ -47,6 +48,7 @@ Edits to `data/**` are validated on every pull request. `data/dist/` is generate
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to add a company or flag, and what makes a source usable
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — hosting, data versioning, validation, PR-bot + rate limiting
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — what's next and the decisions already settled
 - [`docs/SCORING.md`](docs/SCORING.md) — the extendable flag → score formula
 - [`workers/pr-bot/README.md`](workers/pr-bot/README.md) — contribution endpoints and Worker setup
 - `data/categories.json` — the flag-category taxonomy and its default weights

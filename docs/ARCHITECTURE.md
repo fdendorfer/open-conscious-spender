@@ -8,10 +8,13 @@
 
 ## Offline behaviour
 
-The PWA has two independent caches, and the settings page (`/settings`) reports and clears both:
+The PWA has three independent caches, and the settings page (`/settings`) reports and clears them:
 
 - **Dataset** — `bundle.json` in IndexedDB (`idb-keyval`), refreshed on a `meta.json` version mismatch.
 - **App shell** — HTML/JS/CSS precached by the `vite-plugin-pwa` service worker.
+- **Resolved barcodes** — what the Open Facts databases said about each scanned GTIN, in IndexedDB. Hits are kept indefinitely (a product's brand does not change); misses expire after a week, because "not in Open Food Facts yet" gets fixed. Only the brand is stored, never the matched company, so a dataset update is picked up on the next scan.
+
+A scan with no cached answer and no connection reports `offline` rather than "unknown" — the difference between "ask again later" and "this product has no owner on record".
 
 Two constraints shape the config in `app/vite.config.ts`:
 

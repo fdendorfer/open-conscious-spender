@@ -7,6 +7,7 @@ Tracking doc for future improvements and the decisions behind them. One line eac
 - **Dataset breadth** — 76 companies misses most real baskets; bulk-seed the top Swiss and EU grocery owners before promoting the app anywhere.
 - **Barcode override coverage** — every `unknown-brand` result is a candidate override, so mine the issue tracker for repeat scans.
 - **Category-aware alternatives** — "buy this instead" needs a product category on companies, which the schema does not have yet.
+- **Trip history** — the scan trip resets after a 4h gap; keeping past trips would need a real storage budget decision first.
 - **Flag decay** — `decayMultiplier` is wired through scoring but nothing sets it; decide on an age curve before the dataset grows old.
 
 ## Decisions
