@@ -12,13 +12,19 @@ on:
 permissions:
   contents: write
 
+# The job commits and pushes. Two merges in quick succession would otherwise
+# race on the same ref; queue them instead of cancelling a half-done push.
+concurrency:
+  group: build-dataset
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
 
@@ -34,4 +40,9 @@ jobs:
           git add data/dist
           git diff --cached --quiet && echo "No dataset changes" && exit 0
           git commit -m "chore: rebuild dataset bundle [skip ci]"
-          git push
+          for attempt in 1 2 3; do
+            git push && exit 0
+            echo "push rejected, rebasing (attempt $attempt)"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+          done
+          exit 1

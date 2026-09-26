@@ -15,6 +15,15 @@ export interface ScanHandle {
 
 const PRODUCT_BARCODE_FORMATS: BarcodeFormat[] = ['ean_13', 'ean_8', 'upc_a', 'upc_e'];
 
+/** A single short tick confirming the read, so the phone can stay in a pocket-level glance. */
+function confirmHit(): void {
+	try {
+		navigator.vibrate?.(30);
+	} catch {
+		// unsupported, or blocked without a user gesture — the visual result is the real feedback
+	}
+}
+
 export class CameraUnavailableError extends Error {}
 
 /**
@@ -50,6 +59,7 @@ export async function startBarcodeScan(
 			if (barcodes.length > 0) {
 				// Self-pause so one product can't fire a burst of detections.
 				running = false;
+				confirmHit();
 				onDetect(barcodes[0].rawValue);
 				return;
 			}

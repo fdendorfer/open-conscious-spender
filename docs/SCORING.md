@@ -84,7 +84,12 @@ Example at `K = 12`:
 - **New severity level**: add a row to the severity table + its multiplier.
 - **Decay**: implement the reserved `decay.multiplier` function; every flag already carries `dateAdded`.
 - **Per-user weighting**: categories are already just weighted numbers — a future "mute category X" is a per-user override of `category.weight` at render time, no server-side change.
-- **Parent-company inheritance**: a company's displayed score could become the worst of its own score and its parent chain's scores. Not yet implemented.
+
+## Scores do not flow along the ownership graph
+
+A company is scored on its own flags only. Ownership is displayed for context, but a parent's conduct never lowers a subsidiary's score and vice versa.
+
+If a parent's conduct genuinely implicates a subsidiary, record it as a flag on the subsidiary with its own source. That keeps every point on a company's score traceable to a sourced claim about that company, and keeps the score stable when an ownership edge is later corrected.
 
 ## Editorial note
 

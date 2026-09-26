@@ -46,13 +46,27 @@ export interface DatasetMeta {
 	/** Bundle size in bytes. Absent on bundles built before the field existed. */
 	bytes?: number;
 	companies?: number;
+	/** Hex SHA-256 of bundle.json. Absent on bundles built before the field existed. */
+	sha256?: string;
+}
+
+async function fetchText(url: string): Promise<string> {
+	const res = await fetch(url, { cache: 'no-store' });
+	if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+	return res.text();
 }
 
 async function fetchJson<T>(url: string): Promise<T> {
-	const res = await fetch(url, { cache: 'no-store' });
-	if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
-	return res.json();
+	return JSON.parse(await fetchText(url)) as T;
 }
+
+async function sha256Hex(text: string): Promise<string | null> {
+	if (!globalThis.crypto?.subtle) return null; // insecure context — skip the check
+	const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+	return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+export class DatasetIntegrityError extends Error {}
 
 /**
  * Backfills fields added to the schema after older bundles/caches were written
@@ -76,11 +90,20 @@ export async function getCachedDataset(): Promise<Dataset | undefined> {
 	return cached ? normalizeDataset(cached) : undefined;
 }
 
-/** Fetches and stores the full bundle regardless of what is already cached. */
-export async function downloadDataset(): Promise<Dataset> {
-	const bundle = await fetchJson<Omit<Dataset, 'version'>>(`${RAW_BASE}/bundle.json`);
-	const meta = await fetchDatasetMeta();
-	const dataset = normalizeDataset({ ...bundle, version: meta.version });
+/** Fetches and stores the full bundle; `expected` enables an integrity check when the caller holds meta.json. */
+export async function downloadDataset(expected?: DatasetMeta): Promise<Dataset> {
+	const body = await fetchText(`${RAW_BASE}/bundle.json`);
+
+	if (expected?.sha256) {
+		const actual = await sha256Hex(body);
+		if (actual && actual !== expected.sha256) {
+			throw new DatasetIntegrityError('Downloaded dataset failed its checksum.');
+		}
+	}
+
+	// Version comes from inside the bundle, never a separate meta.json fetch: a
+	// rebuild mid-download would otherwise tag these bytes with a newer version.
+	const dataset = normalizeDataset(JSON.parse(body) as Dataset);
 	await set(CACHE_KEY, dataset);
 	return dataset;
 }
@@ -111,9 +134,9 @@ async function refreshIfStale(cached: Dataset | undefined): Promise<void> {
 	try {
 		const meta = await fetchDatasetMeta();
 		if (cached && cached.version === meta.version) return;
-		await downloadDataset();
+		await downloadDataset(meta);
 	} catch {
-		// offline or GitHub unreachable — keep serving the cached copy
+		// offline, unreachable, or a checksum mismatch — keep serving the cached copy
 	}
 }
 

@@ -6,6 +6,7 @@
 import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -30,12 +31,6 @@ async function build() {
 	// strip the human-readable comment key before shipping to clients
 	delete barcodeOverrides._comment;
 
-	const bundle = { categories, companies, barcodeOverrides };
-
-	const bundleJson = JSON.stringify(bundle);
-	await mkdir(distDir, { recursive: true });
-	await writeFile(path.join(distDir, 'bundle.json'), bundleJson);
-
 	let version = 'local';
 	try {
 		version = execSync('git rev-parse --short HEAD', { cwd: rootDir }).toString().trim();
@@ -44,12 +39,23 @@ async function build() {
 		version = `local-${Date.now()}`;
 	}
 
+	// version lives inside the bundle so a client always stores the version of the
+	// bytes it actually received, even if meta.json moved on mid-download
+	const bundle = { version, categories, companies, barcodeOverrides };
+
+	const bundleJson = JSON.stringify(bundle);
+	await mkdir(distDir, { recursive: true });
+	await writeFile(path.join(distDir, 'bundle.json'), bundleJson);
+
+	const sha256 = createHash('sha256').update(bundleJson, 'utf8').digest('hex');
+
 	// bytes/companies let the app quote a download size before fetching the bundle itself
 	const meta = {
 		version,
 		builtAt: new Date().toISOString(),
 		bytes: Buffer.byteLength(bundleJson),
-		companies: companies.length
+		companies: companies.length,
+		sha256
 	};
 	await writeFile(path.join(distDir, 'meta.json'), JSON.stringify(meta));
 

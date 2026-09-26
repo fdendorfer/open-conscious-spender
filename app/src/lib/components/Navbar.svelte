@@ -15,12 +15,12 @@
 	} from 'phosphor-svelte';
 	import Logo from './Logo.svelte';
 	import CompanySearch from './CompanySearch.svelte';
-	import ScannerOverlay from './ScannerOverlay.svelte';
 	import { loadDataset, type Dataset, type Company } from '$lib/dataset';
 	import { shoppingMode } from '$lib/shoppingMode.svelte';
 	import { searchHistory } from '$lib/searchHistory.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { scanner } from '$lib/scannerBus.svelte';
+	import { retryPendingDrafts } from '$lib/contribute';
 
 	interface BeforeInstallPromptEvent extends Event {
 		prompt(): Promise<void>;
@@ -47,6 +47,16 @@
 	let searchOpen = $state(false);
 	let searchDataset = $state<Dataset | null>(null);
 	let searchComponent = $state<CompanySearch | undefined>(undefined);
+	let searchDialog = $state<HTMLDialogElement | undefined>(undefined);
+
+	// Statically importing the overlay pulled the barcode/WASM stack into the
+	// root layout chunk, so every visitor paid for it on first paint.
+	let ScannerOverlay = $state<typeof import('./ScannerOverlay.svelte').default | null>(null);
+	$effect(() => {
+		if (scanner.isOpen && !ScannerOverlay) {
+			void import('./ScannerOverlay.svelte').then((m) => (ScannerOverlay = m.default));
+		}
+	});
 
 	onMount(() => {
 		shoppingMode.hydrate();
@@ -59,6 +69,11 @@
 		window.addEventListener('appinstalled', () => {
 			deferredPrompt = null;
 		});
+
+		// Drafts stranded by a failed submit go out again quietly, on load and
+		// whenever the device comes back online.
+		void retryPendingDrafts();
+		window.addEventListener('online', () => void retryPendingDrafts());
 	});
 
 	async function installApp() {
@@ -79,13 +94,14 @@
 	async function openSearch() {
 		searchOpen = true;
 		logoMenuOpen = false;
+		searchDialog?.showModal();
 		if (!searchDataset) searchDataset = await loadDataset();
 		await tick();
 		searchComponent?.focus();
 	}
 
 	function closeSearch() {
-		searchOpen = false;
+		searchDialog?.close();
 	}
 
 	function goToCompany(company: Company) {
@@ -116,12 +132,6 @@
 		openSearch();
 	}
 </script>
-
-<svelte:window
-	onkeydown={(e) => {
-		if (e.key === 'Escape' && searchOpen) closeSearch();
-	}}
-/>
 
 <nav class="sticky top-0 z-50 flex items-center gap-6 bg-white px-6 py-3 dark:bg-zinc-950">
 	<div class="relative flex shrink-0 items-center gap-1">
@@ -231,37 +241,37 @@
 	></button>
 {/if}
 
-{#if searchOpen}
-	<button
-		class="fixed inset-0 z-[60] cursor-default bg-black/40 dark:bg-black/70"
-		aria-label="Close search"
-		onclick={closeSearch}
-	></button>
-	<div class="pointer-events-none fixed inset-0 z-[61] flex flex-col items-center px-4 pt-24">
-		<div
-			class="pointer-events-auto w-full max-w-md rounded-xl bg-white p-4 shadow-2xl dark:border dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/80"
+<!-- showModal() gives the focus trap, inert background and Escape handling for free. -->
+<dialog
+	bind:this={searchDialog}
+	class="m-0 mt-24 w-full max-w-md rounded-xl bg-white p-4 shadow-2xl backdrop:bg-black/40 sm:mx-auto dark:border dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/80 dark:backdrop:bg-black/70"
+	aria-label="Search companies"
+	onclose={() => (searchOpen = false)}
+	onclick={(e) => {
+		if (e.target === searchDialog) closeSearch();
+	}}
+>
+	<div class="mb-3 flex items-center justify-between">
+		<span class="text-sm font-medium text-gray-900 dark:text-zinc-100">Search companies</span>
+		<button
+			class="cursor-pointer rounded p-1 text-gray-400 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+			aria-label="Close search"
+			onclick={closeSearch}
 		>
-			<div class="mb-3 flex items-center justify-between">
-				<span class="text-sm font-medium text-gray-900 dark:text-zinc-100">Search companies</span>
-				<button
-					class="cursor-pointer rounded p-1 text-gray-400 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-					aria-label="Close search"
-					onclick={closeSearch}
-				>
-					<X size={18} />
-				</button>
-			</div>
-			<CompanySearch
-				bind:this={searchComponent}
-				dataset={searchDataset}
-				floatResults={false}
-				onSelect={goToCompany}
-				onEscape={closeSearch}
-			/>
-		</div>
+			<X size={18} />
+		</button>
 	</div>
-{/if}
+	{#if searchOpen}
+		<CompanySearch
+			bind:this={searchComponent}
+			dataset={searchDataset}
+			floatResults={false}
+			onSelect={goToCompany}
+			onEscape={closeSearch}
+		/>
+	{/if}
+</dialog>
 
-{#if scanner.isOpen}
+{#if scanner.isOpen && ScannerOverlay}
 	<ScannerOverlay onClose={() => scanner.close()} onSearchByName={searchFromScanner} />
 {/if}

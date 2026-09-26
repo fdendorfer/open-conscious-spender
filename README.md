@@ -1,15 +1,15 @@
 # Open Conscious Spender (OCS)
 
-A progressive web app for instant, low-reading ethical-shopping lookups: scan a barcode in-store, get an icon-based read on the parent company's red flags, decide in seconds.
+A progressive web app for instant, low-reading ethical-shopping lookups: scan a barcode in-store, get an icon-based read on the company's red flags, decide in seconds.
 
 Inspired by [consciousspend.com](https://consciousspend.com), with three differences:
 - **Public contributions** — anyone can request a brand in one tap, or open a dataset PR from the app if they have a source.
-- **Parent-company focus** — ownership graph so a flag on a subsidiary surfaces on the brand you're actually holding.
+- **Brand-to-owner lookup** — brands map to the company that owns them, so scanning a product tells you who you're actually buying from. Ownership is shown for context; it never moves a flag between companies.
 - **Quick-lookup first** — result screen is icons + a score, not paragraphs.
 
 ## Status
 
-Working prototype. The PWA (search, barcode scan, company/brand pages, score breakdown), the dataset pipeline, and the anonymous PR-bot Worker are all implemented; the dataset currently seeds 77 companies, weighted toward the Swiss market.
+Working prototype. The PWA (search, barcode scan, company/brand pages, score breakdown), the dataset pipeline, and the anonymous PR-bot Worker are all implemented; the dataset currently seeds 76 companies, weighted toward the Swiss market.
 
 ## Repo layout
 

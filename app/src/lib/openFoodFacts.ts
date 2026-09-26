@@ -1,13 +1,28 @@
 export interface OffProduct {
 	brand: string | null;
 	productName: string | null;
+	/** Which Open Facts database answered — surfaced so a miss can say where it looked. */
+	source: string;
 }
 
-/** Looks up a barcode via the Open Food Facts public API. Returns null on any failure or unknown code. */
-export async function lookupOpenFoodFacts(gtin: string): Promise<OffProduct | null> {
+interface FactsSource {
+	name: string;
+	host: string;
+}
+
+// Same API shape across all four. Food first: it is by far the largest and the
+// most likely hit for a supermarket scan.
+const SOURCES: FactsSource[] = [
+	{ name: 'Open Food Facts', host: 'world.openfoodfacts.org' },
+	{ name: 'Open Beauty Facts', host: 'world.openbeautyfacts.org' },
+	{ name: 'Open Pet Food Facts', host: 'world.openpetfoodfacts.org' },
+	{ name: 'Open Products Facts', host: 'world.openproductsfacts.org' }
+];
+
+async function lookupOne(source: FactsSource, gtin: string): Promise<OffProduct | null> {
 	try {
 		const res = await fetch(
-			`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(gtin)}.json?fields=product_name,brands`
+			`https://${source.host}/api/v2/product/${encodeURIComponent(gtin)}.json?fields=product_name,brands`
 		);
 		if (!res.ok) return null;
 		const data = (await res.json()) as {
@@ -15,10 +30,20 @@ export async function lookupOpenFoodFacts(gtin: string): Promise<OffProduct | nu
 			product?: { product_name?: string; brands?: string };
 		};
 		if (data.status !== 1 || !data.product) return null;
-		// Open Food Facts' "brands" field is a comma-separated list, most specific first
-		const brand = data.product.brands?.split(',')[0]?.trim() ?? null;
-		return { brand, productName: data.product.product_name ?? null };
+		// the "brands" field is a comma-separated list, most specific first
+		const brand = data.product.brands?.split(',')[0]?.trim() || null;
+		if (!brand) return null;
+		return { brand, productName: data.product.product_name ?? null, source: source.name };
 	} catch {
 		return null;
 	}
+}
+
+/** Resolves a barcode against the Open Facts databases in turn. Returns null when none know it. */
+export async function lookupOpenFoodFacts(gtin: string): Promise<OffProduct | null> {
+	for (const source of SOURCES) {
+		const hit = await lookupOne(source, gtin);
+		if (hit) return hit;
+	}
+	return null;
 }

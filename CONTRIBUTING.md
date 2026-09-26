@@ -55,10 +55,13 @@ Before opening a PR:
 ```sh
 pnpm lint    # prettier --check + eslint
 pnpm check   # svelte-check
+pnpm test    # vitest
 pnpm build
 ```
 
-CI runs all three on every PR touching `app/**` or `workers/**`, plus a typecheck for the worker.
+CI runs all four on every PR touching `app/**` or `workers/**`, plus a typecheck for the worker. On merge to `main` the deploy workflows re-run the same gates against the merge result and then ship to Cloudflare.
+
+Tests cover pure logic only — scoring, search ranking, the ownership walk, and barcode resolution. `src/lib/scoring.test.ts` pins the worked examples from [`docs/SCORING.md`](docs/SCORING.md), so changing the formula means changing both.
 
 ### Conventions
 

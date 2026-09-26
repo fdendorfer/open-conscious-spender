@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { marked } from 'marked';
-	import scoringDoc from '../../../../docs/SCORING.md?raw';
 	import { pageTitle } from '$lib/seo';
+	import type { PageProps } from './$types';
 
-	const html = marked.parse(scoringDoc, { async: false }) as string;
+	let { data }: PageProps = $props();
 </script>
 
 <svelte:head>
@@ -13,7 +12,7 @@
 <main class="mx-auto max-w-3xl px-6 py-10">
 	<div class="scoring-doc">
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -- docs/SCORING.md is a repo file, not user input -->
-		{@html html}
+		{@html data.html}
 	</div>
 </main>
 

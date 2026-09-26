@@ -22,6 +22,8 @@ export interface Draft {
 	createdAt: string;
 	submitted: boolean;
 	prUrl?: string;
+	/** Failed background resends; caps retries so a rejected payload stops eventually. */
+	attempts?: number;
 }
 
 export async function listDrafts(): Promise<Draft[]> {
@@ -152,4 +154,43 @@ export async function reportInaccuracy(companyId: string, note: string): Promise
 	});
 	record(REQUEST_LOG_KEY);
 	return result.issueUrl;
+}
+
+/** A 4xx means the bot rejected the payload itself; retrying it would fail forever. */
+function isPermanent(err: unknown): boolean {
+	return err instanceof SubmissionFailedError && /\((4\d\d)\)$/.test(err.message);
+}
+
+const MAX_RETRY_ATTEMPTS = 5;
+
+/**
+ * Resends drafts stranded by a failed submit (offline mid-aisle is the common case).
+ * Silent by design: the user was already told the contribution was saved.
+ */
+export async function retryPendingDrafts(): Promise<void> {
+	if (!PR_BOT_URL) return;
+
+	const drafts = await listDrafts();
+	const pending = drafts.filter((d) => !d.submitted && (d.attempts ?? 0) < MAX_RETRY_ATTEMPTS);
+	if (pending.length === 0) return;
+
+	for (const draft of pending) {
+		if (submissionsRemainingToday() <= 0) return;
+		try {
+			await submitDraft(draft);
+		} catch (err) {
+			if (err instanceof RateLimitedError) return;
+			await bumpAttempts(draft.id, isPermanent(err));
+		}
+	}
+}
+
+async function bumpAttempts(id: string, permanent: boolean): Promise<void> {
+	const drafts = await listDrafts();
+	await set(
+		DRAFTS_KEY,
+		drafts.map((d) =>
+			d.id === id ? { ...d, attempts: permanent ? MAX_RETRY_ATTEMPTS : (d.attempts ?? 0) + 1 } : d
+		)
+	);
 }
