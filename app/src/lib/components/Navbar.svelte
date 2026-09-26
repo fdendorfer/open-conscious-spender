@@ -18,6 +18,7 @@
 	import { loadDataset, type Dataset, type Company } from '$lib/dataset';
 	import { shoppingMode } from '$lib/shoppingMode.svelte';
 	import { searchHistory } from '$lib/searchHistory.svelte';
+	import { scanTrip } from '$lib/scanTrip.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { scanner } from '$lib/scannerBus.svelte';
 	import { retryPendingDrafts } from '$lib/contribute';
@@ -62,6 +63,7 @@
 		shoppingMode.hydrate();
 		theme.hydrate();
 		searchHistory.hydrate();
+		scanTrip.hydrate();
 		window.addEventListener('beforeinstallprompt', (e) => {
 			e.preventDefault();
 			deferredPrompt = e as BeforeInstallPromptEvent;

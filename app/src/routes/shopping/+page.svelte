@@ -3,6 +3,7 @@
 	import { shoppingMode } from '$lib/shoppingMode.svelte';
 	import { scanner } from '$lib/scannerBus.svelte';
 	import { pageTitle } from '$lib/seo';
+	import TripSummary from '$lib/components/TripSummary.svelte';
 
 	const STEPS = [
 		{
@@ -41,6 +42,8 @@
 			product takes a second instead of a minute.
 		</p>
 	</div>
+
+	<TripSummary />
 
 	<ol class="flex flex-col gap-5">
 		{#each STEPS as step, i (step.title)}

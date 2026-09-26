@@ -39,10 +39,16 @@ async function lookupOne(source: FactsSource, gtin: string): Promise<OffProduct 
 	}
 }
 
-/** Resolves a barcode against the Open Facts databases in turn. Returns null when none know it. */
+/**
+ * Resolves a barcode against the Open Facts databases. All four are queried at
+ * once but awaited in {@link SOURCES} order, so a miss costs one round trip
+ * rather than four while someone stands in an aisle, and the answer stays
+ * deterministic when two databases both know the barcode.
+ */
 export async function lookupOpenFoodFacts(gtin: string): Promise<OffProduct | null> {
-	for (const source of SOURCES) {
-		const hit = await lookupOne(source, gtin);
+	const pending = SOURCES.map((source) => lookupOne(source, gtin));
+	for (const request of pending) {
+		const hit = await request;
 		if (hit) return hit;
 	}
 	return null;

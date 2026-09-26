@@ -7,6 +7,7 @@
 	import { loadDataset, type Dataset, type Company } from '$lib/dataset';
 	import { lookupBarcode } from '$lib/lookup';
 	import { shoppingMode } from '$lib/shoppingMode.svelte';
+	import { scanTrip } from '$lib/scanTrip.svelte';
 	import ScanResultSheet from './ScanResultSheet.svelte';
 
 	let {
@@ -27,6 +28,7 @@
 	let result = $state<Company | null>(null);
 	let missBrand = $state<string | null>(null);
 	let missGtin = $state<string | null>(null);
+	let missKind = $state<'unknown-brand' | 'not-found' | 'offline'>('not-found');
 	let cameraError = $state<string | null>(null);
 
 	let showManual = $state(false);
@@ -88,8 +90,10 @@
 			showFound(lookup.company);
 			return;
 		}
+		missKind = lookup.status;
 		missBrand = lookup.status === 'unknown-brand' ? lookup.brand : null;
 		missGtin = gtin;
+		buzz();
 		phase = 'miss';
 	}
 
@@ -97,11 +101,23 @@
 	// brand page if the in-overlay sheet ever proves worse in practice.
 	function showFound(company: Company) {
 		result = company;
+		scanTrip.record(company.id);
+		buzz();
 		phase = 'found';
+	}
+
+	/** Confirms the scan landed without asking anyone to look up from the shelf. */
+	function buzz() {
+		try {
+			navigator.vibrate?.(20);
+		} catch {
+			// unsupported or blocked by a permissions policy — visual feedback is enough
+		}
 	}
 
 	function scanNext() {
 		result = null;
+		missKind = 'not-found';
 		missBrand = null;
 		missGtin = null;
 		manualBarcode = '';
@@ -206,6 +222,22 @@
 								onclick={addMissingBrand}
 							>
 								Request a rating
+							</button>
+						{:else if missKind === 'offline'}
+							<div>
+								<h2 class="text-xl font-semibold">Offline</h2>
+								<p class="mt-1 text-sm text-gray-600 dark:text-zinc-300">
+									This barcode isn't one of the {Object.keys(dataset?.barcodeOverrides ?? {})
+										.length}
+									known offline, and looking up the brand needs a connection. Scanned products are remembered,
+									so try again once you're back on.
+								</p>
+							</div>
+							<button
+								class="cursor-pointer rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+								onclick={() => missGtin && runLookup(missGtin)}
+							>
+								Try again
 							</button>
 						{:else}
 							<div>
