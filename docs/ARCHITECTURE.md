@@ -63,11 +63,21 @@ Warnings (advisory):
 
 ## Wikidata import
 
-Planned, not yet implemented. Ownership is currently filled in by hand: 7 of 77 companies carry a `parentId`, and no company has a `wikidataId` yet.
+`scripts/import-wikidata.mjs` fills in `wikidataId` and `parentId` from Wikidata. It is a maintainer tool, run by hand and reviewed as a normal PR — never part of the build, and never routed through the public PR-bot.
 
-- `scripts/import-wikidata.mjs` — a standalone Node script, run manually (`node scripts/import-wikidata.mjs`), not part of the build pipeline.
-- Queries Wikidata's SPARQL endpoint for ownership relations (`P127` owned by / `P1830` owner of, etc.) for the companies already present in `data/companies/`, and writes/updates their `parentId` / `wikidataId` fields.
-- Rerunnable idempotently — safe to run every few months as a maintenance task, changes reviewed like any other PR before merge (this is a maintainer action, not routed through the public PR-bot).
+```sh
+node scripts/import-wikidata.mjs                      # dry run, prints the proposed diff
+node scripts/import-wikidata.mjs --write              # apply
+node scripts/import-wikidata.mjs --write --only nestle,coop
+```
+
+Three rules keep the import from writing plausible-looking nonsense:
+
+- **A hit must look like a legal entity** — either a known `P31` organisation type or a company-only claim (`P452` industry, `P1454` legal form, `P2139` revenue, `P1128` employees). The type list alone misses the long tail; Migros is a "cooperative federation".
+- **Country has to agree** — a hit whose `P17` ISO code matches the company's `country` wins. "Sanitas" and "Raiffeisen" each name a larger foreign company than the Swiss one the dataset means. A match found in the wrong country is still reported, but printed under a "check these by hand" heading.
+- **Only `P749` becomes `parentId`** — `P127` ("owned by") is populated with institutional shareholders and treasury stock, so importing it would make BlackRock the parent of half the dataset. A `P749` parent that isn't in the dataset is reported, not invented.
+
+The script is idempotent: a company that already has a `wikidataId` is skipped, so rerunning it every few months only touches newly added entries.
 
 ## Contribution flow (PR bot)
 
