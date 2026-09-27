@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import { goto, replaceState } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { Barcode } from 'phosphor-svelte';
@@ -89,8 +89,9 @@
 	}
 
 	function startOver() {
-		// Drop the hand-off params, so asking for the same brand again re-opens the form.
-		if (pendingAdd) replaceState(resolve('/'), page.state);
+		// Drop the hand-off params, so asking for the same brand again re-opens the
+		// form. A goto() rather than replaceState(), which leaves page.url stale.
+		if (pendingAdd) void goto(resolve('/'), { replaceState: true, noScroll: true });
 		phase = 'browsing';
 		searchQuery = '';
 		submittedPrUrl = null;
