@@ -1,8 +1,10 @@
 import { get, set } from 'idb-keyval';
-import { env } from '$env/dynamic/public';
+import * as publicEnv from '$env/static/public';
 
+// Static, not $env/dynamic/public: the dynamic module is served at runtime from
+// /_app/env.js, which cannot be precached, so it broke every offline visit.
 // Set via the PUBLIC_PR_BOT_URL env var once workers/pr-bot is deployed (see its README).
-const PR_BOT_URL = env.PUBLIC_PR_BOT_URL ?? '';
+const PR_BOT_URL = (publicEnv as Record<string, string | undefined>).PUBLIC_PR_BOT_URL ?? '';
 
 const DRAFTS_KEY = 'ocs-local-drafts';
 const SUBMISSION_LOG_KEY = 'ocs-submission-log';

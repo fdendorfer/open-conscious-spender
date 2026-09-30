@@ -28,6 +28,8 @@ One repo houses both the app and the dataset for now.
 
 ```sh
 cd app && pnpm install && pnpm dev     # run the PWA
+cd app && pnpm test                   # unit tests (vitest)
+cd app && pnpm test:e2e               # browser tests (playwright, builds + previews first)
 
 node scripts/validate-dataset.mjs      # check data/** against the schema
 node scripts/build-dataset.mjs         # regenerate data/dist/ (CI does this on push)
@@ -48,6 +50,7 @@ Edits to `data/**` are validated on every pull request. `data/dist/` is generate
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to add a company or flag, and what makes a source usable
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — hosting, data versioning, validation, PR-bot + rate limiting
+- [`docs/TODO.md`](docs/TODO.md) — unfinished, unverified and known-broken work
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — what's next and the decisions already settled
 - [`docs/SCORING.md`](docs/SCORING.md) — the extendable flag → score formula
 - [`workers/pr-bot/README.md`](workers/pr-bot/README.md) — contribution endpoints and Worker setup

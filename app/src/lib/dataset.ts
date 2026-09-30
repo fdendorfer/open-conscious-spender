@@ -72,9 +72,12 @@ export class DatasetIntegrityError extends Error {}
  * Backfills fields added to the schema after older bundles/caches were written
  * (e.g. IndexedDB may still hold a dataset fetched before `brands` existed).
  */
-function normalizeDataset(raw: Dataset): Dataset {
+function normalizeDataset(raw: Dataset, fallbackVersion?: string): Dataset {
 	return {
 		...raw,
+		// Bundles built before the version moved inside carry none, and a cache
+		// entry without one never matches meta.json — re-downloading on every launch.
+		version: raw.version ?? fallbackVersion ?? '',
 		companies: raw.companies.map((c) => ({ ...c, brands: c.brands ?? [] }))
 	};
 }
@@ -103,7 +106,7 @@ export async function downloadDataset(expected?: DatasetMeta): Promise<Dataset> 
 
 	// Version comes from inside the bundle, never a separate meta.json fetch: a
 	// rebuild mid-download would otherwise tag these bytes with a newer version.
-	const dataset = normalizeDataset(JSON.parse(body) as Dataset);
+	const dataset = normalizeDataset(JSON.parse(body) as Dataset, expected?.version);
 	await set(CACHE_KEY, dataset);
 	return dataset;
 }

@@ -1,6 +1,6 @@
 # Roadmap
 
-Tracking doc for future improvements and the decisions behind them. One line each.
+Tracking doc for future improvements and the decisions behind them. One line each. `docs/TODO.md` holds the shorter list of unfinished and unverified work.
 
 ## Next
 
