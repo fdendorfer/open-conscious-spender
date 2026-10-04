@@ -4,7 +4,6 @@ Open work, grouped by what it blocks. `docs/ROADMAP.md` holds the longer-term di
 
 ## Blocking a real deploy
 
-- [ ] **Seed `data/products/barcode-overrides.json`.** It ships empty, so *no* barcode resolves without a connection, while the offline copy in the scanner implies some do. One override for a common Swiss product would make the offline path real.
 
 ## Known bugs and rough edges
 
