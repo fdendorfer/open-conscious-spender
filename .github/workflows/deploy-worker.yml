@@ -40,6 +40,9 @@ jobs:
       - name: Typecheck
         run: pnpm check
 
+      - name: Test
+        run: pnpm test
+
       # GITHUB_PAT is a Worker secret set once via `wrangler secret put`; a
       # deploy does not touch it, so it is not needed here.
       - name: Deploy
