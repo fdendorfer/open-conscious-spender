@@ -1,3 +1,5 @@
 {
-  "_comment": "GTIN -> company id, for barcodes Open Food Facts cannot resolve or resolves to the wrong owner. Community-submitted mappings land here via PR."
+  "_comment": "GTIN -> company id, for barcodes Open Food Facts cannot resolve or resolves to the wrong owner. Community-submitted mappings land here via PR.",
+  "7610095013569": "zweifel",
+  "7610700002452": "ricola"
 }
