@@ -8,8 +8,6 @@ Open work, grouped by what it blocks. `docs/ROADMAP.md` holds the longer-term di
 ## Known bugs and rough edges
 
 - [ ] **`registerSW.js` 404s in `pnpm dev`.** Harmless — `vite-plugin-pwa` only emits it in a production build — but it puts a permanent error in the dev console. Enable `devOptions` if it gets annoying.
-- [ ] **The trip basket has no empty-state copy.** It renders nothing at all before the first scan, so `/shopping` looks the same whether or not the feature exists.
-- [ ] **Request-form buttons are visually cramped.** "I already have a source" and "Cancel" sit on top of each other with no separation.
 
 ## Untested
 

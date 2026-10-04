@@ -27,7 +27,7 @@ test.describe('shopping trip basket', () => {
 
 	test('clearing empties the basket', async ({ page }) => {
 		await page.getByRole('button', { name: 'Clear' }).click();
-		await expect(page.getByRole('heading', { name: 'This trip' })).toBeHidden();
+		await expect(page.getByText('Nothing scanned yet.')).toBeVisible();
 	});
 
 	test('an item links to its company page', async ({ page }) => {
@@ -41,12 +41,13 @@ test.describe('shopping trip basket', () => {
 			localStorage.setItem('ocs-scan-trip', JSON.stringify([{ companyId: 'nestle', at: stale }]));
 		});
 		await page.reload();
-		await expect(page.getByRole('heading', { name: 'This trip' })).toBeHidden();
+		await expect(page.getByText('Nothing scanned yet.')).toBeVisible();
 	});
 
-	test('no basket is shown before anything is scanned', async ({ page }) => {
+	test('an empty basket explains itself before anything is scanned', async ({ page }) => {
 		await page.evaluate(() => localStorage.removeItem('ocs-scan-trip'));
 		await page.reload();
-		await expect(page.getByRole('heading', { name: 'This trip' })).toBeHidden();
+		await expect(page.getByText('Nothing scanned yet.')).toBeVisible();
+		await expect(page.getByText(/scanned · average/)).toBeHidden();
 	});
 });

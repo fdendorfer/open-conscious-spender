@@ -79,4 +79,14 @@
 			{/each}
 		</ul>
 	</section>
+{:else if dataset}
+	<section
+		class="flex flex-col gap-1 rounded-2xl border border-dashed border-gray-300 p-5 text-center dark:border-zinc-700"
+	>
+		<h2 class="text-sm font-medium">This trip</h2>
+		<p class="text-sm text-gray-500 dark:text-zinc-400">
+			Nothing scanned yet. Every product you scan lands here with its score, so you can see how the
+			whole basket adds up.
+		</p>
+	</section>
 {/if}

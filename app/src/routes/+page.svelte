@@ -253,20 +253,24 @@
 				>
 					Request a rating
 				</button>
-				<button
-					class="text-sm text-gray-500 underline dark:text-zinc-300"
-					type="button"
-					onclick={() => (phase = 'contribute')}
+				<div
+					class="mt-1 flex flex-col items-center gap-1 border-t border-gray-200 pt-3 dark:border-zinc-700"
 				>
-					I already have a source — add the details myself
-				</button>
-				<button
-					class="text-sm text-gray-500 underline dark:text-zinc-300"
-					type="button"
-					onclick={startOver}
-				>
-					Cancel
-				</button>
+					<button
+						class="px-2 py-2 text-sm text-gray-500 underline dark:text-zinc-300"
+						type="button"
+						onclick={() => (phase = 'contribute')}
+					>
+						I already have a source — add the details myself
+					</button>
+					<button
+						class="px-2 py-2 text-sm text-gray-500 underline dark:text-zinc-300"
+						type="button"
+						onclick={startOver}
+					>
+						Cancel
+					</button>
+				</div>
 			</form>
 		{/if}
 
