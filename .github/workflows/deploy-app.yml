@@ -59,6 +59,8 @@ jobs:
         run: pnpm test
 
       - name: Build
+        env:
+          PUBLIC_PR_BOT_URL: https://ocs-pr-bot.flo-dendorfer.workers.dev
         run: pnpm build
 
       - name: Deploy to Cloudflare Pages
