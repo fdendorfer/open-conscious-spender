@@ -7,30 +7,29 @@ test.describe('app updates', () => {
 		await expect(page.getByTestId('app-version')).toHaveText(/^\d+\.\d+\.\d+\+\w+$/);
 	});
 
-	test('a newer deploy drops the cached app and reloads once', async ({ page, context }) => {
+	test('a newer version whose worker cannot load keeps the cached app', async ({
+		page,
+		context
+	}) => {
 		await page.goto('/');
 		await waitForDataset(page);
 		await page.waitForFunction(() => navigator.serviceWorker?.controller !== null, null, {
 			timeout: 15_000
 		});
 
-		let versionChecks = 0;
-		await context.route('**/_app/version.json', (route) => {
-			versionChecks++;
-			return route.fulfill({ json: { version: 'newer-build' } });
+		// The version check gets through, then the connection drops before the new worker loads.
+		await context.route('**/_app/version.json', async (route) => {
+			await route.fulfill({ json: { version: 'newer-build' } });
+			await context.setOffline(true);
 		});
-
 		await page.evaluate(() => ((window as unknown as { stale: boolean }).stale = true));
-		const reloaded = page.waitForEvent('load');
 		await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
-		await reloaded;
-		expect(await page.evaluate(() => 'stale' in window)).toBe(false);
+		await page.waitForTimeout(2000);
+		expect(await page.evaluate(() => 'stale' in window)).toBe(true);
 
-		// The mocked version never matches, so only the guard stops a second reload.
-		const checksAfterReload = versionChecks;
-		await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
-		await expect.poll(() => versionChecks).toBeGreaterThan(checksAfterReload);
-		await page.waitForTimeout(1000);
-		await expect(page.getByRole('main').getByRole('combobox')).toBeVisible();
+		await page.reload();
+		await waitForDataset(page);
+		await page.getByRole('main').getByRole('combobox').fill('Nestlé');
+		await expect(page.getByRole('option').first()).toContainText('Nestlé');
 	});
 });
