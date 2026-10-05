@@ -1,9 +1,18 @@
 <script lang="ts">
 	import './layout.css';
+	import { onMount } from 'svelte';
+	import { reloadIfOutdated } from '$lib/appUpdate';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { SITE_DESCRIPTION, SITE_FULL_NAME, SITE_URL } from '$lib/seo';
 
 	let { children } = $props();
+
+	onMount(() => {
+		void reloadIfOutdated();
+		const onVisible = () => document.visibilityState === 'visible' && void reloadIfOutdated();
+		document.addEventListener('visibilitychange', onVisible);
+		return () => document.removeEventListener('visibilitychange', onVisible);
+	});
 </script>
 
 <svelte:head>

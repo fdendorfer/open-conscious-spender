@@ -74,6 +74,14 @@ async function unregisterServiceWorkers() {
 	}
 }
 
+/** Drops the offline copy of the app and reloads from the network; settings and data stay. */
+export async function reloadFromNetwork(): Promise<void> {
+	if (!browser) return;
+	await clearCaches();
+	await unregisterServiceWorkers();
+	location.reload();
+}
+
 /**
  * Wipes every trace of the app on this device: settings, search history, drafts,
  * the cached dataset and the offline copy of the app itself.

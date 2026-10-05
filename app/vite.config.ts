@@ -2,7 +2,20 @@ import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
+import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
+
+const { version: packageVersion } = JSON.parse(readFileSync('package.json', 'utf8'));
+
+function commitSha(): string {
+	if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 7);
+	try {
+		return execSync('git rev-parse --short HEAD').toString().trim();
+	} catch {
+		return 'dev';
+	}
+}
 
 export default defineConfig({
 	plugins: [
@@ -15,7 +28,9 @@ export default defineConfig({
 			},
 			adapter: adapter(),
 			// The service worker serves the root shell for every route, so its asset URLs must not be relative.
-			paths: { relative: false }
+			paths: { relative: false },
+			// The commit makes every deploy a new version, even without a package.json bump.
+			version: { name: `${packageVersion}+${commitSha()}` }
 		}),
 		SvelteKitPWA({
 			registerType: 'autoUpdate',

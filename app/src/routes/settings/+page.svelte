@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { version } from '$app/environment';
 	import {
 		ArrowClockwise,
 		CheckCircle,
@@ -23,6 +24,7 @@
 		clearDeviceData,
 		ensureAppFilesCached,
 		readDeviceStorage,
+		reloadFromNetwork,
 		type DeviceStorage
 	} from '$lib/deviceData';
 	import { searchHistory } from '$lib/searchHistory.svelte';
@@ -223,7 +225,7 @@
 		</button>
 	</section>
 
-	<section class="flex flex-col gap-3 pb-8">
+	<section class="flex flex-col gap-3">
 		<h2 class="font-medium">Data on this device</h2>
 		<p class="text-sm text-gray-600 dark:text-zinc-300">
 			Nothing here ever leaves your device — it is only stored to keep the app fast and usable
@@ -272,5 +274,22 @@
 				Clear everything on this device
 			</button>
 		{/if}
+	</section>
+
+	<section class="flex flex-col gap-3 pb-8">
+		<h2 class="font-medium">App version</h2>
+		<p class="text-sm text-gray-600 dark:text-zinc-300">
+			You are running <span class="font-mono" data-testid="app-version">{version}</span>. The app
+			updates itself when you open it; if something still looks outdated, reload from the network.
+			Your settings and data stay.
+		</p>
+		<button
+			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-300 px-4 py-3 text-sm font-medium text-gray-900 disabled:opacity-60 dark:border-zinc-600 dark:text-zinc-100"
+			disabled={busy !== null}
+			onclick={() => void reloadFromNetwork()}
+		>
+			<ArrowClockwise size={16} />
+			Reload latest version
+		</button>
 	</section>
 </main>
