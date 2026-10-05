@@ -39,6 +39,22 @@ test.describe('offline and failure states', () => {
 		await expect(page.getByRole('option').first()).toContainText('Nestlé');
 	});
 
+	test('a nested route reloads cleanly once the service worker serves the shell', async ({
+		page
+	}) => {
+		await page.goto('/');
+		await waitForDataset(page);
+		await page.waitForFunction(() => navigator.serviceWorker?.controller !== null, null, {
+			timeout: 15_000
+		});
+
+		const missing: string[] = [];
+		page.on('response', (r) => r.status() === 404 && missing.push(r.url()));
+		await page.goto('/brand/nestle');
+		await expect(page.getByRole('heading', { name: 'Nestlé' })).toBeVisible();
+		expect(missing).toEqual([]);
+	});
+
 	test('an unknown company slug says so instead of hanging', async ({ page }) => {
 		await page.goto('/brand/not-a-real-company');
 		await expect(page.getByText('No company found')).toBeVisible();

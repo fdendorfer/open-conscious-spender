@@ -13,7 +13,9 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			adapter: adapter(),
+			// The service worker serves the root shell for every route, so its asset URLs must not be relative.
+			paths: { relative: false }
 		}),
 		SvelteKitPWA({
 			registerType: 'autoUpdate',
@@ -38,8 +40,7 @@ export default defineConfig({
 				// full dataset bundle is fetched by the app at runtime, not part of the build output,
 				// so it needs its own runtime caching rule once data/dist/ is served
 				globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
-				// the prerendered root doubles as the offline app shell for dynamic routes
-				navigateFallback: '/'
+				navigateFallback: '/shell'
 			}
 		})
 	]
