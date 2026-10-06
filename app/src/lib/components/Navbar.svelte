@@ -88,7 +88,7 @@
 	function onLogoClick(e: MouseEvent) {
 		// Let modifier-clicks (open in new tab, etc.) and desktop clicks behave like a normal link.
 		if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-		if (window.matchMedia('(min-width: 640px)').matches) return;
+		if (window.matchMedia('(min-width: 720px)').matches) return;
 		e.preventDefault();
 		logoMenuOpen = !logoMenuOpen;
 	}

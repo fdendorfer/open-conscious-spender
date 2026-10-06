@@ -50,11 +50,22 @@
 	let downloadBytes = $derived(meta?.bytes ?? null);
 	let companyCount = $derived(cached?.companies.length ?? meta?.companies ?? null);
 	let upToDate = $derived(!!cached && !!meta && cached.version === meta.version);
+	let latestVersion = $state<string | null | undefined>(undefined);
 
 	onMount(async () => {
 		theme.hydrate();
+		void checkLatestVersion();
 		await refresh();
 	});
+
+	async function checkLatestVersion() {
+		try {
+			const res = await fetch('/_app/version.json', { cache: 'no-store' });
+			latestVersion = res.ok ? ((await res.json()) as { version: string }).version : null;
+		} catch {
+			latestVersion = null;
+		}
+	}
 
 	async function refresh() {
 		cached = (await getCachedDataset()) ?? null;
@@ -279,7 +290,26 @@
 	<section class="flex flex-col gap-3 pb-8">
 		<h2 class="font-medium">App version</h2>
 		<p class="text-sm text-gray-600 dark:text-zinc-300">
-			You are running <span class="font-mono" data-testid="app-version">{version}</span>. The app
+			You are running <span class="font-mono" data-testid="app-version">{version}</span>.
+		</p>
+		<p class="flex items-center gap-2 text-sm" data-testid="app-version-status">
+			{#if latestVersion === undefined}
+				<span class="text-gray-500 dark:text-zinc-400">Checking for a newer version…</span>
+			{:else if latestVersion === null}
+				<WifiSlash size={16} class="text-gray-500 dark:text-zinc-400" />
+				<span class="text-gray-500 dark:text-zinc-400">Could not check for updates (offline?)</span>
+			{:else if latestVersion === version}
+				<CheckCircle size={16} class="text-green-600 dark:text-green-400" />
+				<span class="text-green-700 dark:text-green-400">This is the latest version</span>
+			{:else}
+				<Warning size={16} class="text-amber-600 dark:text-amber-400" />
+				<span class="text-amber-700 dark:text-amber-400"
+					>Version <span class="font-mono">{latestVersion}</span> is available</span
+				>
+			{/if}
+		</p>
+		<p class="text-sm text-gray-600 dark:text-zinc-300">
+			The app
 			updates itself when you open it; if something still looks outdated, reload from the network.
 			Your settings and data stay.
 		</p>
