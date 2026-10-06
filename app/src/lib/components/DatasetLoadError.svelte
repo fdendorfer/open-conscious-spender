@@ -14,7 +14,7 @@
 		offline.
 	</p>
 	<button
-		class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+		class="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 		onclick={onRetry}
 	>
 		<ArrowClockwise size={16} />

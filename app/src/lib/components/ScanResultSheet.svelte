@@ -122,7 +122,7 @@
 
 	<div class="flex flex-col gap-2 pt-1">
 		<button
-			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 			onclick={onScanNext}
 		>
 			<Barcode size={20} />

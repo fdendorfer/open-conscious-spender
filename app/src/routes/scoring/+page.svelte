@@ -9,7 +9,7 @@
 	<title>{pageTitle('Scoring')}</title>
 </svelte:head>
 
-<main class="mx-auto max-w-3xl px-6 py-10">
+<main class="mx-auto max-w-4xl px-6 py-10">
 	<div class="scoring-doc">
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -- docs/SCORING.md is a repo file, not user input -->
 		{@html data.html}

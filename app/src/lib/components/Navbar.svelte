@@ -6,8 +6,9 @@
 	import {
 		Barcode,
 		Basket,
-		CaretDown,
 		DownloadSimple,
+		Gear,
+		House,
 		MagnifyingGlass,
 		Moon,
 		Sun,
@@ -44,7 +45,10 @@
 
 	let deferredPrompt = $state<BeforeInstallPromptEvent | null>(null);
 
-	let logoMenuOpen = $state(false);
+	let menuOpen = $state(false);
+	let menuEl = $state<HTMLElement | undefined>(undefined);
+	// Some browsers light-dismiss the popover on pointerdown, before the click lands.
+	let menuOpenOnPress = false;
 	let searchOpen = $state(false);
 	let searchDataset = $state<Dataset | null>(null);
 	let searchComponent = $state<CompanySearch | undefined>(undefined);
@@ -85,17 +89,33 @@
 		if (outcome === 'accepted') deferredPrompt = null;
 	}
 
-	function onLogoClick(e: MouseEvent) {
-		// Let modifier-clicks (open in new tab, etc.) and desktop clicks behave like a normal link.
-		if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-		if (window.matchMedia('(min-width: 720px)').matches) return;
+	// The toggle event that updates menuOpen fires async, so ask the element directly.
+	function isMenuOpen(): boolean {
+		return menuEl?.matches(':popover-open') ?? false;
+	}
+
+	function closeMenu() {
+		if (isMenuOpen()) menuEl?.hidePopover();
+	}
+
+	/** While the menu is open, the Home button goes home instead of toggling it shut. */
+	function onHomeClick(e: MouseEvent) {
+		const wasOpen = isMenuOpen() || menuOpenOnPress;
+		menuOpenOnPress = false;
+		if (!wasOpen) return;
 		e.preventDefault();
-		logoMenuOpen = !logoMenuOpen;
+		closeMenu();
+		goto(resolve('/'));
+	}
+
+	function goToSettings() {
+		closeMenu();
+		goto(resolve('/settings'));
 	}
 
 	async function openSearch() {
 		searchOpen = true;
-		logoMenuOpen = false;
+		closeMenu();
 		searchDialog?.showModal();
 		if (!searchDataset) searchDataset = await loadDataset();
 		await tick();
@@ -127,7 +147,7 @@
 	}
 
 	function toggleShoppingMode() {
-		logoMenuOpen = false;
+		closeMenu();
 		if (shoppingMode.enabled) {
 			shoppingMode.disable();
 			scanner.close();
@@ -144,43 +164,18 @@
 	}
 </script>
 
-<nav class="sticky top-0 z-50 flex items-center gap-6 bg-white px-6 py-3 dark:bg-zinc-950">
-	<div class="relative flex shrink-0 items-center gap-1">
-		<a
-			href={resolve('/')}
-			class="flex items-center gap-2 font-semibold text-gray-900 dark:text-zinc-100"
-			onclick={onLogoClick}
-			aria-haspopup="true"
-			aria-expanded={logoMenuOpen}
-		>
-			<Logo class="h-6 w-6" />
-			<span>Conscious</span>
-			<CaretDown size={14} class="text-gray-400 sm:hidden dark:text-zinc-400" />
-		</a>
+<nav
+	class="sticky top-0 z-50 hidden items-center gap-6 bg-white px-6 py-3 sm:flex dark:bg-zinc-950"
+>
+	<a
+		href={resolve('/')}
+		class="flex shrink-0 items-center gap-2 font-semibold text-gray-900 dark:text-zinc-100"
+	>
+		<Logo class="h-6 w-6" />
+		<span>Conscious</span>
+	</a>
 
-		{#if logoMenuOpen}
-			<div
-				class="absolute top-full left-0 z-50 mt-2 w-40 rounded-xl border border-gray-200 bg-white py-1 text-sm shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40"
-			>
-				{#each NAV_LINKS as link (link.label)}
-					<a
-						href={link.href}
-						aria-current={isCurrent(link.href) ? 'page' : undefined}
-						class="block px-3 py-2 hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-zinc-700 dark:hover:text-zinc-100 {isCurrent(
-							link.href
-						)
-							? 'font-medium text-gray-900 dark:text-zinc-100'
-							: 'text-gray-600 dark:text-zinc-300'}"
-						onclick={() => (logoMenuOpen = false)}
-					>
-						{link.label}
-					</a>
-				{/each}
-			</div>
-		{/if}
-	</div>
-
-	<div class="hidden items-center gap-6 text-sm text-gray-500 sm:flex dark:text-zinc-300">
+	<div class="flex items-center gap-6 text-sm text-gray-500 dark:text-zinc-300">
 		{#each NAV_LINKS as link (link.label)}
 			<a
 				href={link.href}
@@ -207,7 +202,7 @@
 
 		<button
 			class="cursor-pointer rounded-lg p-1.5 transition-colors {shoppingMode.enabled
-				? 'bg-gray-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+				? 'bg-primary text-white dark:bg-zinc-100 dark:text-zinc-900'
 				: 'text-gray-500 hover:text-gray-900 dark:text-zinc-300 dark:hover:text-zinc-100'}"
 			aria-pressed={shoppingMode.enabled}
 			aria-label={shoppingMode.enabled ? 'Exit shopping mode' : 'Enter shopping mode'}
@@ -243,19 +238,98 @@
 	</div>
 </nav>
 
-{#if logoMenuOpen}
-	<!-- Click-outside backdrop for the logo dropdown, sits below the menu itself. -->
+<!-- Phones get a thumb-reachable floating pill instead of the top bar. -->
+<nav
+	class="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex -translate-x-1/2 gap-1 rounded-full bg-primary p-1.5 shadow-xl shadow-black/25 sm:hidden dark:bg-zinc-100"
+>
+	<div
+		bind:this={menuEl}
+		id="nav-menu"
+		popover="auto"
+		ontoggle={(e) => (menuOpen = e.newState === 'open')}
+		class="nav-menu pop-in w-44 origin-bottom rounded-xl border border-gray-200 bg-white py-1 text-sm shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40"
+	>
+		{#each NAV_LINKS as link (link.label)}
+			<a
+				href={link.href}
+				aria-current={isCurrent(link.href) ? 'page' : undefined}
+				class="block px-3 py-2 hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-zinc-700 dark:hover:text-zinc-100 {isCurrent(
+					link.href
+				)
+					? 'font-medium text-gray-900 dark:text-zinc-100'
+					: 'text-gray-600 dark:text-zinc-300'}"
+				onclick={closeMenu}
+			>
+				{link.label}
+			</a>
+		{/each}
+		{#if deferredPrompt}
+			<button
+				class="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-50 dark:text-zinc-300 dark:hover:bg-zinc-700"
+				onclick={installApp}
+			>
+				<DownloadSimple size={16} />
+				Install app
+			</button>
+		{/if}
+	</div>
+
 	<button
-		class="fixed inset-0 z-40 cursor-default"
-		aria-label="Close navigation menu"
-		onclick={() => (logoMenuOpen = false)}
-	></button>
-{/if}
+		class="flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2.5 text-xs transition-colors [anchor-name:--nav-home] {menuOpen ||
+		isCurrent(resolve('/'))
+			? 'bg-white font-semibold text-gray-900 dark:bg-zinc-900 dark:text-zinc-100'
+			: 'text-white/70 hover:text-white dark:text-zinc-900/70 dark:hover:text-zinc-900'}"
+		popovertarget="nav-menu"
+		aria-expanded={menuOpen}
+		aria-label="Navigation menu"
+		onpointerdown={() => (menuOpenOnPress = isMenuOpen())}
+		onclick={onHomeClick}
+	>
+		<House size={20} weight={menuOpen ? 'fill' : 'regular'} />
+	</button>
+
+	<button
+		class="flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2.5 text-xs text-white/70 transition-colors hover:text-white dark:text-zinc-900/70 dark:hover:text-zinc-900"
+		aria-label={shoppingMode.enabled ? 'Scan a barcode' : 'Search companies'}
+		onclick={onPrimaryAction}
+	>
+		{#if shoppingMode.enabled}
+			<Barcode size={20} />
+		{:else}
+			<MagnifyingGlass size={20} />
+		{/if}
+	</button>
+
+	<button
+		class="flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2.5 text-xs transition-colors {shoppingMode.enabled
+			? 'bg-white font-semibold text-gray-900 dark:bg-zinc-900 dark:text-zinc-100'
+			: 'text-white/70 hover:text-white dark:text-zinc-900/70 dark:hover:text-zinc-900'}"
+		aria-pressed={shoppingMode.enabled}
+		aria-label={shoppingMode.enabled ? 'Exit shopping mode' : 'Enter shopping mode'}
+		onclick={toggleShoppingMode}
+	>
+		<Basket size={20} weight={shoppingMode.enabled ? 'fill' : 'regular'} />
+	</button>
+
+	<!-- A button, not a link: Safari skips links when tabbing by default. -->
+	<button
+		class="flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2.5 text-xs transition-colors {isCurrent(
+			resolve('/settings')
+		)
+			? 'bg-white font-semibold text-gray-900 dark:bg-zinc-900 dark:text-zinc-100'
+			: 'text-white/70 hover:text-white dark:text-zinc-900/70 dark:hover:text-zinc-900'}"
+		aria-label="Settings"
+		aria-current={isCurrent(resolve('/settings')) ? 'page' : undefined}
+		onclick={goToSettings}
+	>
+		<Gear size={20} weight={isCurrent(resolve('/settings')) ? 'fill' : 'regular'} />
+	</button>
+</nav>
 
 <!-- showModal() gives the focus trap, inert background and Escape handling for free. -->
 <dialog
 	bind:this={searchDialog}
-	class="m-0 mt-24 w-full max-w-md rounded-xl bg-white p-4 shadow-2xl backdrop:bg-black/40 sm:mx-auto dark:border dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/80 dark:backdrop:bg-black/70"
+	class="pop-in mx-auto mt-24 w-[calc(100%-3rem)] max-w-md rounded-xl bg-white p-4 shadow-2xl backdrop:bg-black/60 dark:border dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/80 dark:backdrop:bg-black/85"
 	aria-label="Search companies"
 	onclose={() => (searchOpen = false)}
 	onclick={(e) => {
@@ -285,7 +359,7 @@
 				<div class="flex flex-col gap-2 p-3">
 					<p class="text-sm text-gray-600 dark:text-zinc-300">No match for "{query}".</p>
 					<button
-						class="cursor-pointer rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+						class="cursor-pointer rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 						onclick={() => requestRating(query)}
 					>
 						Request a rating for "{query}"

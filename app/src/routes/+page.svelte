@@ -154,18 +154,18 @@
 	<title>{pageTitle('Ethical shopping lookups')}</title>
 </svelte:head>
 
-<main class="mx-auto flex max-w-sm flex-col gap-10 p-6 sm:max-w-xl lg:max-w-4xl">
-	<div class="flex flex-col items-center gap-4 pt-8 text-center">
-		<h1 class="text-2xl font-semibold sm:text-3xl">{SITE_FULL_NAME}</h1>
-		<p class="max-w-md text-gray-600 dark:text-zinc-300">
+<main class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10">
+	<div class="flex flex-col gap-4">
+		<h1 class="text-2xl font-semibold">{SITE_FULL_NAME}</h1>
+		<p class="text-gray-600 dark:text-zinc-300">
 			Search a company (or scan its barcode). See its red flags at a glance. Decide in seconds —
 			before you're stuck reading in the aisle.
 		</p>
 	</div>
 
-	<div class="mx-auto flex w-full max-w-md flex-col gap-3">
+	<div class="flex flex-col gap-3">
 		{#if phase === 'loading'}
-			<p class="text-center text-sm text-gray-500 dark:text-zinc-300">Loading dataset…</p>
+			<p class="text-sm text-gray-500 dark:text-zinc-300">Loading dataset…</p>
 		{/if}
 
 		{#if phase === 'load-failed'}
@@ -183,7 +183,7 @@
 					<div class="flex flex-col gap-2 p-3">
 						<p class="text-sm text-gray-600 dark:text-zinc-300">No match for "{query}".</p>
 						<button
-							class="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+							class="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 							onclick={() => addByName(query)}
 						>
 							Request a rating for "{query}"
@@ -197,7 +197,7 @@
 				href={resolve('/shopping')}
 			>
 				<span
-					class="shrink-0 rounded-xl bg-gray-900 p-2 text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="shrink-0 rounded-xl bg-primary p-2 text-white dark:bg-zinc-100 dark:text-zinc-900"
 				>
 					<Barcode size={22} />
 				</span>
@@ -248,7 +248,7 @@
 					<p class="text-sm text-red-600 dark:text-red-400">{requestError}</p>
 				{/if}
 				<button
-					class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 					type="submit"
 				>
 					Request a rating
@@ -289,7 +289,7 @@
 					rel="noreferrer external">Follow it on GitHub</a
 				>
 				<button
-					class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 					onclick={startOver}
 				>
 					Search something else
@@ -363,7 +363,7 @@
 					<p class="text-sm text-red-600 dark:text-red-400">{contributeError}</p>
 				{/if}
 				<button
-					class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 					type="submit"
 				>
 					Submit as a pull request
@@ -386,7 +386,7 @@
 				>
 			</p>
 			<button
-				class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+				class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 				onclick={startOver}
 			>
 				Search again

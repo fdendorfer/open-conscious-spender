@@ -30,4 +30,6 @@
 	<meta name="twitter:image" content="{SITE_URL}/og-image.png" />
 </svelte:head>
 <Navbar />
-{@render children()}
+<div class="pb-24 sm:pb-0">
+	{@render children()}
+</div>

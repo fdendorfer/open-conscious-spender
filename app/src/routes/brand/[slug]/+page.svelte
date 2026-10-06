@@ -121,7 +121,7 @@
 			No company found for "{params.slug}".
 		</p>
 		<a
-			class="rounded-xl bg-gray-900 px-4 py-3 text-center font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+			class="rounded-xl bg-primary px-4 py-3 text-center font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 			href={resolve('/')}
 		>
 			Search instead
@@ -163,7 +163,7 @@
 					<p class="text-sm text-red-600 dark:text-red-400">{reportError}</p>
 				{/if}
 				<button
-					class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 					type="submit"
 				>
 					Send report
@@ -235,7 +235,7 @@
 					<p class="text-sm text-red-600 dark:text-red-400">{flagError}</p>
 				{/if}
 				<button
-					class="rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 					type="submit"
 				>
 					Submit as a pull request

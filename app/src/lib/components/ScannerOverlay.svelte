@@ -218,7 +218,7 @@
 								</p>
 							</div>
 							<button
-								class="cursor-pointer rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+								class="cursor-pointer rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 								onclick={addMissingBrand}
 							>
 								Request a rating
@@ -234,7 +234,7 @@
 								</p>
 							</div>
 							<button
-								class="cursor-pointer rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+								class="cursor-pointer rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 								onclick={() => missGtin && runLookup(missGtin)}
 							>
 								Try again
@@ -247,7 +247,7 @@
 								</p>
 							</div>
 							<button
-								class="cursor-pointer rounded-xl bg-gray-900 px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+								class="cursor-pointer rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 								onclick={onSearchByName}
 							>
 								Search by name instead

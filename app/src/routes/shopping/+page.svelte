@@ -31,11 +31,8 @@
 	<title>{pageTitle('Shopping mode')}</title>
 </svelte:head>
 
-<main class="mx-auto flex max-w-lg flex-col gap-8 px-6 py-10">
-	<div class="flex flex-col items-center gap-3 text-center">
-		<span class="rounded-2xl bg-gray-900 p-3 text-white dark:bg-zinc-100 dark:text-zinc-900">
-			<Barcode size={28} />
-		</span>
+<main class="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-10">
+	<div class="flex flex-col gap-3">
 		<h1 class="text-2xl font-semibold">Shopping mode</h1>
 		<p class="text-gray-600 dark:text-zinc-300">
 			Built for standing in the aisle. The camera becomes your search bar, so checking who owns a
@@ -84,7 +81,7 @@
 	</div>
 
 	<button
-		class="cursor-pointer rounded-xl bg-gray-900 px-4 py-3.5 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+		class="cursor-pointer rounded-xl bg-primary px-4 py-3.5 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 		onclick={startNow}
 	>
 		Start now

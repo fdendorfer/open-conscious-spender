@@ -122,7 +122,7 @@
 
 <svelte:head><title>{pageTitle('Settings')}</title></svelte:head>
 
-<main class="mx-auto flex max-w-xl flex-col gap-10 px-6 py-10">
+<main class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10">
 	<h1 class="text-2xl font-semibold">Settings</h1>
 
 	<section class="flex flex-col gap-3">
@@ -140,7 +140,7 @@
 				{@const active = theme.setting === option.value}
 				<button
 					class="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors {active
-						? 'bg-gray-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+						? 'bg-primary text-white dark:bg-zinc-100 dark:text-zinc-900'
 						: 'text-gray-600 hover:text-gray-900 dark:text-zinc-300 dark:hover:text-zinc-100'}"
 					aria-pressed={active}
 					onclick={() => theme.set(option.value)}
@@ -220,7 +220,7 @@
 		{/if}
 
 		<button
-			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3 font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
 			disabled={busy !== null}
 			onclick={download}
 		>
@@ -309,9 +309,8 @@
 			{/if}
 		</p>
 		<p class="text-sm text-gray-600 dark:text-zinc-300">
-			The app
-			updates itself when you open it; if something still looks outdated, reload from the network.
-			Your settings and data stay.
+			The app updates itself when you open it; if something still looks outdated, reload from the
+			network. Your settings and data stay.
 		</p>
 		<button
 			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-300 px-4 py-3 text-sm font-medium text-gray-900 disabled:opacity-60 dark:border-zinc-600 dark:text-zinc-100"
