@@ -63,6 +63,13 @@
     "defaultWeight": 1.5
   },
   {
+    "id": "transparency",
+    "name": "Transparency",
+    "description": "Hides beneficial ownership, refuses to disclose supply chains, or withholds legally required reporting — opacity that blocks accountability.",
+    "icon": "Eye",
+    "defaultWeight": 1.5
+  },
+  {
     "id": "monopoly-practices",
     "name": "Anti-competitive practices",
     "description": "Confirmed antitrust violations, predatory pricing, or market-dominance abuse.",

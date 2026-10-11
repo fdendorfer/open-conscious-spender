@@ -3,6 +3,7 @@ import {
 	Buildings,
 	ChartLineDown,
 	Coins,
+	Eye,
 	HandFist,
 	HardHat,
 	Leaf,
@@ -28,6 +29,7 @@ export const CATEGORY_ICONS: Record<
 	Coins,
 	Bank,
 	ShieldWarning,
+	Eye,
 	Buildings,
 	ChartLineDown
 };
