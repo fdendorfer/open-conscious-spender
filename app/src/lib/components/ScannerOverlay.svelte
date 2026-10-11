@@ -2,13 +2,36 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { Barcode, Keyboard, MagnifyingGlass, X } from 'phosphor-svelte';
+	import {
+		Barcode,
+		ClockCounterClockwise,
+		Info,
+		MagnifyingGlass,
+		WifiSlash,
+		X
+	} from 'phosphor-svelte';
 	import { startBarcodeScan, CameraUnavailableError, type ScanHandle } from '$lib/barcodeScanner';
 	import { loadDataset, type Dataset, type Company } from '$lib/dataset';
 	import { lookupBarcode } from '$lib/lookup';
 	import { shoppingMode } from '$lib/shoppingMode.svelte';
 	import { scanTrip } from '$lib/scanTrip.svelte';
 	import ScanResultSheet from './ScanResultSheet.svelte';
+	import TripSummary from './TripSummary.svelte';
+
+	const INTRO_STEPS = [
+		{
+			title: 'Point at the barcode',
+			body: 'The camera reads it automatically. Hold the pack steady in the frame.'
+		},
+		{
+			title: 'Glance at the score',
+			body: 'A colour and a number show where the owner stands.'
+		},
+		{
+			title: 'Scan the next item',
+			body: 'Dismiss the result and the camera picks straight back up.'
+		}
+	];
 
 	let {
 		onClose,
@@ -31,15 +54,18 @@
 	let missKind = $state<'unknown-brand' | 'not-found' | 'offline'>('not-found');
 	let cameraError = $state<string | null>(null);
 
-	let showManual = $state(false);
-	let manualBarcode = $state('');
+	let panel = $state<'intro' | 'trip' | null>(shoppingMode.introSeen ? null : 'intro');
 
 	onMount(() => {
 		const previousOverflow = document.body.style.overflow;
 		document.body.style.overflow = 'hidden';
 
 		void loadDataset().then((d) => (dataset = d));
-		void startCamera();
+		// The intro comes first, so the camera permission prompt does not cover it.
+		if (panel !== 'intro') {
+			cameraRequested = true;
+			void startCamera();
+		}
 
 		return () => {
 			document.body.style.overflow = previousOverflow;
@@ -64,10 +90,9 @@
 		} catch (err) {
 			cameraError =
 				err instanceof CameraUnavailableError
-					? 'No camera access. Type the barcode below, or search by name instead.'
+					? 'No camera access. Search by name instead.'
 					: 'Something went wrong starting the camera.';
 			phase = 'camera-error';
-			showManual = true;
 		}
 	}
 
@@ -75,9 +100,26 @@
 		void runLookup(raw);
 	}
 
-	async function submitManualBarcode() {
-		const gtin = manualBarcode.trim();
-		if (gtin) await runLookup(gtin);
+	let cameraRequested = false;
+
+	function closePanel() {
+		shoppingMode.markIntroSeen();
+		panel = null;
+		if (!cameraRequested) {
+			cameraRequested = true;
+			void startCamera();
+		} else if (phase === 'scanning') {
+			scanHandle?.resume();
+		}
+	}
+
+	function togglePanel(name: 'intro' | 'trip') {
+		if (panel === name) {
+			closePanel();
+			return;
+		}
+		panel = name;
+		scanHandle?.pause();
 	}
 
 	async function runLookup(gtin: string) {
@@ -120,7 +162,6 @@
 		missKind = 'not-found';
 		missBrand = null;
 		missGtin = null;
-		manualBarcode = '';
 		if (cameraError) {
 			void startCamera();
 			return;
@@ -143,7 +184,7 @@
 		onClose();
 	}
 
-	let sheetOpen = $derived(phase === 'found' || phase === 'miss');
+	let sheetOpen = $derived(phase === 'found' || phase === 'miss' || panel !== null);
 </script>
 
 <svelte:window
@@ -154,12 +195,26 @@
 
 <div class="fixed inset-0 z-[70] flex flex-col bg-gray-950 text-white">
 	<header class="flex shrink-0 items-center gap-3 px-4 py-3">
-		<span class="flex items-center gap-2 text-sm font-medium">
+		<span class="mr-auto flex items-center gap-2 text-sm font-medium">
 			<Barcode size={20} />
 			Shopping mode
 		</span>
+		{#each [{ name: 'intro', label: 'How it works', icon: Info }, { name: 'trip', label: 'This trip', icon: ClockCounterClockwise }] as const as button (button.name)}
+			<button
+				class="cursor-pointer rounded-full p-2 transition-colors disabled:invisible {panel ===
+				button.name
+					? 'bg-white text-gray-900'
+					: 'text-white/70 hover:bg-white/10 hover:text-white'}"
+				aria-label={button.label}
+				aria-pressed={panel === button.name}
+				disabled={!shoppingMode.introSeen}
+				onclick={() => togglePanel(button.name)}
+			>
+				<button.icon size={22} />
+			</button>
+		{/each}
 		<button
-			class="ml-auto cursor-pointer rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white"
+			class="cursor-pointer rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white"
 			aria-label="Close camera"
 			onclick={onClose}
 		>
@@ -206,7 +261,51 @@
 			<div
 				class="max-h-[70vh] overflow-y-auto rounded-t-2xl bg-white text-gray-900 dark:bg-zinc-900 dark:text-zinc-100"
 			>
-				{#if phase === 'found' && result && dataset}
+				{#if panel === 'intro'}
+					<div class="flex flex-col gap-5 p-5" role="dialog" aria-labelledby="shopping-intro-title">
+						<div>
+							<h2 id="shopping-intro-title" class="text-xl font-semibold">Shopping mode</h2>
+							<p class="mt-1 text-sm text-gray-600 dark:text-zinc-300">
+								The camera becomes your search bar, so checking who owns a product takes a second.
+							</p>
+						</div>
+						<ol class="flex flex-col gap-4">
+							{#each INTRO_STEPS as step, i (step.title)}
+								<li class="flex gap-3">
+									<span
+										class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-700 dark:bg-zinc-800 dark:text-zinc-200"
+									>
+										{i + 1}
+									</span>
+									<div class="flex flex-col gap-0.5">
+										<h3 class="text-sm font-medium">{step.title}</h3>
+										<p class="text-sm text-gray-600 dark:text-zinc-300">{step.body}</p>
+									</div>
+								</li>
+							{/each}
+						</ol>
+						<p class="flex items-start gap-2 text-xs text-gray-500 dark:text-zinc-400">
+							<WifiSlash size={16} class="shrink-0" />
+							Shopping mode stays on until you turn it off. Unknown barcodes need a connection.
+						</p>
+						<button
+							class="cursor-pointer rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+							onclick={closePanel}
+						>
+							{shoppingMode.introSeen ? 'Back to scanning' : 'Start scanning'}
+						</button>
+					</div>
+				{:else if panel === 'trip'}
+					<div class="flex flex-col gap-3 p-4">
+						<TripSummary />
+						<button
+							class="cursor-pointer rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium dark:border-zinc-600"
+							onclick={closePanel}
+						>
+							Back to scanning
+						</button>
+					</div>
+				{:else if phase === 'found' && result && dataset}
 					<ScanResultSheet company={result} {dataset} onScanNext={scanNext} />
 				{:else if phase === 'miss'}
 					<div class="flex flex-col gap-4 p-5">
@@ -276,34 +375,7 @@
 					{/if}
 				</p>
 
-				{#if showManual}
-					<div class="flex gap-2">
-						<input
-							class="min-w-0 flex-1 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-white placeholder:text-white/40"
-							placeholder="Barcode number…"
-							inputmode="numeric"
-							bind:value={manualBarcode}
-							onkeydown={(e) => e.key === 'Enter' && submitManualBarcode()}
-						/>
-						<button
-							class="cursor-pointer rounded-xl bg-white px-4 py-2 font-medium text-gray-900"
-							onclick={submitManualBarcode}
-						>
-							Look up
-						</button>
-					</div>
-				{/if}
-
 				<div class="flex items-center justify-center gap-2 text-sm">
-					{#if !showManual}
-						<button
-							class="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-white/70 hover:bg-white/10 hover:text-white"
-							onclick={() => (showManual = true)}
-						>
-							<Keyboard size={16} />
-							Type barcode
-						</button>
-					{/if}
 					<button
 						class="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-white/70 hover:bg-white/10 hover:text-white"
 						onclick={onSearchByName}

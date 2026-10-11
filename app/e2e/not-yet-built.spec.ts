@@ -5,17 +5,16 @@
  * is a specification rather than a wish: unskip it when the feature lands, and
  * Playwright reports "passed unexpectedly" if a skipped one starts working.
  */
-import { expect, test, type Page } from '@playwright/test';
-import { enableShoppingMode, mockOpenFacts, seedTrip, waitForDataset } from './helpers';
-
-async function openScanner(page: Page) {
-	await page.goto('/');
-	await enableShoppingMode(page);
-	await page.reload();
-	await waitForDataset(page);
-	await page.getByRole('button', { name: 'Scan a barcode' }).click();
-	await page.getByPlaceholder('Barcode number…').waitFor();
-}
+import { expect, test } from '@playwright/test';
+import {
+	enableShoppingMode,
+	installFakeCamera,
+	mockOpenFacts,
+	openScanner,
+	seedTrip,
+	showBarcode,
+	waitForDataset
+} from './helpers';
 
 // data/products/barcode-overrides.json ships empty, so nothing resolves without
 // a connection today. The offline promise in the UI copy depends on this.
@@ -23,25 +22,24 @@ test.fixme('a community barcode override resolves with no connection', async ({
 	page,
 	context
 }) => {
+	await installFakeCamera(page);
 	await page.goto('/');
 	await waitForDataset(page);
 	await enableShoppingMode(page);
 	await context.setOffline(true);
 	await page.reload();
 
-	await page.getByRole('button', { name: 'Scan a barcode' }).click();
-	await page.getByPlaceholder('Barcode number…').fill('7610807000123');
-	await page.getByRole('button', { name: 'Look up' }).click();
+	await page.getByRole('button', { name: 'Scan a barcode', exact: true }).click();
+	await showBarcode(page, '7610807000122');
 
 	await expect(page.getByRole('heading', { name: 'Nestlé' })).toBeVisible();
 });
 
 // The Worker already accepts /submit/barcode; no screen reaches it.
 test.fixme('a scan miss can contribute the barcode mapping itself', async ({ page }) => {
-	await mockOpenFacts(page, { '5000000000000': { brands: 'Unlisted Co' } });
+	await mockOpenFacts(page, { '5000000000005': { brands: 'Unlisted Co' } });
 	await openScanner(page);
-	await page.getByPlaceholder('Barcode number…').fill('5000000000000');
-	await page.getByRole('button', { name: 'Look up' }).click();
+	await showBarcode(page, '5000000000005');
 
 	await page.getByRole('button', { name: /I know who owns this/ }).click();
 	await page.getByRole('combobox', { name: /owner/i }).fill('Nestlé');
@@ -60,7 +58,7 @@ test.fixme('a poor score suggests a better-rated alternative', async ({ page }) 
 
 // Roadmap: trips reset after a 4h gap and are then gone for good.
 test.fixme('past trips are kept and can be reviewed', async ({ page }) => {
-	await page.goto('/shopping');
+	await openScanner(page);
 	await seedTrip(page, ['nestle', 'coop']);
 	await page.evaluate(() => {
 		const old = Date.now() - 5 * 60 * 60 * 1000;
@@ -70,6 +68,8 @@ test.fixme('past trips are kept and can be reviewed', async ({ page }) => {
 		);
 	});
 	await page.reload();
+	await page.getByRole('button', { name: 'Scan a barcode', exact: true }).click();
+	await page.getByRole('button', { name: 'This trip' }).click();
 
 	await page.getByRole('link', { name: /past trips/i }).click();
 	await expect(page.getByText('Migros')).toBeVisible();
@@ -84,9 +84,11 @@ test.fixme('an old flag is visibly aged and weighs less', async ({ page }) => {
 });
 
 test.fixme('a trip can be shared or exported', async ({ page }) => {
-	await page.goto('/shopping');
+	await openScanner(page);
 	await seedTrip(page, ['nestle', 'coop']);
 	await page.reload();
+	await page.getByRole('button', { name: 'Scan a barcode', exact: true }).click();
+	await page.getByRole('button', { name: 'This trip' }).click();
 	await expect(page.getByRole('button', { name: /share|export/i })).toBeVisible();
 });
 

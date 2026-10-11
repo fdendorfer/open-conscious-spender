@@ -37,7 +37,7 @@ test.describe('branding assets', () => {
 
 	test('every page carries a distinct title', async ({ page }) => {
 		const seen: string[] = [];
-		for (const path of ['/', '/companies', '/scoring', '/shopping', '/settings']) {
+		for (const path of ['/', '/companies', '/scoring', '/settings']) {
 			await page.goto(path);
 			seen.push(await page.title());
 		}

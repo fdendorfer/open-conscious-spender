@@ -164,8 +164,7 @@
 			return;
 		}
 		shoppingMode.enable();
-		if (shoppingMode.introSeen) scanner.open();
-		else goto(resolve('/shopping'));
+		scanner.open();
 	}
 
 	function searchFromScanner() {

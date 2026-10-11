@@ -74,3 +74,91 @@ export async function enableShoppingMode(page: Page) {
 export async function waitForDataset(page: Page) {
 	await page.getByRole('main').getByRole('combobox').waitFor({ state: 'visible' });
 }
+
+/**
+ * Replaces the camera with a canvas stream, so scans run through the real
+ * BarcodeDetector path. Call before navigating; show codes with {@link showBarcode}.
+ */
+export async function installFakeCamera(page: Page) {
+	await page.addInitScript(() => {
+		const L = [
+			'0001101',
+			'0011001',
+			'0010011',
+			'0111101',
+			'0100011',
+			'0110001',
+			'0101111',
+			'0111011',
+			'0110111',
+			'0001011'
+		];
+		const PARITY = [
+			'LLLLLL',
+			'LLGLGG',
+			'LLGGLG',
+			'LLGGGL',
+			'LGLLGG',
+			'LGGLLG',
+			'LGGGLL',
+			'LGLGLG',
+			'LGLGGL',
+			'LGGLGL'
+		];
+		const R = L.map((code) => [...code].map((bit) => (bit === '0' ? '1' : '0')).join(''));
+		const G = R.map((code) => [...code].reverse().join(''));
+
+		const canvas = document.createElement('canvas');
+		canvas.width = 640;
+		canvas.height = 480;
+		const ctx = canvas.getContext('2d')!;
+		let bits = '';
+
+		function draw() {
+			ctx.fillStyle = '#fff';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			ctx.fillStyle = '#000';
+			const module = 4;
+			const left = (canvas.width - bits.length * module) / 2;
+			[...bits].forEach((bit, i) => {
+				if (bit === '1') ctx.fillRect(left + i * module, 140, module, 200);
+			});
+		}
+		// captureStream only emits frames when the canvas changes.
+		setInterval(draw, 100);
+
+		(window as unknown as { __showBarcode: (gtin: string) => void }).__showBarcode = (gtin) => {
+			const d = [...gtin].map(Number);
+			const leftHalf = d
+				.slice(1, 7)
+				.map((n, i) => (PARITY[d[0]][i] === 'L' ? L[n] : G[n]))
+				.join('');
+			const rightHalf = d
+				.slice(7)
+				.map((n) => R[n])
+				.join('');
+			bits = '101' + leftHalf + '01010' + rightHalf + '101';
+		};
+
+		const stream = canvas.captureStream(10);
+		navigator.mediaDevices.getUserMedia = async () => stream;
+	});
+}
+
+/** Puts an EAN-13 barcode in front of the fake camera. */
+export async function showBarcode(page: Page, gtin: string) {
+	await page.evaluate((code) => {
+		(window as unknown as { __showBarcode: (gtin: string) => void }).__showBarcode(code);
+	}, gtin);
+}
+
+/** Starts shopping mode with the intro already seen and waits for the camera to be scanning. */
+export async function openScanner(page: Page) {
+	await installFakeCamera(page);
+	await page.goto('/');
+	await enableShoppingMode(page);
+	await page.reload();
+	await waitForDataset(page);
+	await page.getByRole('button', { name: 'Scan a barcode', exact: true }).click();
+	await page.getByText('Point at a product barcode').waitFor();
+}

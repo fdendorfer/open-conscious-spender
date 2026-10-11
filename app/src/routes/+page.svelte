@@ -21,6 +21,8 @@
 		type BrandRequestResult
 	} from '$lib/contribute';
 	import { pageTitle, SITE_FULL_NAME } from '$lib/seo';
+	import { shoppingMode } from '$lib/shoppingMode.svelte';
+	import { scanner } from '$lib/scannerBus.svelte';
 
 	type Phase =
 		| 'loading'
@@ -199,9 +201,12 @@
 		{/if}
 
 		{#if phase === 'loading' || phase === 'browsing'}
-			<a
-				class="flex items-center gap-3 rounded-2xl border border-gray-200 p-4 transition-colors hover:border-gray-400 dark:border-zinc-700 dark:hover:border-zinc-600"
-				href={resolve('/shopping')}
+			<button
+				class="flex cursor-pointer items-center gap-3 rounded-2xl border border-gray-200 p-4 text-left transition-colors hover:border-gray-400 dark:border-zinc-700 dark:hover:border-zinc-600"
+				onclick={() => {
+					shoppingMode.enable();
+					scanner.open();
+				}}
 			>
 				<span
 					class="shrink-0 rounded-xl bg-primary p-2 text-white dark:bg-zinc-100 dark:text-zinc-900"
@@ -216,7 +221,7 @@
 						Shopping mode makes the camera your search bar — scan a barcode, glance, move on.
 					</span>
 				</span>
-			</a>
+			</button>
 		{/if}
 
 		{#if phase === 'looking-up'}
