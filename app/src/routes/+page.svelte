@@ -165,7 +165,12 @@
 
 	<div class="flex flex-col gap-3">
 		{#if phase === 'loading'}
-			<p class="text-sm text-gray-500 dark:text-zinc-300">Loading dataset…</p>
+			<!-- Same box as the search input, so the swap does not shift the page. -->
+			<div
+				class="rounded-xl border border-gray-300 px-3 py-2 text-gray-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+			>
+				Loading dataset…
+			</div>
 		{/if}
 
 		{#if phase === 'load-failed'}
@@ -191,7 +196,9 @@
 					</div>
 				{/snippet}
 			</CompanySearch>
+		{/if}
 
+		{#if phase === 'loading' || phase === 'browsing'}
 			<a
 				class="flex items-center gap-3 rounded-2xl border border-gray-200 p-4 transition-colors hover:border-gray-400 dark:border-zinc-700 dark:hover:border-zinc-600"
 				href={resolve('/shopping')}

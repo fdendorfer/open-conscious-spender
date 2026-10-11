@@ -79,7 +79,7 @@
 			{/each}
 		</ul>
 	</section>
-{:else if dataset}
+{:else}
 	<section
 		class="flex flex-col gap-1 rounded-2xl border border-dashed border-gray-300 p-5 text-center dark:border-zinc-700"
 	>

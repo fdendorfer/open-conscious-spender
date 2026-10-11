@@ -23,6 +23,7 @@
 	import { theme } from '$lib/theme.svelte';
 	import { scanner } from '$lib/scannerBus.svelte';
 	import { retryPendingDrafts } from '$lib/contribute';
+	import { longPress } from '$lib/longPress';
 
 	interface BeforeInstallPromptEvent extends Event {
 		prompt(): Promise<void>;
@@ -49,6 +50,8 @@
 	let menuEl = $state<HTMLElement | undefined>(undefined);
 	// Some browsers light-dismiss the popover on pointerdown, before the click lands.
 	let menuOpenOnPress = false;
+	let tooltip = $state<{ label: string; x: number } | null>(null);
+	let tooltipTimer: ReturnType<typeof setTimeout> | undefined;
 	let searchOpen = $state(false);
 	let searchDataset = $state<Dataset | null>(null);
 	let searchComponent = $state<CompanySearch | undefined>(undefined);
@@ -81,6 +84,13 @@
 		void retryPendingDrafts();
 		window.addEventListener('online', () => void retryPendingDrafts());
 	});
+
+	/** Shows `label` above `button` in the phone pill, which has no visible text labels. */
+	function showTooltip(button: HTMLElement, label: string) {
+		tooltip = { label, x: button.offsetLeft + button.offsetWidth / 2 };
+		clearTimeout(tooltipTimer);
+		tooltipTimer = setTimeout(() => (tooltip = null), 1500);
+	}
 
 	async function installApp() {
 		if (!deferredPrompt) return;
@@ -240,8 +250,18 @@
 
 <!-- Phones get a thumb-reachable floating pill instead of the top bar. -->
 <nav
-	class="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex -translate-x-1/2 gap-1 rounded-full bg-primary p-1.5 shadow-xl shadow-black/25 sm:hidden dark:bg-zinc-100"
+	class="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex -translate-x-1/2 gap-1 rounded-full bg-primary p-1.5 shadow-xl shadow-black/25 select-none [-webkit-touch-callout:none] sm:hidden dark:bg-zinc-100"
 >
+	{#if tooltip}
+		<span
+			role="tooltip"
+			class="pointer-events-none absolute bottom-full mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white shadow-lg dark:bg-zinc-100 dark:text-zinc-900"
+			style:left="{tooltip.x}px"
+		>
+			{tooltip.label}
+		</span>
+	{/if}
+
 	<div
 		bind:this={menuEl}
 		id="nav-menu"
@@ -282,6 +302,7 @@
 		popovertarget="nav-menu"
 		aria-expanded={menuOpen}
 		aria-label="Navigation menu"
+		use:longPress={(b) => showTooltip(b, 'Open menu')}
 		onpointerdown={() => (menuOpenOnPress = isMenuOpen())}
 		onclick={onHomeClick}
 	>
@@ -291,6 +312,7 @@
 	<button
 		class="flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2.5 text-xs text-white/70 transition-colors hover:text-white dark:text-zinc-900/70 dark:hover:text-zinc-900"
 		aria-label={shoppingMode.enabled ? 'Scan a barcode' : 'Search companies'}
+		use:longPress={(b) => showTooltip(b, shoppingMode.enabled ? 'Scan barcode' : 'Search')}
 		onclick={onPrimaryAction}
 	>
 		{#if shoppingMode.enabled}
@@ -306,6 +328,8 @@
 			: 'text-white/70 hover:text-white dark:text-zinc-900/70 dark:hover:text-zinc-900'}"
 		aria-pressed={shoppingMode.enabled}
 		aria-label={shoppingMode.enabled ? 'Exit shopping mode' : 'Enter shopping mode'}
+		use:longPress={(b) =>
+			showTooltip(b, shoppingMode.enabled ? 'Exit shopping mode' : 'Enter shopping mode')}
 		onclick={toggleShoppingMode}
 	>
 		<Basket size={20} weight={shoppingMode.enabled ? 'fill' : 'regular'} />
@@ -319,6 +343,7 @@
 			? 'bg-white font-semibold text-gray-900 dark:bg-zinc-900 dark:text-zinc-100'
 			: 'text-white/70 hover:text-white dark:text-zinc-900/70 dark:hover:text-zinc-900'}"
 		aria-label="Settings"
+		use:longPress={(b) => showTooltip(b, 'Settings')}
 		aria-current={isCurrent(resolve('/settings')) ? 'page' : undefined}
 		onclick={goToSettings}
 	>

@@ -51,6 +51,20 @@
 	let companyCount = $derived(cached?.companies.length ?? meta?.companies ?? null);
 	let upToDate = $derived(!!cached && !!meta && cached.version === meta.version);
 	let latestVersion = $state<string | null | undefined>(undefined);
+	// Until the on-device check returns, the page cannot know whether data is saved.
+	let loaded = $state(false);
+
+	let datasetDetail = $derived(
+		(cached
+			? [companyCount && `${companyCount} companies`, downloadBytes && formatBytes(downloadBytes)]
+			: [
+					downloadBytes && `${formatBytes(downloadBytes)} to download`,
+					companyCount && `${companyCount} companies`
+				]
+		)
+			.filter(Boolean)
+			.join(', ')
+	);
 
 	onMount(async () => {
 		theme.hydrate();
@@ -70,6 +84,7 @@
 	async function refresh() {
 		cached = (await getCachedDataset()) ?? null;
 		storage = await readDeviceStorage();
+		loaded = true;
 		try {
 			meta = await fetchDatasetMeta();
 		} catch {
@@ -160,54 +175,68 @@
 		</p>
 
 		<ul class="flex flex-col gap-2 rounded-xl border border-gray-200 p-4 dark:border-zinc-700">
-			<li class="flex items-start gap-2 text-sm">
-				{#if cached}
-					<CheckCircle
-						size={18}
-						weight="fill"
-						class="mt-0.5 shrink-0 text-green-600 dark:text-green-400"
-					/>
-					<span class="text-gray-600 dark:text-zinc-300">
-						<span class="font-medium text-gray-900 dark:text-zinc-100">Companies data saved</span>
-						{#if companyCount}— {companyCount} companies{/if}
-						{#if downloadBytes}, {formatBytes(downloadBytes)}{/if}
-						{#if meta && !upToDate}
-							<span class="text-amber-600 dark:text-amber-400"> · update available</span>
-						{/if}
-					</span>
-				{:else}
-					<CloudArrowDown size={18} class="mt-0.5 shrink-0 text-gray-400 dark:text-zinc-400" />
-					<span class="text-gray-600 dark:text-zinc-300">
-						<span class="font-medium text-gray-900 dark:text-zinc-100"
-							>Companies data not saved</span
-						>
-						{#if downloadBytes}— {formatBytes(downloadBytes)} to download{/if}
-						{#if companyCount}, {companyCount} companies{/if}
-					</span>
-				{/if}
-			</li>
+			{#if !loaded}
+				{#each [48, 36] as width (width)}
+					<li class="flex min-h-10 items-start gap-2 sm:min-h-0" aria-hidden="true">
+						<span class="mt-0.5 size-[18px] shrink-0 rounded-full bg-gray-200 dark:bg-zinc-700"
+						></span>
+						<span
+							class="mt-1 h-3 animate-pulse rounded bg-gray-200 dark:bg-zinc-700"
+							style:width="{width}%"
+						></span>
+					</li>
+				{/each}
+				<li class="flex h-5 items-center" aria-hidden="true">
+					<span class="h-3 w-1/3 animate-pulse rounded bg-gray-200 dark:bg-zinc-700"></span>
+				</li>
+			{:else}
+				<li class="flex min-h-10 items-start gap-2 text-sm sm:min-h-0">
+					{#if cached}
+						<CheckCircle
+							size={18}
+							weight="fill"
+							class="mt-0.5 shrink-0 text-green-600 dark:text-green-400"
+						/>
+						<span class="text-gray-600 dark:text-zinc-300">
+							<span class="font-medium text-gray-900 dark:text-zinc-100">Companies data saved</span>
+							{#if datasetDetail}— {datasetDetail}{/if}
+							{#if meta && !upToDate}
+								<span class="text-amber-600 dark:text-amber-400"> · update available</span>
+							{/if}
+						</span>
+					{:else}
+						<CloudArrowDown size={18} class="mt-0.5 shrink-0 text-gray-400 dark:text-zinc-400" />
+						<span class="text-gray-600 dark:text-zinc-300">
+							<span class="font-medium text-gray-900 dark:text-zinc-100"
+								>Companies data not saved</span
+							>
+							{#if datasetDetail}— {datasetDetail}{/if}
+						</span>
+					{/if}
+				</li>
 
-			<li class="flex items-start gap-2 text-sm">
-				{#if storage?.appFilesCached}
-					<CheckCircle
-						size={18}
-						weight="fill"
-						class="mt-0.5 shrink-0 text-green-600 dark:text-green-400"
-					/>
-					<span class="font-medium text-gray-900 dark:text-zinc-100">App files saved</span>
-				{:else}
-					<WifiSlash size={18} class="mt-0.5 shrink-0 text-gray-400 dark:text-zinc-400" />
-					<span class="text-gray-600 dark:text-zinc-300">
-						<span class="font-medium text-gray-900 dark:text-zinc-100">App files not saved yet</span
-						>
-						— they are stored automatically a moment after your first visit.
-					</span>
-				{/if}
-			</li>
+				<li class="flex min-h-10 items-start gap-2 text-sm sm:min-h-0">
+					{#if storage?.appFilesCached}
+						<CheckCircle
+							size={18}
+							weight="fill"
+							class="mt-0.5 shrink-0 text-green-600 dark:text-green-400"
+						/>
+						<span class="font-medium text-gray-900 dark:text-zinc-100">App files saved</span>
+					{:else}
+						<WifiSlash size={18} class="mt-0.5 shrink-0 text-gray-400 dark:text-zinc-400" />
+						<span class="text-gray-600 dark:text-zinc-300">
+							<span class="font-medium text-gray-900 dark:text-zinc-100"
+								>App files not saved yet</span
+							>
+							— they are stored automatically a moment after your first visit.
+						</span>
+					{/if}
+				</li>
 
-			{#if storage?.usageBytes}
-				<li class="text-sm text-gray-500 dark:text-zinc-400">
-					{formatBytes(storage.usageBytes)} used on this device in total.
+				<!-- Rendered even when empty so the box keeps its height. -->
+				<li class="text-sm text-gray-500 dark:text-zinc-400" class:invisible={!storage?.usageBytes}>
+					{formatBytes(storage?.usageBytes ?? 0)} used on this device in total.
 				</li>
 			{/if}
 		</ul>
@@ -221,10 +250,13 @@
 
 		<button
 			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
-			disabled={busy !== null}
+			disabled={busy !== null || !loaded}
 			onclick={download}
 		>
-			{#if busy === 'download'}
+			{#if !loaded}
+				<!-- Keeps the button's size without claiming a state yet. -->
+				<span class="invisible">Download for offline use</span>
+			{:else if busy === 'download'}
 				<ArrowClockwise size={18} class="animate-spin" />
 				Downloading…
 			{:else}
@@ -245,7 +277,7 @@
 
 		<button
 			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-300 px-4 py-3 text-sm font-medium text-gray-900 disabled:opacity-60 dark:border-zinc-600 dark:text-zinc-100"
-			disabled={busy !== null || !cached}
+			disabled={busy !== null || !loaded || !cached}
 			onclick={removeDataset}
 		>
 			<Trash size={16} />
