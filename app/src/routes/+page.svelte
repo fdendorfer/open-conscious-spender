@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
@@ -53,6 +53,8 @@
 	let requestError = $state<string | null>(null);
 	let requestResult = $state<BrandRequestResult | null>(null);
 
+	let sending = $state(false);
+
 	onMount(async () => {
 		await load();
 	});
@@ -65,7 +67,8 @@
 			phase = 'load-failed';
 			return;
 		}
-		phase = 'browsing';
+		// A cold load of ?add= has already opened the request form; keep it.
+		phase = pendingAdd ? 'request' : 'browsing';
 	}
 
 	// The scanner and the nav bar search both hand off an unrated brand as
@@ -81,6 +84,12 @@
 		});
 	});
 
+	/** Focuses the element that replaced the control the user just activated. */
+	async function focusAfterSwap(id: string) {
+		await tick();
+		document.getElementById(id)?.focus();
+	}
+
 	function goToCompany(company: Company) {
 		goto(resolve('/brand/[slug]', { slug: company.id }));
 	}
@@ -88,6 +97,12 @@
 	function addByName(name: string) {
 		contributeName = name;
 		phase = 'request';
+		void focusAfterSwap('request-title');
+	}
+
+	function showContributeForm() {
+		phase = 'contribute';
+		void focusAfterSwap('contribute-form');
 	}
 
 	function startOver() {
@@ -102,26 +117,33 @@
 		requestError = null;
 		requestResult = null;
 		requestGtin = null;
+		void focusAfterSwap('home-title');
 	}
 
 	async function sendRequest() {
+		if (sending) return;
 		requestError = null;
 		if (!contributeName.trim()) {
 			requestError = 'A brand name is required.';
 			return;
 		}
+		sending = true;
 		try {
 			requestResult = await requestBrand(contributeName.trim(), requestGtin, requestNote);
 			phase = 'requested';
+			void focusAfterSwap('requested-message');
 		} catch (err) {
 			requestError =
 				err instanceof RateLimitedError || err instanceof SubmissionFailedError
 					? err.message
 					: 'Something went wrong sending your request.';
+		} finally {
+			sending = false;
 		}
 	}
 
 	async function submitContribution() {
+		if (sending) return;
 		contributeError = null;
 		if (!contributeName.trim() || !contributeCategory || !contributeDescription.trim()) {
 			contributeError = 'Name, category, and description are required.';
@@ -139,15 +161,19 @@
 				}
 			]
 		};
+		sending = true;
 		try {
 			const draft = await saveDraft('company', payload);
 			submittedPrUrl = await submitDraft(draft);
 			phase = 'submitted';
+			void focusAfterSwap('submitted-message');
 		} catch (err) {
 			contributeError =
 				err instanceof RateLimitedError || err instanceof SubmissionFailedError
 					? err.message
 					: 'Something went wrong submitting your contribution.';
+		} finally {
+			sending = false;
 		}
 	}
 </script>
@@ -156,9 +182,13 @@
 	<title>{pageTitle('Ethical shopping lookups')}</title>
 </svelte:head>
 
-<main class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10">
+<main
+	id="main"
+	tabindex="-1"
+	class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10 outline-none"
+>
 	<div class="flex flex-col gap-4">
-		<h1 class="text-2xl font-semibold">{SITE_FULL_NAME}</h1>
+		<h1 id="home-title" tabindex="-1" class="text-2xl font-semibold">{SITE_FULL_NAME}</h1>
 		<p class="text-gray-600 dark:text-zinc-300">
 			Search a company (or scan its barcode). See its red flags at a glance. Decide in seconds —
 			before you're stuck reading in the aisle.
@@ -225,22 +255,33 @@
 		{/if}
 
 		{#if phase === 'looking-up'}
-			<p class="text-center text-sm text-gray-500 dark:text-zinc-300">Looking up…</p>
+			<p class="text-center text-sm text-gray-500 dark:text-zinc-300" role="status">Looking up…</p>
 		{/if}
 
 		{#if phase === 'request'}
-			<form class="flex flex-col gap-3" onsubmit={(e) => (e.preventDefault(), sendRequest())}>
+			<form
+				class="flex flex-col gap-3"
+				aria-busy={sending}
+				onsubmit={(e) => (e.preventDefault(), sendRequest())}
+			>
 				<div>
-					<h2 class="text-lg font-semibold">Not rated yet</h2>
+					<h2 id="request-title" tabindex="-1" class="text-lg font-semibold">Not rated yet</h2>
 					<p class="mt-1 text-sm text-gray-600 dark:text-zinc-300">
 						Ask for this brand to be looked into. No research needed — a maintainer does the
 						sourcing. The more people ask, the sooner it gets picked up.
 					</p>
 				</div>
 				<label class="flex flex-col gap-1 text-sm">
-					Brand or company name
+					<span
+						>Brand or company name <span aria-hidden="true" class="text-red-700 dark:text-red-400"
+							>*</span
+						></span
+					>
 					<input
 						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						aria-required="true"
+						aria-invalid={requestError && !contributeName.trim() ? 'true' : undefined}
+						aria-describedby={requestError ? 'request-error' : undefined}
 						bind:value={contributeName}
 					/>
 				</label>
@@ -254,16 +295,22 @@
 				</label>
 
 				<p class="text-xs text-gray-500 dark:text-zinc-300">
+					<span aria-hidden="true">*</span> Required
+				</p>
+				<p class="text-xs text-gray-500 dark:text-zinc-300">
 					{requestsRemainingToday()} requests left today on this device.
 				</p>
 				{#if requestError}
-					<p class="text-sm text-red-600 dark:text-red-400">{requestError}</p>
+					<p id="request-error" role="alert" class="text-sm text-red-600 dark:text-red-400">
+						{requestError}
+					</p>
 				{/if}
 				<button
-					class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="rounded-xl bg-primary px-4 py-3 font-medium text-white aria-disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
 					type="submit"
+					aria-disabled={sending}
 				>
-					Request a rating
+					{sending ? 'Sending…' : 'Request a rating'}
 				</button>
 				<div
 					class="mt-1 flex flex-col items-center gap-1 border-t border-gray-200 pt-3 dark:border-zinc-700"
@@ -271,7 +318,7 @@
 					<button
 						class="px-2 py-2 text-sm text-gray-500 underline dark:text-zinc-300"
 						type="button"
-						onclick={() => (phase = 'contribute')}
+						onclick={showContributeForm}
 					>
 						I already have a source — add the details myself
 					</button>
@@ -288,7 +335,7 @@
 
 		{#if phase === 'requested' && requestResult}
 			<div class="flex flex-col gap-3">
-				<p class="text-sm text-gray-600 dark:text-zinc-300">
+				<p id="requested-message" tabindex="-1" class="text-sm text-gray-600 dark:text-zinc-300">
 					Thanks — <strong>{contributeName}</strong> is on the list.
 					{#if requestResult.requestCount > 1}
 						It's been requested {requestResult.requestCount} times now, which moves it up the queue.
@@ -311,13 +358,23 @@
 
 		{#if phase === 'contribute'}
 			<form
+				id="contribute-form"
+				tabindex="-1"
+				aria-label="Add the details yourself"
+				aria-busy={sending}
 				class="flex flex-col gap-3"
 				onsubmit={(e) => (e.preventDefault(), submitContribution())}
 			>
 				<label class="flex flex-col gap-1 text-sm">
-					Company name
+					<span
+						>Company name <span aria-hidden="true" class="text-red-700 dark:text-red-400">*</span
+						></span
+					>
 					<input
 						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						aria-required="true"
+						aria-invalid={contributeError && !contributeName.trim() ? 'true' : undefined}
+						aria-describedby={contributeError ? 'contribute-error' : undefined}
 						bind:value={contributeName}
 					/>
 				</label>
@@ -332,9 +389,15 @@
 					</select>
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
-					Flag category
+					<span
+						>Flag category <span aria-hidden="true" class="text-red-700 dark:text-red-400">*</span
+						></span
+					>
 					<select
 						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						aria-required="true"
+						aria-invalid={contributeError && !contributeCategory ? 'true' : undefined}
+						aria-describedby={contributeError ? 'contribute-error' : undefined}
 						bind:value={contributeCategory}
 					>
 						{#each dataset?.categories ?? [] as category (category.id)}
@@ -355,9 +418,15 @@
 					</select>
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
-					Description
+					<span
+						>Description <span aria-hidden="true" class="text-red-700 dark:text-red-400">*</span
+						></span
+					>
 					<textarea
 						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						aria-required="true"
+						aria-invalid={contributeError && !contributeDescription.trim() ? 'true' : undefined}
+						aria-describedby={contributeError ? 'contribute-error' : undefined}
 						bind:value={contributeDescription}></textarea>
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
@@ -369,16 +438,22 @@
 				</label>
 
 				<p class="text-xs text-gray-500 dark:text-zinc-300">
+					<span aria-hidden="true">*</span> Required
+				</p>
+				<p class="text-xs text-gray-500 dark:text-zinc-300">
 					{submissionsRemainingToday()} submissions left today on this device.
 				</p>
 				{#if contributeError}
-					<p class="text-sm text-red-600 dark:text-red-400">{contributeError}</p>
+					<p id="contribute-error" role="alert" class="text-sm text-red-600 dark:text-red-400">
+						{contributeError}
+					</p>
 				{/if}
 				<button
-					class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="rounded-xl bg-primary px-4 py-3 font-medium text-white aria-disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
 					type="submit"
+					aria-disabled={sending}
 				>
-					Submit as a pull request
+					{sending ? 'Sending…' : 'Submit as a pull request'}
 				</button>
 				<button
 					class="text-sm text-gray-500 underline dark:text-zinc-300"
@@ -391,7 +466,7 @@
 		{/if}
 
 		{#if phase === 'submitted'}
-			<p class="text-sm text-gray-600 dark:text-zinc-300">
+			<p id="submitted-message" tabindex="-1" class="text-sm text-gray-600 dark:text-zinc-300">
 				Thanks! Your contribution is up for maintainer review:
 				<a class="underline" href={submittedPrUrl} target="_blank" rel="noreferrer external"
 					>{submittedPrUrl}</a

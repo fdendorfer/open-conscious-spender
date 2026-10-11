@@ -8,7 +8,7 @@
 	class="flex flex-col items-center gap-3 rounded-2xl border border-gray-200 p-6 text-center dark:border-zinc-700"
 	role="alert"
 >
-	<WifiSlash size={28} class="text-gray-400 dark:text-zinc-400" />
+	<WifiSlash size={28} class="text-gray-500 dark:text-zinc-400" />
 	<p class="text-sm text-gray-600 dark:text-zinc-300">
 		The dataset couldn't be downloaded. Once it has loaded on this device, it stays available
 		offline.

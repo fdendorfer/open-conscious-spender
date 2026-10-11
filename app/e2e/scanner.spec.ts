@@ -110,7 +110,7 @@ test.describe('shopping mode intro', () => {
 		await waitForDataset(page);
 		await page.getByRole('button', { name: /Already in the shop/ }).click();
 
-		const intro = page.getByRole('dialog', { name: 'Shopping mode' });
+		const intro = page.getByRole('region', { name: 'Shopping mode' });
 		await expect(intro).toBeVisible();
 		await intro.getByRole('button', { name: 'Start scanning' }).click();
 		await expect(page.getByText('Point at a product barcode')).toBeVisible();
@@ -124,7 +124,7 @@ test.describe('shopping mode intro', () => {
 	test('the info button shows the intro again and returns to scanning', async ({ page }) => {
 		await openScanner(page);
 		await page.getByRole('button', { name: 'How it works' }).click();
-		const intro = page.getByRole('dialog', { name: 'Shopping mode' });
+		const intro = page.getByRole('region', { name: 'Shopping mode' });
 		await expect(intro).toBeVisible();
 
 		await intro.getByRole('button', { name: 'Back to scanning' }).click();

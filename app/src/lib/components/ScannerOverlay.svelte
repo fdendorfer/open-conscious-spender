@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import {
@@ -56,9 +56,27 @@
 
 	let panel = $state<'intro' | 'trip' | null>(shoppingMode.introSeen ? null : 'intro');
 
+	let overlayEl = $state<HTMLDivElement | undefined>(undefined);
+	let sheetEl = $state<HTMLDivElement | undefined>(undefined);
+	let statusEl = $state<HTMLParagraphElement | undefined>(undefined);
+	let closeButton = $state<HTMLButtonElement | undefined>(undefined);
+
+	/** Makes everything but the overlay inert, which also traps Tab inside it. */
+	function inertBackground(): () => void {
+		const siblings = [...(overlayEl?.parentElement?.children ?? [])].filter(
+			(el): el is HTMLElement => el !== overlayEl && el instanceof HTMLElement && !el.inert
+		);
+		for (const el of siblings) el.inert = true;
+		return () => {
+			for (const el of siblings) el.inert = false;
+		};
+	}
+
 	onMount(() => {
 		const previousOverflow = document.body.style.overflow;
 		document.body.style.overflow = 'hidden';
+		const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+		const restoreBackground = inertBackground();
 
 		void loadDataset().then((d) => (dataset = d));
 		// The intro comes first, so the camera permission prompt does not cover it.
@@ -69,7 +87,25 @@
 
 		return () => {
 			document.body.style.overflow = previousOverflow;
+			restoreBackground();
+			// Search by name opens its own dialog; focus belongs there, not on the opener.
+			if (opener?.isConnected && !document.querySelector('dialog[open]')) opener.focus();
 		};
+	});
+
+	// Moves focus to whatever replaced the previous view, so it is read out and Tab starts there.
+	let view = $derived(panel ?? (phase === 'found' || phase === 'miss' ? phase : 'camera'));
+	$effect(() => {
+		void view;
+		void tick().then(() => {
+			const heading = sheetEl?.querySelector<HTMLElement>('h2');
+			if (heading) {
+				heading.tabIndex = -1;
+				heading.focus();
+			} else if (view === 'camera') {
+				(statusEl ?? closeButton)?.focus();
+			}
+		});
 	});
 
 	onDestroy(() => {
@@ -193,7 +229,13 @@
 	}}
 />
 
-<div class="fixed inset-0 z-[70] flex flex-col bg-gray-950 text-white">
+<div
+	bind:this={overlayEl}
+	class="fixed inset-0 z-[70] flex flex-col bg-gray-950 text-white"
+	role="dialog"
+	aria-modal="true"
+	aria-label="Barcode scanner"
+>
 	<header class="flex shrink-0 items-center gap-3 px-4 py-3">
 		<span class="mr-auto flex items-center gap-2 text-sm font-medium">
 			<Barcode size={20} />
@@ -216,6 +258,7 @@
 		<button
 			class="cursor-pointer rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white"
 			aria-label="Close camera"
+			bind:this={closeButton}
 			onclick={onClose}
 		>
 			<X size={22} />
@@ -252,17 +295,20 @@
 		{/if}
 
 		{#if cameraError}
-			<p class="relative max-w-xs px-6 text-center text-sm text-white/80">{cameraError}</p>
+			<p role="alert" class="relative max-w-xs px-6 text-center text-sm text-white/80">
+				{cameraError}
+			</p>
 		{/if}
 	</div>
 
 	<div class="shrink-0">
 		{#if sheetOpen}
 			<div
+				bind:this={sheetEl}
 				class="max-h-[70vh] overflow-y-auto rounded-t-2xl bg-white text-gray-900 dark:bg-zinc-900 dark:text-zinc-100"
 			>
 				{#if panel === 'intro'}
-					<div class="flex flex-col gap-5 p-5" role="dialog" aria-labelledby="shopping-intro-title">
+					<section class="flex flex-col gap-5 p-5" aria-labelledby="shopping-intro-title">
 						<div>
 							<h2 id="shopping-intro-title" class="text-xl font-semibold">Shopping mode</h2>
 							<p class="mt-1 text-sm text-gray-600 dark:text-zinc-300">
@@ -294,7 +340,7 @@
 						>
 							{shoppingMode.introSeen ? 'Back to scanning' : 'Start scanning'}
 						</button>
-					</div>
+					</section>
 				{:else if panel === 'trip'}
 					<div class="flex flex-col gap-3 p-4">
 						<TripSummary />
@@ -363,7 +409,12 @@
 			</div>
 		{:else}
 			<div class="flex flex-col gap-3 px-4 pt-2 pb-5">
-				<p class="text-center text-sm text-white/70">
+				<p
+					bind:this={statusEl}
+					role="status"
+					tabindex="-1"
+					class="text-center text-sm text-white/70 outline-none"
+				>
 					{#if phase === 'looking-up'}
 						Looking up…
 					{:else if phase === 'starting'}

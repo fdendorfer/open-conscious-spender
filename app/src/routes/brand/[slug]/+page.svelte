@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { loadDataset, findCompanyById, type Dataset } from '$lib/dataset';
 	import {
 		saveDraft,
@@ -39,6 +39,8 @@
 	let reportError = $state<string | null>(null);
 	let reportIssueUrl = $state<string | null>(null);
 
+	let sending = $state(false);
+
 	onMount(async () => {
 		await load();
 	});
@@ -68,27 +70,40 @@
 		reportIssueUrl = null;
 	});
 
+	/** Focuses the element that replaced the control the user just activated. */
+	async function focusAfterSwap(id: string) {
+		await tick();
+		document.getElementById(id)?.focus();
+	}
+
 	async function submitReport() {
+		if (sending) return;
 		reportError = null;
 		if (!company) return;
 		if (!reportNote.trim()) {
 			reportError = 'Tell us what looks wrong.';
 			return;
 		}
+		sending = true;
 		try {
 			reportIssueUrl = await reportInaccuracy(company.id, reportNote);
+			void focusAfterSwap('report-thanks');
 		} catch (err) {
 			reportError = err instanceof Error ? err.message : 'Something went wrong sending this.';
+		} finally {
+			sending = false;
 		}
 	}
 
 	async function submitFlag() {
+		if (sending) return;
 		flagError = null;
 		if (!dataset || !company) return;
 		if (!flagCategory || !flagDescription.trim()) {
 			flagError = 'Category and description are required.';
 			return;
 		}
+		sending = true;
 		try {
 			const draft = await saveDraft('flag', {
 				companyId: company.id,
@@ -101,8 +116,11 @@
 				}
 			});
 			flagPrUrl = await submitDraft(draft);
+			void focusAfterSwap('flag-thanks');
 		} catch (err) {
 			flagError = err instanceof Error ? err.message : 'Something went wrong submitting this.';
+		} finally {
+			sending = false;
 		}
 	}
 </script>
@@ -111,15 +129,15 @@
 	<title>{pageTitle(company?.name ?? 'Company')}</title>
 </svelte:head>
 
-<main class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-10">
+<main id="main" tabindex="-1" class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-10 outline-none">
 	{#if !loaded}
-		<p class="text-sm text-gray-500 dark:text-zinc-300">Loading…</p>
+		<p class="text-sm text-gray-500 dark:text-zinc-300" role="status">Loading…</p>
 	{:else if loadFailed}
 		<DatasetLoadError onRetry={load} />
 	{:else if !company || !dataset}
-		<p class="text-sm text-gray-600 dark:text-zinc-300">
+		<h1 class="text-sm font-normal text-gray-600 dark:text-zinc-300">
 			No company found for "{params.slug}".
-		</p>
+		</h1>
 		<a
 			class="rounded-xl bg-primary px-4 py-3 text-center font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
 			href={resolve('/')}
@@ -133,13 +151,13 @@
 			<div class="flex flex-col items-start gap-2">
 				<button
 					class="text-sm text-gray-500 underline dark:text-zinc-300"
-					onclick={() => (showFlagForm = true)}
+					onclick={() => ((showFlagForm = true), void focusAfterSwap('flag-polarity'))}
 				>
 					Something we missed? Suggest a flag
 				</button>
 				<button
 					class="text-sm text-gray-500 underline dark:text-zinc-300"
-					onclick={() => (showReportForm = true)}
+					onclick={() => ((showReportForm = true), void focusAfterSwap('report-form'))}
 				>
 					Something here looks wrong? Report it
 				</button>
@@ -147,32 +165,52 @@
 		{/if}
 
 		{#if showReportForm && !reportIssueUrl}
-			<form class="flex flex-col gap-3" onsubmit={(e) => (e.preventDefault(), submitReport())}>
+			<form
+				id="report-form"
+				tabindex="-1"
+				aria-label="Report an inaccuracy"
+				aria-busy={sending}
+				class="flex flex-col gap-3"
+				onsubmit={(e) => (e.preventDefault(), submitReport())}
+			>
 				<label class="flex flex-col gap-1 text-sm">
-					What's inaccurate?
+					<span
+						>What's inaccurate? <span aria-hidden="true" class="text-red-700 dark:text-red-400"
+							>*</span
+						></span
+					>
 					<textarea
 						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
 						rows="4"
 						placeholder="Wrong owner, outdated flag, severity looks off…"
+						aria-required="true"
+						aria-invalid={reportError && !reportNote.trim() ? 'true' : undefined}
+						aria-describedby={reportError ? 'report-error' : undefined}
 						bind:value={reportNote}></textarea>
 				</label>
+				<p class="text-xs text-gray-500 dark:text-zinc-300">
+					<span aria-hidden="true">*</span> Required
+				</p>
 				<p class="text-xs text-gray-500 dark:text-zinc-300">
 					{requestsRemainingToday()} reports left today on this device.
 				</p>
 				{#if reportError}
-					<p class="text-sm text-red-600 dark:text-red-400">{reportError}</p>
+					<p id="report-error" role="alert" class="text-sm text-red-600 dark:text-red-400">
+						{reportError}
+					</p>
 				{/if}
 				<button
-					class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="rounded-xl bg-primary px-4 py-3 font-medium text-white aria-disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
 					type="submit"
+					aria-disabled={sending}
 				>
-					Send report
+					{sending ? 'Sending…' : 'Send report'}
 				</button>
 			</form>
 		{/if}
 
 		{#if reportIssueUrl}
-			<p class="text-sm text-gray-600 dark:text-zinc-300">
+			<p id="report-thanks" tabindex="-1" class="text-sm text-gray-600 dark:text-zinc-300">
 				Thanks — a maintainer will take a look:
 				<a class="underline" href={reportIssueUrl} target="_blank" rel="noreferrer external"
 					>{reportIssueUrl}</a
@@ -181,11 +219,16 @@
 		{/if}
 
 		{#if showFlagForm && !flagPrUrl}
-			<form class="flex flex-col gap-3" onsubmit={(e) => (e.preventDefault(), submitFlag())}>
+			<form
+				class="flex flex-col gap-3"
+				aria-busy={sending}
+				onsubmit={(e) => (e.preventDefault(), submitFlag())}
+			>
 				<label class="flex flex-col gap-1 text-sm">
 					Flag type
 					<select
 						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						id="flag-polarity"
 						bind:value={flagPolarity}
 					>
 						<option value="negative">Red flag (concern)</option>
@@ -193,9 +236,15 @@
 					</select>
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
-					Flag category
+					<span
+						>Flag category <span aria-hidden="true" class="text-red-700 dark:text-red-400">*</span
+						></span
+					>
 					<select
 						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						aria-required="true"
+						aria-invalid={flagError && !flagCategory ? 'true' : undefined}
+						aria-describedby={flagError ? 'flag-error' : undefined}
 						bind:value={flagCategory}
 					>
 						{#each dataset.categories as category (category.id)}
@@ -216,9 +265,15 @@
 					</select>
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
-					Description
+					<span
+						>Description <span aria-hidden="true" class="text-red-700 dark:text-red-400">*</span
+						></span
+					>
 					<textarea
 						class="rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600"
+						aria-required="true"
+						aria-invalid={flagError && !flagDescription.trim() ? 'true' : undefined}
+						aria-describedby={flagError ? 'flag-error' : undefined}
 						bind:value={flagDescription}></textarea>
 				</label>
 				<label class="flex flex-col gap-1 text-sm">
@@ -229,22 +284,28 @@
 					/>
 				</label>
 				<p class="text-xs text-gray-500 dark:text-zinc-300">
+					<span aria-hidden="true">*</span> Required
+				</p>
+				<p class="text-xs text-gray-500 dark:text-zinc-300">
 					{submissionsRemainingToday()} submissions left today on this device.
 				</p>
 				{#if flagError}
-					<p class="text-sm text-red-600 dark:text-red-400">{flagError}</p>
+					<p id="flag-error" role="alert" class="text-sm text-red-600 dark:text-red-400">
+						{flagError}
+					</p>
 				{/if}
 				<button
-					class="rounded-xl bg-primary px-4 py-3 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+					class="rounded-xl bg-primary px-4 py-3 font-medium text-white aria-disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
 					type="submit"
+					aria-disabled={sending}
 				>
-					Submit as a pull request
+					{sending ? 'Sending…' : 'Submit as a pull request'}
 				</button>
 			</form>
 		{/if}
 
 		{#if flagPrUrl}
-			<p class="text-sm text-gray-600 dark:text-zinc-300">
+			<p id="flag-thanks" tabindex="-1" class="text-sm text-gray-600 dark:text-zinc-300">
 				Thanks! Up for maintainer review:
 				<a class="underline" href={flagPrUrl} target="_blank" rel="noreferrer external"
 					>{flagPrUrl}</a

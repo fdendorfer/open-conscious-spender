@@ -2,20 +2,11 @@
 
 Open work, grouped by what it blocks. `docs/ROADMAP.md` holds the longer-term direction and the decisions already settled; this file is the short list of things that are unfinished, unverified, or known-broken.
 
-## Blocking a real deploy
-
-
-## Known bugs and rough edges
-
-- [ ] **`registerSW.js` 404s in `pnpm dev`.** Harmless — `vite-plugin-pwa` only emits it in a production build — but it puts a permanent error in the dev console. Enable `devOptions` if it gets annoying.
-
 ## Untested
 
-- [ ] **The real camera scan path.** Every scanner test drives the manual-barcode fallback, because headless Chromium has no camera. A decode test needs `--use-fake-device-for-media-stream` with a generated barcode frame, or a `BarcodeDetector` stub.
 - [ ] **The PR-bot Worker end to end.** `workers/pr-bot/test/` covers every route against a fake GitHub, but no test submits from the app to a deployed Worker.
-- [ ] **Rune-based stores** (`scanTrip`, `shoppingMode`, `searchHistory`, `theme`). Covered only through the browser; unit tests would need the Svelte vitest plugin.
 - [ ] **`scripts/import-wikidata.mjs`.** Verified by hand on the live API, never by a test. The three matching guards (organisation claim, country agreement, `P749`-only) deserve fixtures.
-- [ ] **Accessibility beyond the combobox.** No axe pass, no keyboard-only walk of the scanner overlay or the contribution forms.
+- [ ] **Real screen-reader pass.** Accessibility audit findings are fixed and axe is clean, but nothing has been tried with NVDA, VoiceOver or TalkBack.
 - [ ] **Lighthouse / bundle budget.** Never measured, so there is no number to regress against.
 
 ## Data

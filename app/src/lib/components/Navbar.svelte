@@ -48,6 +48,7 @@
 
 	let menuOpen = $state(false);
 	let menuEl = $state<HTMLElement | undefined>(undefined);
+	let homeButton = $state<HTMLButtonElement | undefined>(undefined);
 	// Some browsers light-dismiss the popover on pointerdown, before the click lands.
 	let menuOpenOnPress = false;
 	let tooltip = $state<{ label: string; x: number } | null>(null);
@@ -86,6 +87,16 @@
 	});
 
 	/** Shows `label` above `button` in the phone pill, which has no visible text labels. */
+	// Keyboard users get the label for as long as the icon-only button has focus.
+	function showFocusTooltip(e: FocusEvent) {
+		const button = e.target;
+		if (!(button instanceof HTMLElement) || !button.matches(':focus-visible')) return;
+		const label = button.getAttribute('aria-label');
+		if (!label) return;
+		clearTimeout(tooltipTimer);
+		tooltip = { label, x: button.offsetLeft + button.offsetWidth / 2 };
+	}
+
 	function showTooltip(button: HTMLElement, label: string) {
 		tooltip = { label, x: button.offsetLeft + button.offsetWidth / 2 };
 		clearTimeout(tooltipTimer);
@@ -103,6 +114,51 @@
 	function isMenuOpen(): boolean {
 		return menuEl?.matches(':popover-open') ?? false;
 	}
+
+	// Safari does not focus a tapped button, so focus has to be placed in the menu explicitly.
+	function onMenuToggle(e: ToggleEvent) {
+		menuOpen = e.newState === 'open';
+		if (!menuOpen) return;
+		const links = menuEl?.querySelectorAll<HTMLElement>('a, button');
+		const current = menuEl?.querySelector<HTMLElement>('[aria-current="page"]');
+		(current ?? links?.[0])?.focus();
+	}
+
+	// Tabbing out of the menu closes it, so it never stays open behind the focused element.
+	function onMenuFocusOut(e: FocusEvent) {
+		const next = e.relatedTarget;
+		if (next instanceof Node && (menuEl?.contains(next) || homeButton?.contains(next))) return;
+		closeMenu();
+	}
+
+	function onMenuKeydown(e: KeyboardEvent) {
+		const items = [...(menuEl?.querySelectorAll<HTMLElement>('a, button') ?? [])];
+		const i = items.indexOf(document.activeElement as HTMLElement);
+		const next =
+			e.key === 'ArrowDown'
+				? items[(i + 1) % items.length]
+				: e.key === 'ArrowUp'
+					? items[(i - 1 + items.length) % items.length]
+					: e.key === 'Home'
+						? items[0]
+						: e.key === 'End'
+							? items.at(-1)
+							: undefined;
+		if (!next) return;
+		e.preventDefault();
+		next.focus();
+	}
+
+	// Arrow keys move through the menu items, as in the ARIA menu-button pattern.
+	$effect(() => {
+		const el = menuEl;
+		el?.addEventListener('keydown', onMenuKeydown);
+		el?.addEventListener('focusout', onMenuFocusOut);
+		return () => {
+			el?.removeEventListener('keydown', onMenuKeydown);
+			el?.removeEventListener('focusout', onMenuFocusOut);
+		};
+	});
 
 	function closeMenu() {
 		if (isMenuOpen()) menuEl?.hidePopover();
@@ -174,6 +230,7 @@
 </script>
 
 <nav
+	aria-label="Main"
 	class="sticky top-0 z-50 hidden items-center gap-6 bg-white px-6 py-3 sm:flex dark:bg-zinc-950"
 >
 	<a
@@ -249,6 +306,9 @@
 
 <!-- Phones get a thumb-reachable floating pill instead of the top bar. -->
 <nav
+	aria-label="Main"
+	onfocusin={showFocusTooltip}
+	onfocusout={() => (tooltip = null)}
 	class="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex -translate-x-1/2 gap-1 rounded-full bg-primary p-1.5 shadow-xl shadow-black/25 select-none [-webkit-touch-callout:none] sm:hidden dark:bg-zinc-100"
 >
 	{#if tooltip}
@@ -265,12 +325,14 @@
 		bind:this={menuEl}
 		id="nav-menu"
 		popover="auto"
-		ontoggle={(e) => (menuOpen = e.newState === 'open')}
+		ontoggle={onMenuToggle}
 		class="nav-menu pop-in w-44 origin-bottom rounded-xl border border-gray-200 bg-white py-1 text-sm shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40"
 	>
 		{#each NAV_LINKS as link (link.label)}
+			<!-- Explicit tabindex: Safari's default Tab order skips links. -->
 			<a
 				href={link.href}
+				tabindex="0"
 				aria-current={isCurrent(link.href) ? 'page' : undefined}
 				class="block px-3 py-2 hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-zinc-700 dark:hover:text-zinc-100 {isCurrent(
 					link.href
@@ -299,6 +361,8 @@
 			? 'bg-white font-semibold text-gray-900 dark:bg-zinc-900 dark:text-zinc-100'
 			: 'text-white/70 hover:text-white dark:text-zinc-900/70 dark:hover:text-zinc-900'}"
 		popovertarget="nav-menu"
+		bind:this={homeButton}
+		onfocusout={onMenuFocusOut}
 		aria-expanded={menuOpen}
 		aria-label="Navigation menu"
 		use:longPress={(b) => showTooltip(b, 'Open menu')}
@@ -363,7 +427,7 @@
 	<div class="mb-3 flex items-center justify-between">
 		<span class="text-sm font-medium text-gray-900 dark:text-zinc-100">Search companies</span>
 		<button
-			class="cursor-pointer rounded p-1 text-gray-400 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+			class="cursor-pointer rounded p-1 text-gray-500 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-zinc-100"
 			aria-label="Close search"
 			onclick={closeSearch}
 		>

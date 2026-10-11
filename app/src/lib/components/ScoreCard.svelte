@@ -19,20 +19,20 @@
 	};
 
 	const BAND_TEXT: Record<Band, string> = {
-		green: 'text-green-600 dark:text-green-400',
-		yellow: 'text-yellow-600 dark:text-yellow-400',
-		red: 'text-red-600 dark:text-red-400'
+		green: 'text-green-700 dark:text-green-400',
+		yellow: 'text-yellow-700 dark:text-yellow-400',
+		red: 'text-red-700 dark:text-red-400'
 	};
 </script>
 
 <div class="flex flex-col items-center gap-1 rounded-xl p-6 text-center {BAND_SURFACE[band]}">
-	<span class="text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-zinc-300"
-		>Score</span
-	>
+	<h2 class="text-xs font-medium tracking-wide text-gray-600 uppercase dark:text-zinc-300">
+		Score
+	</h2>
 	<span class="text-6xl font-bold {BAND_TEXT[band]}">{score}</span>
 	<span class="text-sm font-medium {BAND_TEXT[band]}">{BAND_LABEL[band]}</span>
 	<!-- Score gauge -->
-	<div class="relative mt-3 w-full">
+	<div class="relative mt-3 w-full" aria-hidden="true">
 		<!-- Downward triangle marker positioned at the score -->
 		<div class="relative mb-1 h-2">
 			<div
@@ -47,7 +47,7 @@
 			<div class="flex-1 rounded-r-full bg-green-400 dark:bg-green-500"></div>
 		</div>
 		<!-- Scale labels -->
-		<div class="mt-1.5 flex justify-between text-xs text-gray-400 dark:text-zinc-400">
+		<div class="mt-1.5 flex justify-between text-xs text-gray-600 dark:text-zinc-400">
 			<span>-100</span>
 			<span>0</span>
 			<span>100</span>

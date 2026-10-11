@@ -24,9 +24,9 @@
 	};
 
 	const BAND_TEXT: Record<Band, string> = {
-		green: 'text-green-600 dark:text-green-400',
-		yellow: 'text-yellow-600 dark:text-yellow-400',
-		red: 'text-red-600 dark:text-red-400'
+		green: 'text-green-700 dark:text-green-400',
+		yellow: 'text-yellow-700 dark:text-yellow-400',
+		red: 'text-red-700 dark:text-red-400'
 	};
 
 	const BAND_LABEL: Record<Band, string> = {

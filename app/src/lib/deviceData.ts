@@ -36,7 +36,7 @@ export async function readDeviceStorage(): Promise<DeviceStorage> {
 
 /**
  * Waits for the service worker to finish precaching the app shell. Registration
- * itself happens in `registerSW.js`; this only reports whether it got there.
+ * itself happens in the root layout; this only reports whether it got there.
  */
 export async function ensureAppFilesCached(): Promise<boolean> {
 	if (!browser || !('serviceWorker' in navigator)) return false;

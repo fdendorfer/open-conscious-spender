@@ -28,7 +28,7 @@
 	<h3 class="text-sm font-medium">How the score was calculated</h3>
 
 	{#if categoryBreakdown.length === 0}
-		<p class="text-xs text-gray-400 dark:text-zinc-400">
+		<p class="text-xs text-gray-500 dark:text-zinc-400">
 			No flags recorded yet — score defaults to 0.
 		</p>
 	{:else}
@@ -39,30 +39,30 @@
 					<span class="min-w-0 truncate">{name}</span>
 					<span
 						class={net < 0
-							? 'text-red-500 dark:text-red-400'
-							: 'text-green-600 dark:text-green-400'}>{signed(net)}</span
+							? 'text-red-600 dark:text-red-400'
+							: 'text-green-700 dark:text-green-400'}>{signed(net)}</span
 					>
 				</div>
 			{/each}
 			<div class="my-0.5 border-t border-gray-100 dark:border-zinc-700"></div>
 			<div class="flex justify-between gap-4 text-gray-600 dark:text-zinc-300">
 				<span>Raw positive</span>
-				<span class="text-green-600 dark:text-green-400">{signed(rawPos)}</span>
+				<span class="text-green-700 dark:text-green-400">{signed(rawPos)}</span>
 			</div>
 			<div class="flex justify-between gap-4 text-gray-600 dark:text-zinc-300">
 				<span>Raw negative</span>
-				<span class="text-red-500 dark:text-red-400">{signed(-rawNeg)}</span>
+				<span class="text-red-600 dark:text-red-400">{signed(-rawNeg)}</span>
 			</div>
 
-			<p class="mt-2 text-gray-400 dark:text-zinc-400">Saturate with 100 × (1 − e^(−raw / K))</p>
+			<p class="mt-2 text-gray-500 dark:text-zinc-400">Saturate with 100 × (1 − e^(−raw / K))</p>
 
 			<div class="flex justify-between gap-4 text-gray-600 dark:text-zinc-300">
 				<span>Saturated positive</span>
-				<span class="text-green-600 dark:text-green-400">{signed(saturatedPos)}</span>
+				<span class="text-green-700 dark:text-green-400">{signed(saturatedPos)}</span>
 			</div>
 			<div class="flex justify-between gap-4 text-gray-600 dark:text-zinc-300">
 				<span>Saturated negative</span>
-				<span class="text-red-500 dark:text-red-400">{signed(saturatedNeg)}</span>
+				<span class="text-red-600 dark:text-red-400">{signed(saturatedNeg)}</span>
 			</div>
 			<div class="my-0.5 border-t border-gray-100 dark:border-zinc-700"></div>
 			<div class="flex justify-between gap-4 font-medium text-gray-900 dark:text-zinc-100">

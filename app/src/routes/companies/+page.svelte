@@ -52,6 +52,11 @@
 		}
 	}
 
+	function ariaSort(key: SortKey) {
+		if (sortKey !== key) return 'none';
+		return sortDir === 'asc' ? 'ascending' : 'descending';
+	}
+
 	function chevron(key: SortKey) {
 		if (sortKey !== key) return '↕';
 		return sortDir === 'asc' ? '↑' : '↓';
@@ -75,11 +80,12 @@
 	<title>{pageTitle('Ranking')}</title>
 </svelte:head>
 
-<main class="mx-auto max-w-4xl px-6 py-10">
+<main id="main" tabindex="-1" class="mx-auto max-w-4xl px-6 py-10 outline-none">
 	<h1 class="mb-6 text-2xl font-semibold">Companies reviewed</h1>
 
 	<input
-		class="mb-4 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 dark:border-zinc-700 dark:placeholder:text-zinc-400 dark:focus:border-zinc-600"
+		aria-label="Filter companies by name"
+		class="mb-4 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 focus-visible:ring-2 focus-visible:ring-gray-500 dark:border-zinc-700 dark:placeholder:text-zinc-400 dark:focus:border-zinc-600"
 		placeholder="Filter by name…"
 		bind:value={filter}
 	/>
@@ -87,7 +93,7 @@
 	{#if loadFailed}
 		<DatasetLoadError onRetry={load} />
 	{:else if !dataset}
-		<p class="text-sm text-gray-400 dark:text-zinc-400">Loading…</p>
+		<p class="text-sm text-gray-500 dark:text-zinc-400">Loading…</p>
 	{:else}
 		<div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-zinc-700">
 			<table class="w-full text-sm">
@@ -95,36 +101,44 @@
 					class="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wide text-gray-500 uppercase dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
 				>
 					<tr>
-						<th class="px-4 py-3">
+						<th class="px-4 py-3" aria-sort={ariaSort('name')}>
 							<button
 								class="flex items-center gap-1 hover:text-gray-900 dark:hover:text-zinc-100"
 								onclick={() => sortBy('name')}
 							>
-								Company <span class="text-gray-300 dark:text-zinc-500">{chevron('name')}</span>
+								Company <span class="text-gray-500 dark:text-zinc-400" aria-hidden="true"
+									>{chevron('name')}</span
+								>
 							</button>
 						</th>
-						<th class="px-4 py-3">
+						<th class="px-4 py-3" aria-sort={ariaSort('country')}>
 							<button
 								class="flex items-center gap-1 hover:text-gray-900 dark:hover:text-zinc-100"
 								onclick={() => sortBy('country')}
 							>
-								Country <span class="text-gray-300 dark:text-zinc-500">{chevron('country')}</span>
+								Country <span class="text-gray-500 dark:text-zinc-400" aria-hidden="true"
+									>{chevron('country')}</span
+								>
 							</button>
 						</th>
-						<th class="px-4 py-3">
+						<th class="px-4 py-3" aria-sort={ariaSort('score')}>
 							<button
 								class="flex items-center gap-1 hover:text-gray-900 dark:hover:text-zinc-100"
 								onclick={() => sortBy('score')}
 							>
-								Score <span class="text-gray-300 dark:text-zinc-500">{chevron('score')}</span>
+								Score <span class="text-gray-500 dark:text-zinc-400" aria-hidden="true"
+									>{chevron('score')}</span
+								>
 							</button>
 						</th>
-						<th class="px-4 py-3">
+						<th class="px-4 py-3" aria-sort={ariaSort('flags')}>
 							<button
 								class="flex items-center gap-1 hover:text-gray-900 dark:hover:text-zinc-100"
 								onclick={() => sortBy('flags')}
 							>
-								Flags <span class="text-gray-300 dark:text-zinc-500">{chevron('flags')}</span>
+								Flags <span class="text-gray-500 dark:text-zinc-400" aria-hidden="true"
+									>{chevron('flags')}</span
+								>
 							</button>
 						</th>
 					</tr>
@@ -149,7 +163,7 @@
 					{/each}
 					{#if rows.length === 0}
 						<tr>
-							<td class="px-4 py-6 text-center text-gray-400 dark:text-zinc-400" colspan="4"
+							<td class="px-4 py-6 text-center text-gray-500 dark:text-zinc-400" colspan="4"
 								>No companies match your filter.</td
 							>
 						</tr>
@@ -157,7 +171,7 @@
 				</tbody>
 			</table>
 		</div>
-		<p class="mt-3 text-xs text-gray-400 dark:text-zinc-400">
+		<p class="mt-3 text-xs text-gray-500 dark:text-zinc-400" aria-live="polite">
 			{rows.length} of {dataset.companies.length} companies
 		</p>
 	{/if}

@@ -22,16 +22,16 @@
 			emptyText: 'No red flags recorded.',
 			headingColor: 'text-red-600 dark:text-red-400',
 			borderColor: 'border-red-100 dark:border-red-900/50',
-			pointsColor: 'text-red-500 dark:text-red-400',
+			pointsColor: 'text-red-600 dark:text-red-400',
 			sign: '−',
 			idPrefix: 'r'
 		},
 		positive: {
 			label: 'Green flags',
 			emptyText: 'No green flags recorded.',
-			headingColor: 'text-green-600 dark:text-green-400',
+			headingColor: 'text-green-700 dark:text-green-400',
 			borderColor: 'border-green-100 dark:border-green-900/50',
-			pointsColor: 'text-green-600 dark:text-green-400',
+			pointsColor: 'text-green-700 dark:text-green-400',
 			sign: '+',
 			idPrefix: 'g'
 		}
@@ -104,11 +104,11 @@
 <div class="flex flex-col gap-3">
 	<h2 class="font-medium {config.headingColor}">
 		{config.label}
-		<span class="ml-1 text-sm font-normal text-gray-400 dark:text-zinc-400">({rows.length})</span>
+		<span class="ml-1 text-sm font-normal text-gray-500 dark:text-zinc-400">({rows.length})</span>
 	</h2>
 
 	{#if rows.length === 0}
-		<p class="text-sm text-gray-400 dark:text-zinc-400">{config.emptyText}</p>
+		<p class="text-sm text-gray-500 dark:text-zinc-400">{config.emptyText}</p>
 	{:else}
 		{#each rows as { flag, category, points, Icon }, i (flag)}
 			{@const pid = `${companyId}-${config.idPrefix}${i}`}
@@ -120,9 +120,9 @@
 						{flag.severity}
 					</span>
 					{#if flag.status === 'sourced'}
-						<span class="text-xs text-green-600 dark:text-green-400">✓ Sourced</span>
+						<span class="text-xs text-green-700 dark:text-green-400">✓ Sourced</span>
 					{:else}
-						<span class="text-xs text-gray-400 dark:text-zinc-400">○ Unverified</span>
+						<span class="text-xs text-gray-500 dark:text-zinc-400">○ Unverified</span>
 					{/if}
 					<span class="ml-auto flex items-center gap-1.5">
 						<span class="font-mono text-xs {config.pointsColor}"
@@ -130,8 +130,8 @@
 						>
 						<button
 							popovertarget={pid}
-							class="-m-2.5 p-2.5 text-xs text-gray-300 hover:text-gray-500 dark:text-zinc-500 dark:hover:text-zinc-300"
-							aria-label="Scoring details">ⓘ</button
+							class="-m-2.5 p-2.5 text-xs text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-300"
+							aria-label="Scoring details for {category?.name ?? flag.category}">ⓘ</button
 						>
 					</span>
 				</div>
@@ -146,7 +146,7 @@
 					>
 				{/if}
 				{#if flag.dateAdded}
-					<span class="text-xs text-gray-400 dark:text-zinc-400">Added {flag.dateAdded}</span>
+					<span class="text-xs text-gray-500 dark:text-zinc-400">Added {flag.dateAdded}</span>
 				{/if}
 
 				<!-- Popover shell (transparent, anchor-positioned) wraps the visible card -->

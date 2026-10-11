@@ -25,6 +25,9 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# vite-plugin-pwa dev service worker
+/dev-dist
+
 # Playwright
 /test-results
 /playwright-report

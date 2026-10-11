@@ -34,10 +34,13 @@ export default defineConfig({
 		}),
 		SvelteKitPWA({
 			registerType: 'autoUpdate',
-			// Absolute, so registerSW.js does not resolve sw.js against the current
+			// Registered by the root layout, so dev and build share one path.
+			injectRegister: false,
+			// Absolute, so sw.js is never resolved against the current
 			// document (on /brand/x that asked for /brand/sw.js and got the SPA fallback HTML).
 			base: '/',
 			scope: '/',
+			devOptions: { enabled: true, navigateFallback: '/shell' },
 			manifest: {
 				name: 'Open Conscious Spender',
 				short_name: 'OCS',
@@ -52,6 +55,9 @@ export default defineConfig({
 				]
 			},
 			workbox: {
+				// Implied by autoUpdate only while injectRegister is on, so spelled out.
+				skipWaiting: true,
+				clientsClaim: true,
 				// full dataset bundle is fetched by the app at runtime, not part of the build output,
 				// so it needs its own runtime caching rule once data/dist/ is served
 				globPatterns: ['**/*.{js,css,html,svg,png,ico}'],

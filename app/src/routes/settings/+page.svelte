@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { version } from '$app/environment';
 	import {
 		ArrowClockwise,
@@ -46,6 +46,16 @@
 	let busy = $state<Busy | null>(null);
 	let error = $state<string | null>(null);
 	let confirmingClearAll = $state(false);
+	let clearedAll = $state(false);
+	let clearAllButton = $state<HTMLButtonElement | undefined>(undefined);
+	let cancelClearButton = $state<HTMLButtonElement | undefined>(undefined);
+
+	async function setConfirmingClearAll(open: boolean) {
+		confirmingClearAll = open;
+		clearedAll = false;
+		await tick();
+		(open ? cancelClearButton : clearAllButton)?.focus();
+	}
 
 	let downloadBytes = $derived(meta?.bytes ?? null);
 	let companyCount = $derived(cached?.companies.length ?? meta?.companies ?? null);
@@ -133,15 +143,20 @@
 		shoppingMode.hydrate();
 		searchHistory.hydrate();
 		cached = null;
-		confirmingClearAll = false;
 		storage = await readDeviceStorage();
 		busy = null;
+		await setConfirmingClearAll(false);
+		clearedAll = true;
 	}
 </script>
 
 <svelte:head><title>{pageTitle('Settings')}</title></svelte:head>
 
-<main class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10">
+<main
+	id="main"
+	tabindex="-1"
+	class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10 outline-none"
+>
 	<h1 class="text-2xl font-semibold">Settings</h1>
 
 	<section class="flex flex-col gap-3">
@@ -185,13 +200,14 @@
 						<span class="mt-0.5 size-[18px] shrink-0 rounded-full bg-gray-200 dark:bg-zinc-700"
 						></span>
 						<span
-							class="mt-1 h-3 animate-pulse rounded bg-gray-200 dark:bg-zinc-700"
+							class="mt-1 h-3 rounded bg-gray-200 motion-safe:animate-pulse dark:bg-zinc-700"
 							style:width="{width}%"
 						></span>
 					</li>
 				{/each}
 				<li class="flex h-5 items-center" aria-hidden="true">
-					<span class="h-3 w-1/3 animate-pulse rounded bg-gray-200 dark:bg-zinc-700"></span>
+					<span class="h-3 w-1/3 rounded bg-gray-200 motion-safe:animate-pulse dark:bg-zinc-700"
+					></span>
 				</li>
 			{:else}
 				<li class="flex min-h-10 items-start gap-2 text-sm sm:min-h-0">
@@ -209,7 +225,7 @@
 							{/if}
 						</span>
 					{:else}
-						<CloudArrowDown size={18} class="mt-0.5 shrink-0 text-gray-400 dark:text-zinc-400" />
+						<CloudArrowDown size={18} class="mt-0.5 shrink-0 text-gray-500 dark:text-zinc-400" />
 						<span class="text-gray-600 dark:text-zinc-300">
 							<span class="font-medium text-gray-900 dark:text-zinc-100"
 								>Companies data not saved</span
@@ -228,7 +244,7 @@
 						/>
 						<span class="font-medium text-gray-900 dark:text-zinc-100">App files saved</span>
 					{:else}
-						<WifiSlash size={18} class="mt-0.5 shrink-0 text-gray-400 dark:text-zinc-400" />
+						<WifiSlash size={18} class="mt-0.5 shrink-0 text-gray-500 dark:text-zinc-400" />
 						<span class="text-gray-600 dark:text-zinc-300">
 							<span class="font-medium text-gray-900 dark:text-zinc-100"
 								>App files not saved yet</span
@@ -246,12 +262,19 @@
 		</ul>
 
 		{#if error}
-			<p class="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+			<p role="alert" class="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
 				<Warning size={16} />
 				{error}
 			</p>
 		{/if}
 
+		<p class="sr-only" role="status">
+			{#if busy === 'download'}
+				Downloading companies data…
+			{:else if clearedAll}
+				Everything on this device was cleared.
+			{/if}
+		</p>
 		<button
 			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
 			disabled={busy !== null || !loaded || !canDownload}
@@ -261,7 +284,7 @@
 				<!-- Keeps the button's size without claiming a state yet. -->
 				<span class="invisible">Download for offline use</span>
 			{:else if busy === 'download'}
-				<ArrowClockwise size={18} class="animate-spin" />
+				<ArrowClockwise size={18} class="motion-safe:animate-spin" />
 				Downloading…
 			{:else if !canDownload}
 				<CheckCircle size={18} weight="fill" />
@@ -308,7 +331,8 @@
 					<button
 						class="cursor-pointer rounded-xl px-4 py-2 text-sm text-gray-600 dark:text-zinc-300"
 						disabled={busy !== null}
-						onclick={() => (confirmingClearAll = false)}
+						bind:this={cancelClearButton}
+						onclick={() => setConfirmingClearAll(false)}
 					>
 						Cancel
 					</button>
@@ -318,7 +342,8 @@
 			<button
 				class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-red-300 px-4 py-3 text-sm font-medium text-red-600 disabled:opacity-60 dark:border-red-900/60 dark:text-red-400"
 				disabled={busy !== null}
-				onclick={() => (confirmingClearAll = true)}
+				bind:this={clearAllButton}
+				onclick={() => setConfirmingClearAll(true)}
 			>
 				<Trash size={16} />
 				Clear everything on this device

@@ -18,8 +18,8 @@ A scan with no cached answer and no connection reports `offline` rather than "un
 
 Two constraints shape the config in `app/vite.config.ts`:
 
-- `base`/`scope` are pinned to `'/'`. The generated `registerSW.js` resolves its script path against
-  the *document*, so the default relative `./sw.js` asked for `/brand/sw.js` on a company page, got
+- `base`/`scope` are pinned to `'/'`. The registration code resolves its script path against
+  the _document_, so the default relative `./sw.js` asked for `/brand/sw.js` on a company page, got
   the SPA fallback HTML back, and failed registration on an unsupported MIME type.
 - The root route is prerendered (`app/src/routes/+layout.ts`), because workbox's `navigateFallback`
   points at `/` and can only bind a handler to a URL that is actually in the precache manifest.
@@ -38,7 +38,12 @@ The client needs a cheap way to know "is my cached dataset stale?" without re-do
 
 - A build step (`.github/workflows/build-dataset.yml`, on push to the default branch touching `data/**`) validates `data/**`, packages it into a single bundle, and writes `data/dist/meta.json`:
   ```json
-  { "version": "<git short sha>", "builtAt": "<ISO timestamp>", "bytes": 46931, "companies": 77 }
+  {
+    "version": "<git short sha>",
+    "builtAt": "<ISO timestamp>",
+    "bytes": 46931,
+    "companies": 77
+  }
   ```
   `bytes` (size of `bundle.json`) and `companies` let the settings page quote a download size
   before fetching the bundle — GitHub's raw host does not expose `Content-Length` to CORS reads.
@@ -98,9 +103,9 @@ The Worker authenticates to GitHub via a fine-grained **Personal Access Token** 
 
 Keyed on `slugify(name)` for brands and on `companyId` for corrections, stored as an HTML marker comment in the issue body (`<!-- ocs:brand-request:nestle-waters -->`) and falling back to the issue title, so issues filed by hand on GitHub still match.
 
-The key detail is *where* the key is read from. GitHub's search API is index-lagged by seconds to minutes, so two requests for the same brand a moment apart would both miss and open two issues. The Worker pages through `GET /issues?state=open&labels=…` instead, capped at 5 pages — which caps the open backlog it can see at 500 requests. Beyond that, duplicates slip through; that's the signal to start closing issues faster.
+The key detail is _where_ the key is read from. GitHub's search API is index-lagged by seconds to minutes, so two requests for the same brand a moment apart would both miss and open two issues. The Worker pages through `GET /issues?state=open&labels=…` instead, capped at 5 pages — which caps the open backlog it can see at 500 requests. Beyond that, duplicates slip through; that's the signal to start closing issues faster.
 
-The list endpoint is *less* lagged than search but not strongly consistent either, as the first live smoke test proved: a second request a few seconds behind the first didn't see the issue the first had just created, and opened a duplicate. A third request 30s later deduplicated correctly. So the collision window is a few seconds wide, and two people scanning the same new product inside it get two issues, which a maintainer then closes as duplicates.
+The list endpoint is _less_ lagged than search but not strongly consistent either, as the first live smoke test proved: a second request a few seconds behind the first didn't see the issue the first had just created, and opened a duplicate. A third request 30s later deduplicated correctly. So the collision window is a few seconds wide, and two people scanning the same new product inside it get two issues, which a maintainer then closes as duplicates.
 
 Closing that window entirely needs a strongly consistent slug → issue-number map that GitHub can't provide — a Durable Object, or a Worker KV entry written through on create (KV is itself eventually consistent, so it narrows the window rather than closing it). Untaken for now: the failure is a duplicate issue rather than lost data, and the rate is low at expected traffic.
 
@@ -120,7 +125,7 @@ Client-side, on-device: **10 PR submissions** and **30 requests** per rolling 24
 
 This is a courtesy limit, not a control — clearing storage resets it. It was chosen over a server-side limit because that needs KV or a Durable Object, and the cheaper protections matter more:
 
-- **The PAT's own budget** is the real shared resource: 5,000 REST calls/hour across *all* users of the app. A brand request spends 2-6 of them, mostly on the dedupe paging, which puts the practical ceiling near 1,000-2,500 requests/hour. The existence check deliberately goes through `raw.githubusercontent.com`, which doesn't count against it.
+- **The PAT's own budget** is the real shared resource: 5,000 REST calls/hour across _all_ users of the app. A brand request spends 2-6 of them, mostly on the dedupe paging, which puts the practical ceiling near 1,000-2,500 requests/hour. The existence check deliberately goes through `raw.githubusercontent.com`, which doesn't count against it.
 - **Cloudflare's free tier** caps the Worker at 100k requests/day.
 
 Neither is close at expected traffic. If flooding does show up, a Cloudflare WAF rate-limiting rule at the zone edge is the first thing to reach for — no code, no state. Worth checking whether the Workers rate-limiting binding fits too; it avoids a KV round trip, but confirm its current availability and limits before depending on it.

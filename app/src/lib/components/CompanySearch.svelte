@@ -18,9 +18,16 @@
 		red: 'bg-red-500 dark:bg-red-400'
 	};
 
+	const BAND_LABEL: Record<Band, string> = {
+		green: 'Low concern',
+		yellow: 'Neutral',
+		red: 'High concern'
+	};
+
 	let {
 		dataset,
 		placeholder = 'Search company name…',
+		label = 'Search companies',
 		query = $bindable(''),
 		floatResults = true,
 		onSelect,
@@ -30,6 +37,7 @@
 	}: {
 		dataset: Dataset | null;
 		placeholder?: string;
+		label?: string;
 		query?: string;
 		/** Float results over the page. Set false inside a panel that should grow instead. */
 		floatResults?: boolean;
@@ -68,8 +76,10 @@
 	let rows = $derived(searching ? results : recent);
 	let panelOpen = $derived(searching || showRecent);
 
-	function rowBand(company: Company) {
-		return dataset ? scoreCompany(company.flags, dataset.categories).band : 'green';
+	function rowScore(company: Company) {
+		return dataset
+			? scoreCompany(company.flags, dataset.categories)
+			: { score: 0, band: 'green' as Band };
 	}
 
 	function selectCompany(company: Company) {
@@ -108,6 +118,7 @@
 		bind:this={inputEl}
 		class="w-full rounded-xl border border-gray-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder:text-zinc-400"
 		{placeholder}
+		aria-label={label}
 		role="combobox"
 		aria-expanded={panelOpen}
 		aria-controls={panelOpen ? listboxId : undefined}
@@ -137,7 +148,7 @@
 			role="presentation"
 		>
 			{#if showRecent}
-				<p class="px-3 pt-2 pb-1 text-xs font-medium text-gray-400 dark:text-zinc-400">
+				<p class="px-3 pt-2 pb-1 text-xs font-medium text-gray-500 dark:text-zinc-400">
 					Recent searches
 				</p>
 			{/if}
@@ -147,6 +158,7 @@
 				     selection through aria-activedescendant, per the ARIA combobox pattern. -->
 				<ul id={listboxId} role="listbox" aria-label="Company results">
 					{#each rows as { company, matchedBrand }, i (company.id)}
+						{@const { score, band } = rowScore(company)}
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<li
 							id={optionId(i)}
@@ -158,13 +170,17 @@
 							onclick={() => selectCompany(company)}
 							onmouseenter={() => (activeIndex = i)}
 						>
-							<span class="h-2 w-2 shrink-0 rounded-full {BAND_DOT[rowBand(company)]}"></span>
+							<span class="h-2 w-2 shrink-0 rounded-full {BAND_DOT[band]}"></span>
 							{#if matchedBrand}
 								{matchedBrand}
-								<span class="text-gray-400 dark:text-zinc-400">({company.name})</span>
+								<span class="text-gray-500 dark:text-zinc-400">({company.name})</span>
 							{:else}
 								{company.name}
 							{/if}
+							<span class="ml-auto pl-2 text-sm text-gray-500 tabular-nums dark:text-zinc-400">
+								<span class="sr-only">{BAND_LABEL[band]}, score</span>
+								{score}
+							</span>
 						</li>
 					{/each}
 				</ul>

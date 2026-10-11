@@ -13,8 +13,10 @@ export default defineConfig({
 	},
 	projects: [{ name: 'mobile-chrome', use: { ...devices['Pixel 7'] } }],
 	webServer: {
-		// Preview, not dev: the service worker and registerSW.js only exist in a real build.
+		// Preview, not dev: only a real build precaches the app shell.
 		command: 'pnpm build && pnpm preview',
+		// Never reachable: specs that submit route this host themselves.
+		env: { PUBLIC_PR_BOT_URL: 'https://pr-bot.test' },
 		port: 4173,
 		reuseExistingServer: !process.env.CI,
 		timeout: 180_000

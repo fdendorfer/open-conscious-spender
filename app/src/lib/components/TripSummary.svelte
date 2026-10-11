@@ -13,9 +13,9 @@
 	});
 
 	const BAND_TEXT: Record<Band, string> = {
-		green: 'text-green-600 dark:text-green-400',
-		yellow: 'text-yellow-600 dark:text-yellow-400',
-		red: 'text-red-600 dark:text-red-400'
+		green: 'text-green-700 dark:text-green-400',
+		yellow: 'text-yellow-700 dark:text-yellow-400',
+		red: 'text-red-700 dark:text-red-400'
 	};
 
 	let items = $derived(
@@ -69,7 +69,7 @@
 					</a>
 					<span class="text-sm font-semibold {BAND_TEXT[item.band]}">{item.score}</span>
 					<button
-						class="cursor-pointer rounded-full p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
+						class="cursor-pointer rounded-full p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800"
 						aria-label="Remove {item.company.name} from this trip"
 						onclick={() => scanTrip.remove(item.company.id)}
 					>
