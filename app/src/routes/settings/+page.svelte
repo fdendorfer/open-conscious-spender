@@ -50,6 +50,8 @@
 	let downloadBytes = $derived(meta?.bytes ?? null);
 	let companyCount = $derived(cached?.companies.length ?? meta?.companies ?? null);
 	let upToDate = $derived(!!cached && !!meta && cached.version === meta.version);
+	// Re-downloading an up-to-date copy only rewrites the same entry, so it is not offered.
+	let canDownload = $derived(!cached || (!!meta && !upToDate));
 	let latestVersion = $state<string | null | undefined>(undefined);
 	// Until the on-device check returns, the page cannot know whether data is saved.
 	let loaded = $state(false);
@@ -70,6 +72,8 @@
 		theme.hydrate();
 		void checkLatestVersion();
 		await refresh();
+		// On a first visit the service worker is still saving the app files when the page reads them.
+		void navigator.serviceWorker?.ready.then(async () => (storage = await readDeviceStorage()));
 	});
 
 	async function checkLatestVersion() {
@@ -102,7 +106,7 @@
 		busy = 'download';
 		error = null;
 		try {
-			cached = await downloadDataset();
+			cached = await downloadDataset(meta ?? undefined);
 			await ensureAppFilesCached();
 		} catch {
 			error = 'Download failed. Check your connection and try again.';
@@ -250,7 +254,7 @@
 
 		<button
 			class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
-			disabled={busy !== null || !loaded}
+			disabled={busy !== null || !loaded || !canDownload}
 			onclick={download}
 		>
 			{#if !loaded}
@@ -259,9 +263,12 @@
 			{:else if busy === 'download'}
 				<ArrowClockwise size={18} class="animate-spin" />
 				Downloading…
+			{:else if !canDownload}
+				<CheckCircle size={18} weight="fill" />
+				Companies data up to date
 			{:else}
 				<CloudArrowDown size={18} />
-				{cached && upToDate ? 'Download again' : 'Download for offline use'}
+				{cached ? 'Update companies data' : 'Download for offline use'}
 				{#if downloadBytes}<span class="font-normal opacity-70">({formatBytes(downloadBytes)})</span
 					>{/if}
 			{/if}
